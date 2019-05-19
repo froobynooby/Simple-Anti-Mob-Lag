@@ -1,5 +1,5 @@
 # Don't change this!
-version: 2
+version: 3
 
 
 # When the server's TPS drops below this, we will start freezing mobs.
