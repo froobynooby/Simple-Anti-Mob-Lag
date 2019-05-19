@@ -1,0 +1,5 @@
+# Should we unfreeze mobs when the chunk they are in is unloaded?
+unfreeze-on-unload: true
+
+# Should we unfreeze all the loaded mobs when the plugin shuts down?
+unfreeze-on-shutdown: true

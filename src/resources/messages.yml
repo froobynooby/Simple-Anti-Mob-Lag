@@ -1,0 +1,13 @@
+#Don't change this!
+version: 1
+
+#This will be broadcast to players with the permission 'saml.notify' if enabled in config when we begin freezing mobs.
+#Use '%TPS' to display the current TPS.
+starting-freezing-operation: '&cTPS low (%TPS). Will attempt to freeze some mobs...'
+
+#This will be broadcast to players with the permission 'saml.notify' if enabled in config when we finish freezing mobs.
+#Use '%TIME' to display the amount of time the operation took.
+#Use '%NUMBER_FROZEN' to display the number of mobs frozen in this operation.
+#Use '%TOTAL_FROZEN' to display the total number of frozen mobs currently loaded.
+#Use '%TOTAL_MOBS' to display the total number of mobs currently loaded (frozen or not).
+freezing-operation-complete: '&c%NUMBER_FROZEN mobs have been frozen in %TIMEms (%TOTAL_FROZEN/%TOTAL_MOBS now frozen).'
