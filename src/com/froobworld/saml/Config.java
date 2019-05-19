@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 public class Config {
-    private static final int CURRENT_VERSION = 2;
+    private static final int CURRENT_VERSION = 3;
 
     private Saml saml;
     private YamlConfiguration config;
@@ -33,12 +33,12 @@ public class Config {
                 Saml.logger().warning("There was a problem copying the config:");
                 config = YamlConfiguration.loadConfiguration(new BufferedReader(new InputStreamReader(saml.getResource("resources/config.yml"))));
                 e.printStackTrace();
-                Saml.logger().warning("We may still be able to run...");
+                Saml.logger().info("We may still be able to run...");
                 return;
             }
         }
         config = YamlConfiguration.loadConfiguration(configFile);
-        Saml.logger().warning("Config successfully loaded.");
+        Saml.logger().info("Config successfully loaded.");
 
         int version = config.getInt("version");
         if(version  > CURRENT_VERSION) {

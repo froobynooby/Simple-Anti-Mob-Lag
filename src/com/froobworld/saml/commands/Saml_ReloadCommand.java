@@ -13,8 +13,8 @@ public class Saml_ReloadCommand implements CommandExecutor {
     private Messages messages;
 
     public Saml_ReloadCommand(Saml saml) {
-        this.config = saml.getLwalConfig();
-        this.messages = saml.getLwalMessages();
+        this.config = saml.getSamlConfig();
+        this.messages = saml.getSamlMessages();
     }
 
 

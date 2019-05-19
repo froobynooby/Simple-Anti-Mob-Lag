@@ -2,11 +2,12 @@ package com.froobworld.saml;
 
 import com.froobworld.saml.commands.SamlCommand;
 import com.froobworld.saml.listeners.EventListener;
+import com.froobworld.saml.tasks.CacheSavingTask;
+import com.froobworld.saml.tasks.CheckCacheStartupTask;
 import com.froobworld.saml.tasks.MobFreezeTask;
+import com.froobworld.saml.tasks.UnfreezeOnShutdownTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
@@ -14,6 +15,7 @@ import java.util.logging.Logger;
 public class Saml extends JavaPlugin {
     private Config config;
     private Messages messages;
+    private MobFreezeTask mobFreezeTask;
 
     @Override
     public void onEnable() {
@@ -30,7 +32,9 @@ public class Saml extends JavaPlugin {
     }
 
     private void addTasks() {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new MobFreezeTask(this, config, messages));
+        new CheckCacheStartupTask(this);
+        this.mobFreezeTask = new MobFreezeTask(this);
+        new CacheSavingTask(this);
     }
 
     private void registerCommands() {
@@ -41,29 +45,24 @@ public class Saml extends JavaPlugin {
     }
 
     private void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(new EventListener(config), this);
+        Bukkit.getPluginManager().registerEvents(new EventListener(this), this);
     }
 
-    public Config getLwalConfig() {
+    public Config getSamlConfig() {
         return config;
     }
 
-    public Messages getLwalMessages() {
+    public Messages getSamlMessages() {
         return messages;
+    }
+
+    public MobFreezeTask getMobFreezeTask() {
+        return mobFreezeTask;
     }
 
     @Override
     public void onDisable() {
-        if(config.getBoolean("unfreeze-on-shutdown")) {
-            for(World world : Bukkit.getWorlds()) {
-                for(LivingEntity entity : world.getLivingEntities()) {
-                    if(!entity.hasAI()) {
-                        entity.setAI(true);
-                    }
-                }
-            }
-        }
-
+        new UnfreezeOnShutdownTask(this).run();
         logger().info("Successfully disabled.");
     }
 

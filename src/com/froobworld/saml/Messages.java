@@ -31,12 +31,12 @@ public class Messages {
                 Saml.logger().warning("There was a problem copying the messages file:");
                 config = YamlConfiguration.loadConfiguration(new InputStreamReader(saml.getResource("resources/messages.yml")));
                 e.printStackTrace();
-                Saml.logger().warning("We may still be able to run...");
+                Saml.logger().info("We may still be able to run...");
                 return;
             }
         }
         config = YamlConfiguration.loadConfiguration(configFile);
-        Saml.logger().warning("Messages config successfully loaded.");
+        Saml.logger().info("Messages config successfully loaded.");
 
         int version = config.getInt("version");
         if(version  > CURRENT_VERSION) {

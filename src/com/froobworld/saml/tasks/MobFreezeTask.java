@@ -1,6 +1,7 @@
 package com.froobworld.saml.tasks;
 
 import com.froobworld.saml.Config;
+import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.Messages;
 import com.froobworld.saml.utils.TpsSupplier;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Tameable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,12 +23,24 @@ public class MobFreezeTask implements Runnable {
     private Config config;
     private Messages messages;
     private TpsSupplier tpsSupplier;
+    private FrozenChunkCache frozenChunkCache;
 
-    public MobFreezeTask(Saml saml, Config config, Messages messages) {
+    public MobFreezeTask(Saml saml) {
         this.saml = saml;
-        this.config = config;
-        this.messages = messages;
+        this.config = saml.getSamlConfig();
+        this.messages = saml.getSamlMessages();
         this.tpsSupplier = new TpsSupplier(saml);
+        if(saml.getSamlConfig().getBoolean("keep-frozen-chunk-cache")) {
+            frozenChunkCache = new FrozenChunkCache(new File(saml.getDataFolder(), ".chunk-cache"), false);
+        } else {
+            frozenChunkCache = null;
+        }
+        Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this);
+    }
+
+
+    public FrozenChunkCache getFrozenChunkCache() {
+        return frozenChunkCache;
     }
 
     @Override
@@ -100,6 +114,9 @@ public class MobFreezeTask implements Runnable {
                     }
                     if(entity.hasAI()) {
                         entity.setAI(false);
+                        if(frozenChunkCache != null) {
+                            frozenChunkCache.addChunk(entity.getLocation().getChunk());
+                        }
                         numberFrozen++;
                     }
                     totalFrozen++;
@@ -146,6 +163,9 @@ public class MobFreezeTask implements Runnable {
                     for(NeighbouredEntity neighbour : neighbouredEntity.neighbours) {
                         if(neighbour.entity.hasAI()) {
                             neighbour.entity.setAI(false);
+                            if(frozenChunkCache != null) {
+                                frozenChunkCache.addChunk(neighbour.entity.getLocation().getChunk());
+                            }
                             totalFrozen++;
                             numberFrozen++;
                         }
@@ -153,7 +173,9 @@ public class MobFreezeTask implements Runnable {
                 }
             }
         }
-
+        if(frozenChunkCache != null) {
+            frozenChunkCache.saveToFile();
+        }
         long elapsedTime = System.currentTimeMillis() - startTime;
         MessageUtils.broadcastToOpsAndConsole(messages.getMessage("freezing-operation-complete")
                         .replaceAll("%TIME", "" + elapsedTime)

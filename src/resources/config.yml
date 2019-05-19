@@ -20,6 +20,20 @@ maximum-operation-time: 300
 # At most how many mobs should be unfrozen in any given operation?
 unfreeze-limit: 100
 
+# Should we keep a list of chunks containing frozen mobs in them, so we may be able to unfreeze them if the plugin doesn't shut down correctly?
+# Keep this as true if you think you'll uninstall this plugin at some point. This will allow you to unfreeze all the unfrozen in your world easily.
+keep-frozen-chunk-cache: true
+
+# Should we unfreeze mobs which were not unfrozen previously when the plugin is started?
+# Warning: this operation loads chunks and therefore can cause a lot of lag.
+unfreeze-cached-chunks-on-startup: false
+
+# Every how many ticks should we unfreeze these mobs?
+ticks-per-cached-chunk-unfreeze: 40
+
+# Do you use Paper? If so, do you want this task to run in a more efficient manner?
+use-paper-get-chunk-async: false
+
 
 # Should we only freeze mobs that are in large groups, ignoring single mobs?
 # This is good if you want to freeze large player-made farms, but don't want to freeze random monsters in the world.
