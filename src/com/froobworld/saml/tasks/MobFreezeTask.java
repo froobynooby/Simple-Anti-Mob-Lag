@@ -140,9 +140,6 @@ public class MobFreezeTask implements Runnable {
                     totalFrozen++;
                     continue;
                 }
-                if(neverFreeze.contains(entity.getType().name())) {
-                    continue;
-                }
                 if(ignoreTamed && entity instanceof Tameable && ((Tameable) entity).getOwner() != null) {
                     continue;
                 }
@@ -152,9 +149,13 @@ public class MobFreezeTask implements Runnable {
                 if(ignoreLoveMode && entity instanceof Animals && ((Animals) entity).isLoveMode()) {
                     continue;
                 }
+                if(neverFreeze.contains(entity.getType().name())) {
+                    continue;
+                }
                 NeighbouredEntity thisEntity = new NeighbouredEntity(entity);
                 neighbouredEntities.add(thisEntity);
                 if(alwaysFreeze.contains(entity.getType().name())) {
+                    thisEntity.freezeByDefault = true;
                     continue;
                 }
                 for(NeighbouredEntity otherEntity : neighbouredEntities) {
@@ -165,7 +166,7 @@ public class MobFreezeTask implements Runnable {
             }
 
             for(NeighbouredEntity neighbouredEntity : neighbouredEntities) {
-                if(neighbouredEntity.neighbours.size() > minimumSize || alwaysFreeze.contains(neighbouredEntity.entity.getType().name())) {
+                if(neighbouredEntity.neighbours.size() > minimumSize || neighbouredEntity.freezeByDefault) {
                     for(NeighbouredEntity neighbour : neighbouredEntity.neighbours) {
                         if(neighbour.entity.hasAI()) {
                             neighbour.entity.setAI(false);
@@ -193,12 +194,14 @@ public class MobFreezeTask implements Runnable {
 
     private class NeighbouredEntity {
         private LivingEntity entity;
-        private Set<NeighbouredEntity> neighbours;
+        private List<NeighbouredEntity> neighbours;
+        private boolean freezeByDefault;
 
         public NeighbouredEntity(LivingEntity entity) {
             this.entity = entity;
-            this.neighbours = new HashSet<NeighbouredEntity>();
+            this.neighbours = new ArrayList<NeighbouredEntity>();
             neighbours.add(this);
+            freezeByDefault = true;
         }
 
         public void addNeighbour(NeighbouredEntity neighbour) {
