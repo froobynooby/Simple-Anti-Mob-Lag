@@ -12,7 +12,7 @@ public class TpsSupplier implements Supplier<Double> {
         useNms = NmsUtils.getTPS() != null;
         if(!useNms) {
             Saml.logger().info("Could not access NMS for TPS. We will have to use a less accurate approximation.");
-            tpsCalculator = new TpsCalculator(60, saml);
+            tpsCalculator = new TpsCalculator(1200, saml);
         }
     }
 
