@@ -1,6 +1,5 @@
 package com.froobworld.saml.listeners;
 
-import com.froobworld.saml.Config;
 import com.froobworld.saml.Saml;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

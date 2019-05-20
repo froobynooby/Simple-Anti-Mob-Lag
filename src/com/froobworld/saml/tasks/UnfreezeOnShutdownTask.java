@@ -1,6 +1,5 @@
 package com.froobworld.saml.tasks;
 
-import com.froobworld.saml.Config;
 import com.froobworld.saml.Saml;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -23,9 +22,6 @@ public class UnfreezeOnShutdownTask implements Runnable {
                         entity.setAI(true);
                     }
                 }
-            }
-            if(saml.getMobFreezeTask().getFrozenChunkCache() != null) {
-                saml.getMobFreezeTask().getFrozenChunkCache().deleteCacheFile();
             }
         }
     }

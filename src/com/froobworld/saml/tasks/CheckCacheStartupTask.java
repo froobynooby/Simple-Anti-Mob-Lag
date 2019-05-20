@@ -20,7 +20,7 @@ public class CheckCacheStartupTask implements Runnable {
 
         File chunkCacheFile = new File(saml.getDataFolder(), ".chunk-cache");
         if(chunkCacheFile.exists()) {
-            if(!saml.getSamlConfig().getBoolean("unfreeze-on-shutdown")) {
+            if(saml.getSamlConfig().getBoolean("unfreeze-on-shutdown") && saml.getSamlConfig().getBoolean("unfreeze-on-unload")) {
                 Saml.logger().info("There is an old chunk cache file. Perhaps the server didn't shut down correctly?");
             }
             if(!chunkCacheDirectory.exists()) {
@@ -34,7 +34,7 @@ public class CheckCacheStartupTask implements Runnable {
                 if(chunkCacheDirectory.listFiles().length > 0) {
                     Saml.logger().info("We will now start unfreezing chunks from the old cache files.");
                     for (File file : chunkCacheDirectory.listFiles()) {
-                        new UnfreezeChunksTask(new FrozenChunkCache(file, true), saml);
+                        new UnfreezeChunksTask(new FrozenChunkCache(file, saml, true), saml);
                     }
                 }
             }

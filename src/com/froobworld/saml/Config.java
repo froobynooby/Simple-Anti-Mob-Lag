@@ -1,6 +1,8 @@
 package com.froobworld.saml;
 
+import com.froobworld.saml.events.SamlConfigReloadEvent;
 import com.froobworld.saml.utils.ConfigUpdater;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.BufferedReader;
@@ -39,6 +41,7 @@ public class Config {
         }
         config = YamlConfiguration.loadConfiguration(configFile);
         Saml.logger().info("Config successfully loaded.");
+        Bukkit.getPluginManager().callEvent(new SamlConfigReloadEvent(this));
 
         int version = config.getInt("version");
         if(version  > CURRENT_VERSION) {

@@ -31,7 +31,7 @@ public class MobFreezeTask implements Runnable {
         this.messages = saml.getSamlMessages();
         this.tpsSupplier = new TpsSupplier(saml);
         if(saml.getSamlConfig().getBoolean("keep-frozen-chunk-cache")) {
-            frozenChunkCache = new FrozenChunkCache(new File(saml.getDataFolder(), ".chunk-cache"), false);
+            createChunkCacheIfNotExist();
         } else {
             frozenChunkCache = null;
         }
@@ -41,6 +41,12 @@ public class MobFreezeTask implements Runnable {
 
     public FrozenChunkCache getFrozenChunkCache() {
         return frozenChunkCache;
+    }
+
+    public void createChunkCacheIfNotExist() {
+        if(frozenChunkCache == null) {
+            frozenChunkCache = new FrozenChunkCache(new File(saml.getDataFolder(), ".chunk-cache"), saml, false);
+        }
     }
 
     @Override

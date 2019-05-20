@@ -16,16 +16,26 @@ public class FrozenChunkCache {
     private Set<ChunkCoordinates> frozenChunkCoordinates;
     private File cacheFile;
     private boolean unsavedChanges;
+    private boolean shouldSaveOnExit;
 
-    public FrozenChunkCache(File cacheFile, boolean loadFromFile) {
+    public FrozenChunkCache(File cacheFile, Saml saml, boolean loadFromFile) {
         this.cacheFile = cacheFile;
         frozenChunkCoordinates = new HashSet<ChunkCoordinates>();
         if(loadFromFile) {
             loadFromFile();
         }
         unsavedChanges = false;
+        shouldSaveOnExit = !saml.getSamlConfig().getBoolean("unfreeze-on-shutdown") || !saml.getSamlConfig().getBoolean("unfreeze-on-unload");
     }
 
+
+    public boolean shouldSaveOnExit() {
+        return shouldSaveOnExit;
+    }
+
+    public void setShouldSaveOnExit() {
+        shouldSaveOnExit = true;
+    }
 
     private void loadFromFile() {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(cacheFile);

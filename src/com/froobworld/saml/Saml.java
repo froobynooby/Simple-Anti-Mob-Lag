@@ -2,10 +2,8 @@ package com.froobworld.saml;
 
 import com.froobworld.saml.commands.SamlCommand;
 import com.froobworld.saml.listeners.EventListener;
-import com.froobworld.saml.tasks.CacheSavingTask;
-import com.froobworld.saml.tasks.CheckCacheStartupTask;
-import com.froobworld.saml.tasks.MobFreezeTask;
-import com.froobworld.saml.tasks.UnfreezeOnShutdownTask;
+import com.froobworld.saml.listeners.SamlListener;
+import com.froobworld.saml.tasks.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,6 +44,7 @@ public class Saml extends JavaPlugin {
 
     private void registerListeners() {
         Bukkit.getPluginManager().registerEvents(new EventListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new SamlListener(this), this);
     }
 
     public Config getSamlConfig() {
@@ -63,6 +62,7 @@ public class Saml extends JavaPlugin {
     @Override
     public void onDisable() {
         new UnfreezeOnShutdownTask(this).run();
+        new HandleCacheOnShutdownTask(this).run();
         logger().info("Successfully disabled.");
     }
 
