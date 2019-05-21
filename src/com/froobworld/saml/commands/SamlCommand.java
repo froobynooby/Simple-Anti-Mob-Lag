@@ -26,11 +26,13 @@ public class SamlCommand implements CommandExecutor {
             return false;
         }
         if(args.length > 0) {
-            if(args[0].equalsIgnoreCase("reload")) {
+            if(args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
                 return new Saml_ReloadCommand(saml).onCommand(sender, command, cl, args);
             }
         }
-        sender.sendMessage(ChatColor.YELLOW + "SAML " + saml.getDescription().getVersion());
+        sender.sendMessage(ChatColor.YELLOW + "Simple Anti-Mob Lag " + saml.getDescription().getVersion());
+        sender.sendMessage("www.spigotmc.org/resources/simple-anti-mob-lag.67484/");
+        sender.sendMessage("");
         sender.sendMessage("/" + cl + " reload - Reload SAML configuration.");
         return true;
     }
@@ -41,6 +43,7 @@ public class SamlCommand implements CommandExecutor {
             List<String> completions = new ArrayList<String>();
             if(args.length == 1) {
                 completions.add("reload");
+                completions.add("rl");
             }
 
             return StringUtil.copyPartialMatches(args[args.length - 1], completions, new ArrayList<String>());
