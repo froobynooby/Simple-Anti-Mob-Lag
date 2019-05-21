@@ -156,6 +156,7 @@ public class MobFreezeTask implements Runnable {
                 neighbouredEntities.add(thisEntity);
                 if(alwaysFreeze.contains(entity.getType().name())) {
                     thisEntity.freezeByDefault = true;
+                    thisEntity.addNeighbour(thisEntity);
                     continue;
                 }
                 for(NeighbouredEntity otherEntity : neighbouredEntities) {
@@ -201,7 +202,7 @@ public class MobFreezeTask implements Runnable {
             this.entity = entity;
             this.neighbours = new ArrayList<NeighbouredEntity>();
             neighbours.add(this);
-            freezeByDefault = true;
+            freezeByDefault = false;
         }
 
         public void addNeighbour(NeighbouredEntity neighbour) {
