@@ -5,6 +5,8 @@ import com.froobworld.saml.Saml;
 import org.bukkit.util.FileUtil;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CheckCacheStartupTask implements Runnable {
     private Saml saml;
@@ -33,9 +35,11 @@ public class CheckCacheStartupTask implements Runnable {
             if (chunkCacheDirectory.exists()) {
                 if(chunkCacheDirectory.listFiles().length > 0) {
                     Saml.logger().info("We will now start unfreezing chunks from the old cache files.");
+                    List<FrozenChunkCache> frozenChunkCaches = new ArrayList<FrozenChunkCache>();
                     for (File file : chunkCacheDirectory.listFiles()) {
-                        new UnfreezeChunksTask(new FrozenChunkCache(file, saml, true), saml);
+                        frozenChunkCaches.add(new FrozenChunkCache(file, saml, true));
                     }
+                    new UnfreezeChunksTask(frozenChunkCaches, saml);
                 }
             }
         }

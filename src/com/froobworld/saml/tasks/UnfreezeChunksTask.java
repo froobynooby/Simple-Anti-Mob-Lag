@@ -13,12 +13,15 @@ import java.util.Iterator;
 import java.util.List;
 
 public class UnfreezeChunksTask implements Runnable {
-    private FrozenChunkCache frozenChunkCache;
+    private List<FrozenChunkCache> frozenChunkCaches;
+    private FrozenChunkCache currentCache;
+    private int place;
+    private int lastCompleted;
     private Saml saml;
     private boolean paper;
 
-    public UnfreezeChunksTask(FrozenChunkCache frozenChunkCache, Saml saml) {
-        this.frozenChunkCache = frozenChunkCache;
+    public UnfreezeChunksTask(List<FrozenChunkCache> frozenChunkCaches, Saml saml) {
+        this.frozenChunkCaches = frozenChunkCaches;
         this.saml = saml;
         start();
     }
@@ -28,11 +31,13 @@ public class UnfreezeChunksTask implements Runnable {
             if(Bukkit.getServer().getVersion().contains("Paper")) {
                 if(CompatibilityUtils.getCanUsePaperAsyncChunkGet()) {
                     paper = true;
-                    List<ChunkCoordinates> copy = new ArrayList<ChunkCoordinates>();
-                    copy.addAll(frozenChunkCache.getFrozenChunkCoordinates());
-                    copy.forEach(c -> c.getWorld().getChunkAtAsync(
-                            c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(this)
-                    ));
+                    List<FrozenChunkCache> cacheCopy = new ArrayList<FrozenChunkCache>(frozenChunkCaches);
+                    for(FrozenChunkCache frozenChunkCache : cacheCopy) {
+                        List<ChunkCoordinates> coordsCopy = new ArrayList<ChunkCoordinates>(frozenChunkCache.getFrozenChunkCoordinates());
+                        coordsCopy.forEach(c -> c.getWorld().getChunkAtAsync(
+                                c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(frozenChunkCache)
+                        ));
+                    }
                 } else {
                     paper = false;
                     Saml.logger().warning("You elected to use Paper's async chunk fetcher, but this is not supported on your version.");
@@ -45,26 +50,36 @@ public class UnfreezeChunksTask implements Runnable {
             }
         } else {
             paper = false;
+            if(!frozenChunkCaches.isEmpty()) {
+                currentCache = frozenChunkCaches.get(0);
+                place = 0;
+            }
         }
+        lastCompleted = 0;
         run();
     }
 
     @Override
     public void run() {
-        if(frozenChunkCache.getFrozenChunkCoordinates().size() == 0) {
-            Saml.logger().info("We have finished unfreezing the previously unfrozen mobs.");
-            frozenChunkCache.deleteCacheFile();
+        if(frozenChunkCaches.stream().allMatch( c -> c.getFrozenChunkCoordinates().isEmpty() )) {
+            Saml.logger().info("We have finished unfreezing the previously frozen mobs.");
+            frozenChunkCaches.forEach( f -> f.deleteCacheFile() );
             return;
         }
         if(!paper) {
-            ChunkCoordinates nextChunkCoordinates = frozenChunkCache.getFrozenChunkCoordinates().iterator().next();
-            new UnfreezeChunkConsumer(this).accept(nextChunkCoordinates.toChunk());
+            if(currentCache.getFrozenChunkCoordinates().isEmpty()) {
+                place++;
+                currentCache = frozenChunkCaches.get(place);
+
+            }
+            new UnfreezeChunkConsumer(currentCache).accept(currentCache.getFrozenChunkCoordinates().iterator().next().toChunk());
+        }
+        int completed = (int) frozenChunkCaches.stream().filter(f -> f.getFrozenChunkCoordinates().isEmpty() ).count();
+        if(completed > lastCompleted) {
+            lastCompleted = completed;
+            Saml.logger().info("We have unfrozen " + completed + " of " + frozenChunkCaches.size() + " of the old frozen chunk caches.");
         }
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this, saml.getSamlConfig().getLong("ticks-per-cached-chunk-unfreeze"));
-    }
-
-    public void chunkUnfrozen(Chunk chunk) {
-        frozenChunkCache.removeChunk(chunk);
     }
 }

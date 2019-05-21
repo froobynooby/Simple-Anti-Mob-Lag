@@ -1,5 +1,6 @@
 package com.froobworld.saml.utils;
 
+import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.tasks.UnfreezeChunksTask;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
@@ -8,10 +9,10 @@ import org.bukkit.entity.LivingEntity;
 import java.util.function.Consumer;
 
 public class UnfreezeChunkConsumer implements Consumer<Chunk> {
-    private UnfreezeChunksTask unfreezeChunksTask;
+    private FrozenChunkCache frozenChunkCache;
 
-    public UnfreezeChunkConsumer(UnfreezeChunksTask unfreezeChunksTask) {
-        this.unfreezeChunksTask = unfreezeChunksTask;
+    public UnfreezeChunkConsumer(FrozenChunkCache frozenChunkCache) {
+        this.frozenChunkCache = frozenChunkCache;
     }
 
 
@@ -27,6 +28,6 @@ public class UnfreezeChunkConsumer implements Consumer<Chunk> {
                 }
             }
         }
-        unfreezeChunksTask.chunkUnfrozen(chunk);
+        frozenChunkCache.removeChunk(chunk);
     }
 }
