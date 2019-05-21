@@ -4,6 +4,7 @@ import com.froobworld.saml.Config;
 import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.Messages;
+import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.TpsSupplier;
 import com.froobworld.saml.utils.MessageUtils;
 import org.bukkit.Bukkit;
@@ -146,7 +147,7 @@ public class MobFreezeTask implements Runnable {
                 if(ignoreLeashed && entity.isLeashed()) {
                     continue;
                 }
-                if(ignoreLoveMode && entity instanceof Animals && ((Animals) entity).isLoveMode()) {
+                if(CompatibilityUtils.getIgnoreLoveModeOption(config) && entity instanceof Animals && ((Animals) entity).isLoveMode()) {
                     continue;
                 }
                 if(neverFreeze.contains(entity.getType().name())) {

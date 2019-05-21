@@ -3,6 +3,7 @@ package com.froobworld.saml.tasks;
 import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.utils.ChunkCoordinates;
+import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.UnfreezeChunkConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -25,12 +26,18 @@ public class UnfreezeChunksTask implements Runnable {
     private void start() {
         if(saml.getSamlConfig().getBoolean("use-paper-get-chunk-async")) {
             if(Bukkit.getServer().getVersion().contains("Paper")) {
-                paper = true;
-                List<ChunkCoordinates> copy = new ArrayList<ChunkCoordinates>();
-                copy.addAll(frozenChunkCache.getFrozenChunkCoordinates());
-                copy.forEach(c -> c.getWorld().getChunkAtAsync(
-                        c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(this)
-                ));
+                if(CompatibilityUtils.getCanUsePaperAsyncChunkGet()) {
+                    paper = true;
+                    List<ChunkCoordinates> copy = new ArrayList<ChunkCoordinates>();
+                    copy.addAll(frozenChunkCache.getFrozenChunkCoordinates());
+                    copy.forEach(c -> c.getWorld().getChunkAtAsync(
+                            c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(this)
+                    ));
+                } else {
+                    paper = false;
+                    Saml.logger().warning("You elected to use Paper's async chunk fetcher, but this is not supported on your version.");
+                    Saml.logger().info("We will use the regular method instead.");
+                }
             } else {
                 Saml.logger().warning("You elected to use Paper's async chunk fetcher, but you don't seem to be using Paper!");
                 Saml.logger().info("We will use the regular method instead.");
