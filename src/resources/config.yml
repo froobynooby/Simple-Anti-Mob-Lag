@@ -31,7 +31,7 @@ unfreeze-cached-chunks-on-startup: false
 # Every how many ticks should we unfreeze these mobs?
 ticks-per-cached-chunk-unfreeze: 40
 
-# Do you use Paper? If so, do you want this task to run in a more efficient manner?
+# Do you use Paper? If so, do you want this task (the cache unfreezing task) to run in a more efficient manner?
 use-paper-get-chunk-async: false
 
 
@@ -72,7 +72,7 @@ ignore-tamed: true
 # Should mobs that are leashed never be frozen?
 ignore-leashed: true
 
-# Should we ignore mobs that are in love mode (breeding mode)?
+# Should mobs that are in love mode (breeding mode) never be frozen?
 ignore-love-mode: true
 
 
