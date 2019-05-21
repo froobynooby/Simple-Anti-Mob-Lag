@@ -15,6 +15,9 @@ public class Saml extends JavaPlugin {
     private Messages messages;
     private MobFreezeTask mobFreezeTask;
 
+    private UnfreezeOnShutdownTask unfreezeOnShutdownTask;
+    private HandleCacheOnShutdownTask handleCacheOnShutdownTask;
+
     @Override
     public void onEnable() {
         config = new Config(this);
@@ -33,6 +36,9 @@ public class Saml extends JavaPlugin {
         new CheckCacheStartupTask(this);
         this.mobFreezeTask = new MobFreezeTask(this);
         new CacheSavingTask(this);
+
+        this.unfreezeOnShutdownTask = new UnfreezeOnShutdownTask(this);
+        this.handleCacheOnShutdownTask = new HandleCacheOnShutdownTask(this);
     }
 
     private void registerCommands() {
@@ -61,8 +67,8 @@ public class Saml extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        new UnfreezeOnShutdownTask(this).run();
-        new HandleCacheOnShutdownTask(this).run();
+        unfreezeOnShutdownTask.run();
+        handleCacheOnShutdownTask.run();
         logger().info("Successfully disabled.");
     }
 
