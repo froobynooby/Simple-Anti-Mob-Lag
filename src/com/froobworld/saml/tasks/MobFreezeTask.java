@@ -159,7 +159,7 @@ public class MobFreezeTask implements Runnable {
                     continue;
                 }
                 for(NeighbouredEntity otherEntity : neighbouredEntities) {
-                    if(thisEntity.neighbours >= minimumSize && otherEntity.neighbours >= minimumSize) {
+                    if(thisEntity.mostPopularNeighbour.neighbours >= minimumSize && otherEntity.mostPopularNeighbour.neighbours >= minimumSize) {
                         continue;
                     }
                     if(thisEntity.entity.getLocation().distanceSquared(otherEntity.entity.getLocation())  < maximumRadiusSq) {
@@ -168,8 +168,14 @@ public class MobFreezeTask implements Runnable {
                         if(thisEntity.mostPopularNeighbour.neighbours < otherEntity.neighbours) {
                             thisEntity.mostPopularNeighbour = otherEntity;
                         }
+                        if(thisEntity.mostPopularNeighbour.neighbours < thisEntity.neighbours) {
+                            thisEntity.mostPopularNeighbour = thisEntity;
+                        }
                         if(otherEntity.mostPopularNeighbour.neighbours < thisEntity.neighbours) {
                             otherEntity.mostPopularNeighbour = thisEntity;
+                        }
+                        if(otherEntity.mostPopularNeighbour.neighbours < otherEntity.neighbours) {
+                            otherEntity.mostPopularNeighbour = otherEntity;
                         }
                     }
                 }
@@ -177,7 +183,7 @@ public class MobFreezeTask implements Runnable {
             }
 
             for(NeighbouredEntity neighbouredEntity : neighbouredEntities) {
-                if(neighbouredEntity.neighbours >= minimumSize || neighbouredEntity.mostPopularNeighbour.neighbours >= minimumSize || neighbouredEntity.freezeByDefault) {
+                if(neighbouredEntity.mostPopularNeighbour.neighbours >= minimumSize || neighbouredEntity.freezeByDefault) {
                     if(neighbouredEntity.entity.hasAI()) {
                         neighbouredEntity.entity.setAI(false);
                         if(frozenChunkCache != null) {
