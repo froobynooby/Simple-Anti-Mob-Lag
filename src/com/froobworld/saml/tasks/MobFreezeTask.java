@@ -154,10 +154,9 @@ public class MobFreezeTask implements Runnable {
                     continue;
                 }
                 NeighbouredEntity thisEntity = new NeighbouredEntity(entity);
-                neighbouredEntities.add(thisEntity);
                 if(alwaysFreeze.contains(entity.getType().name())) {
                     thisEntity.freezeByDefault = true;
-                    thisEntity.addNeighbour(thisEntity);
+                    thisEntity.neighbours.add(thisEntity);
                     continue;
                 }
                 for(NeighbouredEntity otherEntity : neighbouredEntities) {
@@ -165,6 +164,8 @@ public class MobFreezeTask implements Runnable {
                         thisEntity.addNeighbour(otherEntity);
                     }
                 }
+                neighbouredEntities.add(thisEntity);
+                thisEntity.neighbours.add(thisEntity);
             }
 
             for(NeighbouredEntity neighbouredEntity : neighbouredEntities) {
