@@ -93,7 +93,6 @@ public class MobFreezeTask implements Runnable {
 
         boolean ignoreTamed = config.getBoolean("ignored-tamed");
         boolean ignoreLeashed = config.getBoolean("ignore-leashed");
-        boolean ignoreLoveMode = config.getBoolean("ignore-love-mode");
         Set<String> neverFreeze = new HashSet<String>(config.getStringList("never-freeze"));
         Set<String> alwaysFreeze = new HashSet<String>(config.getStringList("always-freeze"));
 
@@ -116,7 +115,7 @@ public class MobFreezeTask implements Runnable {
                     if(ignoreLeashed && entity.isLeashed()) {
                         continue;
                     }
-                    if(ignoreLoveMode && entity instanceof Animals && ((Animals) entity).isLoveMode()) {
+                    if(CompatibilityUtils.getIgnoreLoveModeOption(config) && entity instanceof Animals && ((Animals) entity).isLoveMode()) {
                         continue;
                     }
                     if(entity.hasAI()) {
