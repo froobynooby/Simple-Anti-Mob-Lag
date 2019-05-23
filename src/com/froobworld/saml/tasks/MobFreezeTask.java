@@ -156,37 +156,35 @@ public class MobFreezeTask implements Runnable {
                 if(alwaysFreeze.contains(entity.getType().name())) {
                     neighbouredEntities.add(thisEntity);
                     thisEntity.freezeByDefault = true;
-                    thisEntity.neighbours.add(thisEntity);
                     continue;
                 }
                 for(NeighbouredEntity otherEntity : neighbouredEntities) {
-                    if(thisEntity.neighbours.size() >= minimumSize && otherEntity.neighbours.size() >= minimumSize) {
+                    if(thisEntity.neighbours >= minimumSize && otherEntity.neighbours >= minimumSize) {
                         continue;
                     }
                     if(thisEntity.entity.getLocation().distanceSquared(otherEntity.entity.getLocation())  < maximumRadiusSq) {
-                        if(thisEntity.neighbours.size() < minimumSize) {
-                            thisEntity.neighbours.add(otherEntity);
+                        thisEntity.neighbours++;
+                        otherEntity.neighbours++;
+                        if(thisEntity.mostPopularNeighbour.neighbours < otherEntity.neighbours) {
+                            thisEntity.mostPopularNeighbour = otherEntity;
                         }
-                        if(otherEntity.neighbours.size() < minimumSize) {
-                            otherEntity.neighbours.add(thisEntity);
+                        if(otherEntity.mostPopularNeighbour.neighbours < thisEntity.neighbours) {
+                            otherEntity.mostPopularNeighbour = thisEntity;
                         }
                     }
                 }
                 neighbouredEntities.add(thisEntity);
-                thisEntity.neighbours.add(thisEntity);
             }
 
             for(NeighbouredEntity neighbouredEntity : neighbouredEntities) {
-                if(neighbouredEntity.neighbours.size() >= minimumSize || neighbouredEntity.freezeByDefault) {
-                    for(NeighbouredEntity neighbour : neighbouredEntity.neighbours) {
-                        if(neighbour.entity.hasAI()) {
-                            neighbour.entity.setAI(false);
-                            if(frozenChunkCache != null) {
-                                frozenChunkCache.addChunk(neighbour.entity.getLocation().getChunk());
-                            }
-                            totalFrozen++;
-                            numberFrozen++;
+                if(neighbouredEntity.neighbours >= minimumSize || neighbouredEntity.mostPopularNeighbour.neighbours >= minimumSize || neighbouredEntity.freezeByDefault) {
+                    if(neighbouredEntity.entity.hasAI()) {
+                        neighbouredEntity.entity.setAI(false);
+                        if(frozenChunkCache != null) {
+                            frozenChunkCache.addChunk(neighbouredEntity.entity.getLocation().getChunk());
                         }
+                        totalFrozen++;
+                        numberFrozen++;
                     }
                 }
             }
@@ -205,14 +203,15 @@ public class MobFreezeTask implements Runnable {
 
     private class NeighbouredEntity {
         private LivingEntity entity;
-        private List<NeighbouredEntity> neighbours;
+        private int neighbours;
+        private NeighbouredEntity mostPopularNeighbour;
         private boolean freezeByDefault;
 
         public NeighbouredEntity(LivingEntity entity) {
             this.entity = entity;
-            this.neighbours = new ArrayList<NeighbouredEntity>();
-            neighbours.add(this);
-            freezeByDefault = false;
+            this.neighbours = 1;
+            this.mostPopularNeighbour = this;
+            this.freezeByDefault = false;
         }
     }
 
