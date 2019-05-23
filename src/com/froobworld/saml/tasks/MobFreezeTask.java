@@ -159,6 +159,9 @@ public class MobFreezeTask implements Runnable {
                     continue;
                 }
                 for(NeighbouredEntity otherEntity : neighbouredEntities) {
+                    if(thisEntity.neighbours.size() >= minimumSize && otherEntity.neighbours.size() >= minimumSize) {
+                        continue;
+                    }
                     if(thisEntity.entity.getLocation().distanceSquared(otherEntity.entity.getLocation())  < maximumRadiusSq) {
                         thisEntity.addNeighbour(otherEntity);
                     }
@@ -168,7 +171,7 @@ public class MobFreezeTask implements Runnable {
             }
 
             for(NeighbouredEntity neighbouredEntity : neighbouredEntities) {
-                if(neighbouredEntity.neighbours.size() > minimumSize || neighbouredEntity.freezeByDefault) {
+                if(neighbouredEntity.neighbours.size() >= minimumSize || neighbouredEntity.freezeByDefault) {
                     for(NeighbouredEntity neighbour : neighbouredEntity.neighbours) {
                         if(neighbour.entity.hasAI()) {
                             neighbour.entity.setAI(false);
