@@ -82,6 +82,7 @@ ignore-love-mode: true
 # This is CaSE SenSiTIVe, it needs to be in all CAPS!
 never-freeze:
   - VILLAGER
+  - WANDERING_TRADER
   - PILLAGER
   - VINDICATOR
   - VEX
