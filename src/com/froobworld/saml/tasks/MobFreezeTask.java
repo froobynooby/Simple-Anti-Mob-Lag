@@ -164,7 +164,12 @@ public class MobFreezeTask implements Runnable {
                         continue;
                     }
                     if(thisEntity.entity.getLocation().distanceSquared(otherEntity.entity.getLocation())  < maximumRadiusSq) {
-                        thisEntity.addNeighbour(otherEntity);
+                        if(thisEntity.neighbours.size() < minimumSize) {
+                            thisEntity.neighbours.add(otherEntity);
+                        }
+                        if(otherEntity.neighbours.size() < minimumSize) {
+                            otherEntity.neighbours.add(thisEntity);
+                        }
                     }
                 }
                 neighbouredEntities.add(thisEntity);
@@ -208,11 +213,6 @@ public class MobFreezeTask implements Runnable {
             this.neighbours = new ArrayList<NeighbouredEntity>();
             neighbours.add(this);
             freezeByDefault = false;
-        }
-
-        public void addNeighbour(NeighbouredEntity neighbour) {
-            neighbours.add(neighbour);
-            neighbour.neighbours.add(this);
         }
     }
 
