@@ -154,6 +154,7 @@ public class MobFreezeTask implements Runnable {
                 }
                 NeighbouredEntity thisEntity = new NeighbouredEntity(entity);
                 if(alwaysFreeze.contains(entity.getType().name())) {
+                    neighbouredEntities.add(thisEntity);
                     thisEntity.freezeByDefault = true;
                     thisEntity.neighbours.add(thisEntity);
                     continue;
