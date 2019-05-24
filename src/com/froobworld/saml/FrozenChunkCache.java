@@ -45,7 +45,7 @@ public class FrozenChunkCache {
     }
 
     public void addChunk(Location location) {
-        frozenChunkCoordinates.add(new ChunkCoordinates(location.getWorld().getUID(),location.getBlockX() >> 4, location.getBlockY() >> 4));
+        frozenChunkCoordinates.add(new ChunkCoordinates(location.getWorld().getUID(),location.getBlockX() >> 4, location.getBlockZ() >> 4));
         unsavedChanges = true;
     }
 
