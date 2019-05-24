@@ -121,7 +121,7 @@ public class MobFreezeTask implements Runnable {
                     if(entity.hasAI()) {
                         entity.setAI(false);
                         if(frozenChunkCache != null) {
-                            frozenChunkCache.addChunk(entity.getLocation().getChunk());
+                            frozenChunkCache.addChunk(entity.getLocation());
                         }
                         numberFrozen++;
                     }
@@ -187,7 +187,7 @@ public class MobFreezeTask implements Runnable {
                     if(neighbouredEntity.entity.hasAI()) {
                         neighbouredEntity.entity.setAI(false);
                         if(frozenChunkCache != null) {
-                            frozenChunkCache.addChunk(neighbouredEntity.entity.getLocation().getChunk());
+                            frozenChunkCache.addChunk(neighbouredEntity.entity.getLocation());
                         }
                         totalFrozen++;
                         numberFrozen++;

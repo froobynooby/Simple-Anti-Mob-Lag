@@ -2,7 +2,7 @@ package com.froobworld.saml;
 
 import com.froobworld.saml.utils.ChunkCoordinates;
 import org.bukkit.Chunk;
-import org.bukkit.World;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -44,23 +44,13 @@ public class FrozenChunkCache {
         }
     }
 
-    public void addChunk(Chunk chunk) {
-        frozenChunkCoordinates.add(new ChunkCoordinates(chunk.getWorld().getUID(), chunk.getX(), chunk.getZ()));
-        unsavedChanges = true;
-    }
-
-    public void addChunk(World world, int x, int z) {
-        frozenChunkCoordinates.add(new ChunkCoordinates(world.getUID(), x, z));
+    public void addChunk(Location location) {
+        frozenChunkCoordinates.add(new ChunkCoordinates(location.getWorld().getUID(),location.getBlockX() >> 4, location.getBlockY() >> 4));
         unsavedChanges = true;
     }
 
     public void removeChunk(Chunk chunk) {
         frozenChunkCoordinates.remove(new ChunkCoordinates(chunk.getWorld().getUID(), chunk.getX(), chunk.getZ()));
-        unsavedChanges = true;
-    }
-
-    public void removeChunk(World world, int x, int z) {
-        frozenChunkCoordinates.remove(new ChunkCoordinates(world.getUID(), x, z));
         unsavedChanges = true;
     }
 
