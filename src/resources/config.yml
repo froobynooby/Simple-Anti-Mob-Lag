@@ -1,5 +1,5 @@
 # Don't change this!
-version: 3
+version: 4
 
 
 # When the server's TPS drops below this, we will start freezing mobs.
@@ -68,6 +68,9 @@ unfreeze-on-shutdown: true
 
 # Should tamed mobs (cats, dogs, horses, etc.) never be frozen?
 ignore-tamed: true
+
+# Should we ignore mobs named with a name tag?
+ignore-named: true
 
 # Should mobs that are leashed never be frozen?
 ignore-leashed: true

@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 public class Config {
-    private static final int CURRENT_VERSION = 3;
+    private static final int CURRENT_VERSION = 4;
 
     private Saml saml;
     private YamlConfiguration config;

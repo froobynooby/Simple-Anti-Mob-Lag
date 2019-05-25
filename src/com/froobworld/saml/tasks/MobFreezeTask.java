@@ -92,6 +92,7 @@ public class MobFreezeTask implements Runnable {
         double maximumRadiusSq = smartScaling ? baseMaximumRadiusSq / Math.pow((1 - (thresholdTps - tps) / thresholdTps), 2) : baseMaximumRadiusSq;
 
         boolean ignoreTamed = config.getBoolean("ignore-tamed");
+        boolean ignoreNamed = config.getBoolean("ignore-named");
         boolean ignoreLeashed = config.getBoolean("ignore-leashed");
         Set<String> neverFreeze = new HashSet<String>(config.getStringList("never-freeze"));
         Set<String> alwaysFreeze = new HashSet<String>(config.getStringList("always-freeze"));
@@ -110,6 +111,9 @@ public class MobFreezeTask implements Runnable {
                         continue;
                     }
                     if(ignoreTamed && entity instanceof Tameable && ((Tameable) entity).getOwner() != null) {
+                        continue;
+                    }
+                    if(ignoreNamed && entity.getCustomName() != null) {
                         continue;
                     }
                     if(ignoreLeashed && entity.isLeashed()) {
@@ -141,6 +145,9 @@ public class MobFreezeTask implements Runnable {
                     continue;
                 }
                 if(ignoreTamed && entity instanceof Tameable && ((Tameable) entity).getOwner() != null) {
+                    continue;
+                }
+                if(ignoreNamed && entity.getCustomName() != null) {
                     continue;
                 }
                 if(ignoreLeashed && entity.isLeashed()) {
