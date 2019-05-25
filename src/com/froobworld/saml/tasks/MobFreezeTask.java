@@ -91,7 +91,7 @@ public class MobFreezeTask implements Runnable {
         double minimumSize = smartScaling ? baseMinimumSize * (1 - (thresholdTps - tps) / thresholdTps) : baseMinimumSize;
         double maximumRadiusSq = smartScaling ? baseMaximumRadiusSq / Math.pow((1 - (thresholdTps - tps) / thresholdTps), 2) : baseMaximumRadiusSq;
 
-        boolean ignoreTamed = config.getBoolean("ignored-tamed");
+        boolean ignoreTamed = config.getBoolean("ignore-tamed");
         boolean ignoreLeashed = config.getBoolean("ignore-leashed");
         Set<String> neverFreeze = new HashSet<String>(config.getStringList("never-freeze"));
         Set<String> alwaysFreeze = new HashSet<String>(config.getStringList("always-freeze"));
