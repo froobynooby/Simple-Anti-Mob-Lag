@@ -31,7 +31,7 @@ public class SamlCommand implements CommandExecutor {
             }
         }
         sender.sendMessage(ChatColor.YELLOW + "Simple Anti-Mob Lag " + saml.getDescription().getVersion());
-        sender.sendMessage("www.spigotmc.org/resources/simple-anti-mob-lag.67484/");
+        sender.sendMessage(ChatColor.YELLOW + "Resource page: " + ChatColor.WHITE + "https://www.spigotmc.org/resources/67484/");
         sender.sendMessage("");
         sender.sendMessage("/" + cl + " reload - Reload SAML configuration.");
         return true;
