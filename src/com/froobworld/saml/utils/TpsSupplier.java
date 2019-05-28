@@ -2,6 +2,8 @@ package com.froobworld.saml.utils;
 
 import com.froobworld.saml.Saml;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.function.Supplier;
 
 public class TpsSupplier implements Supplier<Double> {
@@ -18,7 +20,9 @@ public class TpsSupplier implements Supplier<Double> {
 
     @Override
     public Double get() {
+        BigDecimal bd = new BigDecimal(useNms ? NmsUtils.getTPS() : tpsCalculator.getTPS());
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
 
-        return useNms ? NmsUtils.getTPS() : tpsCalculator.getTPS();
+        return bd.doubleValue();
     }
 }
