@@ -30,7 +30,7 @@ public class SamlMobFreezeEvent extends Event implements Cancellable {
 
     @Override
     public void setCancelled(boolean b) {
-        this.cancelled = cancelled;
+        this.cancelled = b;
     }
 
     @Override
