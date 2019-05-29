@@ -4,6 +4,7 @@ import com.froobworld.saml.Config;
 import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.Messages;
+import com.froobworld.saml.events.SamlMobFreezeEvent;
 import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.TpsSupplier;
 import com.froobworld.saml.utils.MessageUtils;
@@ -97,6 +98,7 @@ public class MobFreezeTask implements Runnable {
         Set<String> neverFreeze = new HashSet<String>(config.getStringList("never-freeze"));
         Set<String> alwaysFreeze = new HashSet<String>(config.getStringList("always-freeze"));
 
+        List<LivingEntity> mobsToFreeze = new ArrayList<LivingEntity>();
         for(World world : Bukkit.getWorlds()) {
             if(System.currentTimeMillis() - startTime > maxOperationTime) {
                 break;
@@ -107,6 +109,9 @@ public class MobFreezeTask implements Runnable {
             if(!groupBias) {
                 for(LivingEntity entity : world.getLivingEntities()) {
                     totalMobs++;
+                    if(!entity.hasAI()) {
+                        totalFrozen++;
+                    }
                     if(neverFreeze.contains(entity.getType().name())) {
                         continue;
                     }
@@ -123,13 +128,13 @@ public class MobFreezeTask implements Runnable {
                         continue;
                     }
                     if(entity.hasAI()) {
+                        mobsToFreeze.add(entity);
                         entity.setAI(false);
                         if(frozenChunkCache != null) {
                             frozenChunkCache.addChunk(entity.getLocation());
                         }
                         numberFrozen++;
                     }
-                    totalFrozen++;
                 }
                 continue;
             }
@@ -192,19 +197,30 @@ public class MobFreezeTask implements Runnable {
             for(NeighbouredEntity neighbouredEntity : neighbouredEntities) {
                 if(neighbouredEntity.mostPopularNeighbour.neighbours >= minimumSize || neighbouredEntity.freezeByDefault) {
                     if(neighbouredEntity.entity.hasAI()) {
-                        neighbouredEntity.entity.setAI(false);
-                        if(frozenChunkCache != null) {
-                            frozenChunkCache.addChunk(neighbouredEntity.entity.getLocation());
-                        }
-                        totalFrozen++;
-                        numberFrozen++;
+                        mobsToFreeze.add(neighbouredEntity.entity);
                     }
                 }
             }
         }
-        if(frozenChunkCache != null) {
-            frozenChunkCache.saveToFile();
+
+        SamlMobFreezeEvent mobFreezeEvent = new SamlMobFreezeEvent(mobsToFreeze);
+        Bukkit.getPluginManager().callEvent(mobFreezeEvent);
+        if(!mobFreezeEvent.isCancelled()) {
+            for(LivingEntity entity : mobFreezeEvent.getMobsToFreeze()) {
+                if(entity.hasAI()) {
+                    entity.setAI(false);
+                    if(frozenChunkCache != null) {
+                        frozenChunkCache.addChunk(entity.getLocation());
+                    }
+                    numberFrozen++;
+                    totalFrozen++;
+                }
+            }
+            if(frozenChunkCache != null) {
+                frozenChunkCache.saveToFile();
+            }
         }
+
         long elapsedTime = System.currentTimeMillis() - startTime;
         MessageUtils.broadcastToOpsAndConsole(messages.getMessage("freezing-operation-complete")
                         .replaceAll("%TIME", "" + elapsedTime)
