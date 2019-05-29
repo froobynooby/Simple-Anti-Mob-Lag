@@ -108,6 +108,7 @@ public class MobFreezeTask implements Runnable {
                     totalMobs++;
                     if(!entity.hasAI()) {
                         totalFrozen++;
+                        continue;
                     }
                     if(System.currentTimeMillis() - startTime > maxOperationTime) {
                         continue;
