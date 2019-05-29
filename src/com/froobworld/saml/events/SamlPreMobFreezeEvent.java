@@ -15,12 +15,7 @@ public class SamlPreMobFreezeEvent extends Event implements Cancellable {
 
     public SamlPreMobFreezeEvent() {
         this.cancelled = false;
-        shouldIgnorePredicate = new Predicate<LivingEntity>() {
-            @Override
-            public boolean test(LivingEntity livingEntity) {
-                return false;
-            }
-        };
+        shouldIgnorePredicate = e -> false;
     }
 
 

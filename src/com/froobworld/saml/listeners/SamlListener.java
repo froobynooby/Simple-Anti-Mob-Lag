@@ -41,36 +41,11 @@ public class SamlListener implements Listener {
         boolean ignoreLeashed = saml.getSamlConfig().getBoolean("ignore-leashed");
         Set<String> neverFreeze = new HashSet<String>(saml.getSamlConfig().getStringList("never-freeze"));
 
-        event.addShouldIgnorePredicate(new Predicate<LivingEntity>() {
-            @Override
-            public boolean test(LivingEntity entity) {
-                return neverFreeze.contains(entity.getType().name());
-            }
-        });
-        event.addShouldIgnorePredicate(new Predicate<LivingEntity>() {
-            @Override
-            public boolean test(LivingEntity entity) {
-                return ignoreTamed && entity instanceof Tameable && ((Tameable) entity).getOwner() != null;
-            }
-        });
-        event.addShouldIgnorePredicate(new Predicate<LivingEntity>() {
-            @Override
-            public boolean test(LivingEntity entity) {
-                return ignoreNamed && entity.getCustomName() != null;
-            }
-        });
-        event.addShouldIgnorePredicate(new Predicate<LivingEntity>() {
-            @Override
-            public boolean test(LivingEntity entity) {
-                return ignoreLeashed && entity.isLeashed();
-            }
-        });
-        event.addShouldIgnorePredicate(new Predicate<LivingEntity>() {
-            @Override
-            public boolean test(LivingEntity entity) {
-                return CompatibilityUtils.getIgnoreLoveModeOption(saml.getSamlConfig()) && entity instanceof Animals && ((Animals) entity).isLoveMode();
-            }
-        });
+        event.addShouldIgnorePredicate( e -> neverFreeze.contains(e.getType().name()));
+        event.addShouldIgnorePredicate( e -> (ignoreTamed && e instanceof Tameable && ((Tameable) e).getOwner() != null) );
+        event.addShouldIgnorePredicate( e -> (ignoreNamed && e.getCustomName() != null));
+        event.addShouldIgnorePredicate( e -> ignoreLeashed && e.isLeashed());
+        event.addShouldIgnorePredicate( e -> CompatibilityUtils.getIgnoreLoveModeOption(saml.getSamlConfig()) && e instanceof Animals && ((Animals) e).isLoveMode());
     }
 
 }
