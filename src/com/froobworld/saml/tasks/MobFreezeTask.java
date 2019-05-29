@@ -100,9 +100,6 @@ public class MobFreezeTask implements Runnable {
 
         List<LivingEntity> mobsToFreeze = new ArrayList<LivingEntity>();
         for(World world : Bukkit.getWorlds()) {
-            if(System.currentTimeMillis() - startTime > maxOperationTime) {
-                break;
-            }
             if(config.getStringList("ignore-worlds").contains(world.getName())) {
                 continue;
             }
@@ -111,6 +108,9 @@ public class MobFreezeTask implements Runnable {
                     totalMobs++;
                     if(!entity.hasAI()) {
                         totalFrozen++;
+                    }
+                    if(System.currentTimeMillis() - startTime > maxOperationTime) {
+                        continue;
                     }
                     if(neverFreeze.contains(entity.getType().name())) {
                         continue;
@@ -134,12 +134,12 @@ public class MobFreezeTask implements Runnable {
 
             List<NeighbouredEntity> neighbouredEntities = new ArrayList<NeighbouredEntity>();
             for(LivingEntity entity : world.getLivingEntities()) {
-                if(System.currentTimeMillis() - startTime > maxOperationTime) {
-                    break;
-                }
                 totalMobs++;
                 if(!entity.hasAI()) {
                     totalFrozen++;
+                    continue;
+                }
+                if(System.currentTimeMillis() - startTime > maxOperationTime) {
                     continue;
                 }
                 if(ignoreTamed && entity instanceof Tameable && ((Tameable) entity).getOwner() != null) {
