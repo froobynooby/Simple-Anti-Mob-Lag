@@ -127,14 +127,7 @@ public class MobFreezeTask implements Runnable {
                     if(CompatibilityUtils.getIgnoreLoveModeOption(config) && entity instanceof Animals && ((Animals) entity).isLoveMode()) {
                         continue;
                     }
-                    if(entity.hasAI()) {
-                        mobsToFreeze.add(entity);
-                        entity.setAI(false);
-                        if(frozenChunkCache != null) {
-                            frozenChunkCache.addChunk(entity.getLocation());
-                        }
-                        numberFrozen++;
-                    }
+                    mobsToFreeze.add(entity);
                 }
                 continue;
             }
@@ -196,9 +189,7 @@ public class MobFreezeTask implements Runnable {
 
             for(NeighbouredEntity neighbouredEntity : neighbouredEntities) {
                 if(neighbouredEntity.mostPopularNeighbour.neighbours >= minimumSize || neighbouredEntity.freezeByDefault) {
-                    if(neighbouredEntity.entity.hasAI()) {
-                        mobsToFreeze.add(neighbouredEntity.entity);
-                    }
+                    mobsToFreeze.add(neighbouredEntity.entity);
                 }
             }
         }
