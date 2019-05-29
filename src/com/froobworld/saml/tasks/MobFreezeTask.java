@@ -5,14 +5,12 @@ import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.Messages;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
-import com.froobworld.saml.utils.CompatibilityUtils;
+import com.froobworld.saml.events.SamlPreMobFreezeEvent;
 import com.froobworld.saml.utils.TpsSupplier;
 import com.froobworld.saml.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.Animals;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Tameable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -78,6 +76,12 @@ public class MobFreezeTask implements Runnable {
         if(tps > thresholdTps) {
             return;
         }
+        SamlPreMobFreezeEvent preMobFreezeEvent = new SamlPreMobFreezeEvent();
+        Bukkit.getPluginManager().callEvent(preMobFreezeEvent);
+        if(preMobFreezeEvent.isCancelled()) {
+            return;
+        }
+
         MessageUtils.broadcastToOpsAndConsole(messages.getMessage("starting-freezing-operation")
                 .replaceAll("%TPS", "" + tps)
                 , config);
@@ -92,10 +96,6 @@ public class MobFreezeTask implements Runnable {
         double minimumSize = smartScaling ? baseMinimumSize * (1 - (thresholdTps - tps) / thresholdTps) : baseMinimumSize;
         double maximumRadiusSq = smartScaling ? baseMaximumRadiusSq / Math.pow((1 - (thresholdTps - tps) / thresholdTps), 2) : baseMaximumRadiusSq;
 
-        boolean ignoreTamed = config.getBoolean("ignore-tamed");
-        boolean ignoreNamed = config.getBoolean("ignore-named");
-        boolean ignoreLeashed = config.getBoolean("ignore-leashed");
-        Set<String> neverFreeze = new HashSet<String>(config.getStringList("never-freeze"));
         Set<String> alwaysFreeze = new HashSet<String>(config.getStringList("always-freeze"));
 
         List<LivingEntity> mobsToFreeze = new ArrayList<LivingEntity>();
@@ -113,19 +113,7 @@ public class MobFreezeTask implements Runnable {
                     if(System.currentTimeMillis() - startTime > maxOperationTime) {
                         continue;
                     }
-                    if(neverFreeze.contains(entity.getType().name())) {
-                        continue;
-                    }
-                    if(ignoreTamed && entity instanceof Tameable && ((Tameable) entity).getOwner() != null) {
-                        continue;
-                    }
-                    if(ignoreNamed && entity.getCustomName() != null) {
-                        continue;
-                    }
-                    if(ignoreLeashed && entity.isLeashed()) {
-                        continue;
-                    }
-                    if(CompatibilityUtils.getIgnoreLoveModeOption(config) && entity instanceof Animals && ((Animals) entity).isLoveMode()) {
+                    if(preMobFreezeEvent.getShouldIgnorePredicate().test(entity)) {
                         continue;
                     }
                     mobsToFreeze.add(entity);
@@ -143,19 +131,7 @@ public class MobFreezeTask implements Runnable {
                 if(System.currentTimeMillis() - startTime > maxOperationTime) {
                     continue;
                 }
-                if(ignoreTamed && entity instanceof Tameable && ((Tameable) entity).getOwner() != null) {
-                    continue;
-                }
-                if(ignoreNamed && entity.getCustomName() != null) {
-                    continue;
-                }
-                if(ignoreLeashed && entity.isLeashed()) {
-                    continue;
-                }
-                if(CompatibilityUtils.getIgnoreLoveModeOption(config) && entity instanceof Animals && ((Animals) entity).isLoveMode()) {
-                    continue;
-                }
-                if(neverFreeze.contains(entity.getType().name())) {
+                if(preMobFreezeEvent.getShouldIgnorePredicate().test(entity)) {
                     continue;
                 }
                 NeighbouredEntity thisEntity = new NeighbouredEntity(entity);
