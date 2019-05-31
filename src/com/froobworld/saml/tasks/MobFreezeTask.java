@@ -73,7 +73,7 @@ public class MobFreezeTask implements Runnable {
         if(tps > thresholdTps) {
             return;
         }
-        SamlPreMobFreezeEvent preMobFreezeEvent = new SamlPreMobFreezeEvent();
+        SamlPreMobFreezeEvent preMobFreezeEvent = new SamlPreMobFreezeEvent(tps);
         Bukkit.getPluginManager().callEvent(preMobFreezeEvent);
         if(preMobFreezeEvent.isCancelled()) {
             return;

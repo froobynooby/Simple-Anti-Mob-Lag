@@ -12,10 +12,12 @@ public class SamlPreMobFreezeEvent extends Event implements Cancellable {
 
     private boolean cancelled;
     private Predicate<LivingEntity> shouldIgnorePredicate;
+    private double tps;
 
-    public SamlPreMobFreezeEvent() {
+    public SamlPreMobFreezeEvent(double tps) {
         this.cancelled = false;
         shouldIgnorePredicate = e -> false;
+        this.tps = tps;
     }
 
 
@@ -25,6 +27,10 @@ public class SamlPreMobFreezeEvent extends Event implements Cancellable {
 
     public Predicate<LivingEntity> getShouldIgnorePredicate() {
         return shouldIgnorePredicate;
+    }
+
+    public double getTps() {
+        return tps;
     }
 
     @Override
