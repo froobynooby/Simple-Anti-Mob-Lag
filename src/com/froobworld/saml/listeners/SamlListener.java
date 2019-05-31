@@ -24,6 +24,11 @@ public class SamlListener implements Listener {
 
     @EventHandler
     public void onSamlConfigReload(SamlConfigReloadEvent event) {
+        if(event.getConfig().getBoolean("use-advanced-config")) {
+            if(!saml.getAdvancedConfig().isLoaded()) {
+                saml.getAdvancedConfig().loadFromFile();
+            }
+        }
         if(event.getConfig().getBoolean("keep-frozen-chunk-cache")) {
             saml.getMobFreezeTask().createChunkCacheIfNotExist();
         }

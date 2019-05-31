@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 public class Saml extends JavaPlugin {
     private Config config;
+    private AdvancedConfig advancedConfig;
     private Messages messages;
     private MobFreezeTask mobFreezeTask;
 
@@ -23,6 +24,10 @@ public class Saml extends JavaPlugin {
     public void onEnable() {
         config = new Config(this);
         config.loadFromFile();
+        advancedConfig = new AdvancedConfig(this);
+        if(config.getBoolean("use-advanced-config")) {
+            advancedConfig.loadFromFile();
+        }
         messages = new Messages(this);
         messages.loadFromFile();
 
@@ -58,6 +63,10 @@ public class Saml extends JavaPlugin {
 
     public Config getSamlConfig() {
         return config;
+    }
+
+    public AdvancedConfig getAdvancedConfig() {
+        return advancedConfig;
     }
 
     public Messages getSamlMessages() {
