@@ -1,0 +1,2 @@
+# Do you want a config file with more options to generate?
+use-advanced-config: false

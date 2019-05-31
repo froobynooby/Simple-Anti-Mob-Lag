@@ -1,5 +1,8 @@
 # Don't change this!
-version: 4
+version: 5
+
+# Do you want a config file with more options to generate?
+use-advanced-config: false
 
 
 # When the server's TPS drops below this, we will start freezing mobs.
