@@ -75,6 +75,10 @@ public class SamlConfiguration {
         return loaded;
     }
 
+    public boolean keyExists(String key) {
+        return config.contains(key);
+    }
+
     public String getString(String key) {
         return config.getString("key");
     }
