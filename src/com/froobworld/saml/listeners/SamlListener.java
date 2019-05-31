@@ -44,13 +44,14 @@ public class SamlListener implements Listener {
         boolean ignoreTamed = saml.getSamlConfig().getBoolean("ignore-tamed");
         boolean ignoreNamed = saml.getSamlConfig().getBoolean("ignore-named");
         boolean ignoreLeashed = saml.getSamlConfig().getBoolean("ignore-leashed");
+        boolean ignoreLoveMode = saml.getSamlConfig().getBoolean("ignore-love-mode");
         Set<String> neverFreeze = new HashSet<String>(saml.getSamlConfig().getStringList("never-freeze"));
 
         event.addShouldIgnorePredicate( e -> (neverFreeze.contains(e.getType().name())) );
         event.addShouldIgnorePredicate( e -> (ignoreTamed && e instanceof Tameable && ((Tameable) e).getOwner() != null) );
         event.addShouldIgnorePredicate( e -> (ignoreNamed && e.getCustomName() != null) );
         event.addShouldIgnorePredicate( e -> (ignoreLeashed && e.isLeashed()) );
-        event.addShouldIgnorePredicate( e -> (CompatibilityUtils.getIgnoreLoveModeOption(saml.getSamlConfig()) && e instanceof Animals && ((Animals) e).isLoveMode()) );
+        event.addShouldIgnorePredicate( e -> (CompatibilityUtils.ANIMAL_LOVE_MODE && ignoreLoveMode && e instanceof Animals && ((Animals) e).isLoveMode()) );
     }
 
 }

@@ -29,7 +29,7 @@ public class UnfreezeChunksTask implements Runnable {
     private void start() {
         if(saml.getSamlConfig().getBoolean("use-paper-get-chunk-async")) {
             if(Bukkit.getServer().getVersion().contains("Paper")) {
-                if(CompatibilityUtils.getCanUsePaperAsyncChunkGet()) {
+                if(CompatibilityUtils.USE_PAPER_GET_CHUNK_ASYNC) {
                     paper = true;
                     List<FrozenChunkCache> cacheCopy = new ArrayList<FrozenChunkCache>(frozenChunkCaches);
                     for(FrozenChunkCache frozenChunkCache : cacheCopy) {

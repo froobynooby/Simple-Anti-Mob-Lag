@@ -1,12 +1,10 @@
 package com.froobworld.saml.utils;
 
-import com.froobworld.saml.SamlConfiguration;
-
 import java.util.function.Consumer;
 
 public class CompatibilityUtils {
-    private static final boolean ANIMAL_LOVE_MODE;
-    private static final boolean USE_PAPER_GET_CHUNK_ASYNC;
+    public static final boolean ANIMAL_LOVE_MODE;
+    public static final boolean USE_PAPER_GET_CHUNK_ASYNC;
     static {
         boolean loveModeMethodExists;
         try {
@@ -25,13 +23,5 @@ public class CompatibilityUtils {
             asyncChunkGetMethodExists = false;
         }
         USE_PAPER_GET_CHUNK_ASYNC = asyncChunkGetMethodExists;
-    }
-
-    public static boolean getIgnoreLoveModeOption(SamlConfiguration config) {
-        return ANIMAL_LOVE_MODE && config.getBoolean("ignore-love-mode");
-    }
-
-    public static boolean getCanUsePaperAsyncChunkGet() {
-        return USE_PAPER_GET_CHUNK_ASYNC;
     }
 }
