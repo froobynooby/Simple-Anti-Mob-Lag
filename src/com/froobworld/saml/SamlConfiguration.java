@@ -80,7 +80,7 @@ public class SamlConfiguration {
     }
 
     public String getString(String key) {
-        return config.getString("key");
+        return config.getString(key);
     }
 
     public Boolean getBoolean(String key) {
