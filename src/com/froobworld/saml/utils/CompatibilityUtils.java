@@ -1,6 +1,6 @@
 package com.froobworld.saml.utils;
 
-import com.froobworld.saml.Config;
+import com.froobworld.saml.SamlConfiguration;
 
 import java.util.function.Consumer;
 
@@ -27,7 +27,7 @@ public class CompatibilityUtils {
         USE_PAPER_GET_CHUNK_ASYNC = asyncChunkGetMethodExists;
     }
 
-    public static boolean getIgnoreLoveModeOption(Config config) {
+    public static boolean getIgnoreLoveModeOption(SamlConfiguration config) {
         return ANIMAL_LOVE_MODE && config.getBoolean("ignore-love-mode");
     }
 

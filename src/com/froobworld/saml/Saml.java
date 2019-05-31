@@ -1,6 +1,7 @@
 package com.froobworld.saml;
 
 import com.froobworld.saml.commands.SamlCommand;
+import com.froobworld.saml.events.SamlConfigReloadEvent;
 import com.froobworld.saml.listeners.EventListener;
 import com.froobworld.saml.listeners.SamlListener;
 import com.froobworld.saml.metrics.Metrics;
@@ -12,9 +13,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Logger;
 
 public class Saml extends JavaPlugin {
-    private Config config;
-    private AdvancedConfig advancedConfig;
-    private Messages messages;
+    private SamlConfiguration config;
+    private SamlConfiguration advancedConfig;
+    private SamlConfiguration messages;
     private MobFreezeTask mobFreezeTask;
 
     private UnfreezeOnShutdownTask unfreezeOnShutdownTask;
@@ -22,13 +23,13 @@ public class Saml extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        config = new Config(this);
+        config = new SamlConfiguration(this, SamlConfiguration.CONFIG_CURRENT_VERSION, "config.yml");
         config.loadFromFile();
-        advancedConfig = new AdvancedConfig(this);
+        advancedConfig = new SamlConfiguration(this, SamlConfiguration.ADVANCED_CONFIG_CURRENT_VERSION, "advanced_config.yml");
         if(config.getBoolean("use-advanced-config")) {
             advancedConfig.loadFromFile();
         }
-        messages = new Messages(this);
+        messages = new SamlConfiguration(this, SamlConfiguration.MESSAGES_CURRENT_VERSION, "messages.yml");
         messages.loadFromFile();
 
         registerCommands();
@@ -61,16 +62,25 @@ public class Saml extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new SamlListener(this), this);
     }
 
-    public Config getSamlConfig() {
+    public SamlConfiguration getSamlConfig() {
         return config;
     }
 
-    public AdvancedConfig getAdvancedConfig() {
+    public SamlConfiguration getAdvancedConfig() {
         return advancedConfig;
     }
 
-    public Messages getSamlMessages() {
+    public SamlConfiguration getSamlMessages() {
         return messages;
+    }
+
+    public void reloadSamlConfiguration() {
+        config.loadFromFile();
+        if(advancedConfig.isLoaded()) {
+            advancedConfig.loadFromFile();
+        }
+        messages.loadFromFile();
+        Bukkit.getPluginManager().callEvent(new SamlConfigReloadEvent(config, advancedConfig, messages));
     }
 
     public MobFreezeTask getMobFreezeTask() {

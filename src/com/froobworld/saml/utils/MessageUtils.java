@@ -1,14 +1,14 @@
 package com.froobworld.saml.utils;
 
-import com.froobworld.saml.Config;
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.SamlConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class MessageUtils {
 
-    public static void broadcastToOps(String message, Config config) {
+    public static void broadcastToOps(String message, SamlConfiguration config) {
         if(!config.getBoolean("broadcast-to-ops")) {
             return;
         }
@@ -19,14 +19,14 @@ public class MessageUtils {
         }
     }
 
-    public static void broadcastToConsole(String message, Config config) {
+    public static void broadcastToConsole(String message, SamlConfiguration config) {
         if(!config.getBoolean("broadcast-to-console")) {
             return;
         }
         Saml.logger().info(ChatColor.translateAlternateColorCodes('&', message));
     }
 
-    public static void broadcastToOpsAndConsole(String message, Config config) {
+    public static void broadcastToOpsAndConsole(String message, SamlConfiguration config) {
         broadcastToOps(message, config);
         broadcastToConsole(message, config);
     }

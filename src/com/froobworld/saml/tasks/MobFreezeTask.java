@@ -1,9 +1,6 @@
 package com.froobworld.saml.tasks;
 
-import com.froobworld.saml.Config;
-import com.froobworld.saml.FrozenChunkCache;
-import com.froobworld.saml.Saml;
-import com.froobworld.saml.Messages;
+import com.froobworld.saml.*;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
 import com.froobworld.saml.events.SamlPreMobFreezeEvent;
 import com.froobworld.saml.utils.TpsSupplier;
@@ -20,8 +17,8 @@ import java.util.Set;
 
 public class MobFreezeTask implements Runnable {
     private Saml saml;
-    private Config config;
-    private Messages messages;
+    private SamlConfiguration config;
+    private SamlConfiguration messages;
     private TpsSupplier tpsSupplier;
     private FrozenChunkCache frozenChunkCache;
 
@@ -82,7 +79,7 @@ public class MobFreezeTask implements Runnable {
             return;
         }
 
-        MessageUtils.broadcastToOpsAndConsole(messages.getMessage("starting-freezing-operation")
+        MessageUtils.broadcastToOpsAndConsole(messages.getString("starting-freezing-operation")
                 .replaceAll("%TPS", "" + tps)
                 , config);
         int numberFrozen = 0;
@@ -190,7 +187,7 @@ public class MobFreezeTask implements Runnable {
         }
 
         long elapsedTime = System.currentTimeMillis() - startTime;
-        MessageUtils.broadcastToOpsAndConsole(messages.getMessage("freezing-operation-complete")
+        MessageUtils.broadcastToOpsAndConsole(messages.getString("freezing-operation-complete")
                         .replaceAll("%TIME", "" + elapsedTime)
                         .replaceAll("%NUMBER_FROZEN", "" + numberFrozen)
                         .replaceAll("%TOTAL_FROZEN", "" + totalFrozen)
