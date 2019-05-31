@@ -1,2 +1,49 @@
+# This is a config file with more options than you would find in config.yml.
+# For the most part, these options just allow you to specify things per entity.
+# The options in the standard config.yml will still be used as a default when you have not specified something in here.
+
 # Don't change this!
 version: 1
+
+
+# Be sure to remove any comment markers (the #'s) to activate an option!
+
+# Should we unfreeze mobs of the following types when they are interacted with?
+unfreeze-on-interact:
+#  HORSE: true
+#  DONKEY: true
+#  MULE: true
+#  SKELETON_HORSE: true
+
+# Should we unfreeze mobs of the following types when they take damage?
+unfreeze-on-damage:
+#  ZOMBIE: true
+#  SKELETON: true
+#  CREEPER: true
+
+# Should we ignore tamed mobs of the following types?
+ignore-tamed:
+#  HORSE: true
+#  DONKEY: true
+#  MULE: true
+#  SKELETON_HORSE: true
+#  WOLF: false
+#  CAT: false
+
+# Should we ignore mobs of the following types that are named with a name tag?
+ignore-named:
+#  WOLF: true
+#  CAT: true
+
+# Should mobs of the following types that are leashed never be frozen?
+ignore-leashed:
+#  HORSE: true
+#  DONKEY: true
+#  MULE: true
+
+# Should mobs that are in love mode (breeding mode) never be frozen?
+ignore-love-mode:
+#  CHICKEN: false
+#  COW: false
+#  PIG: false
+#  HORSE: true
