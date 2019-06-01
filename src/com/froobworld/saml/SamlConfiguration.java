@@ -51,23 +51,27 @@ public class SamlConfiguration {
         config = YamlConfiguration.loadConfiguration(configFile);
         Saml.logger().info(fileName + " successfully loaded.");
 
-        int version = config.getInt("version");
-        if(version  > currentVersion) {
-            Saml.logger().warning("Your're using a " + fileName + " for a higher version. This may lead to some issues.");
-            Saml.logger().info("You may wish to regenerate this file by deleting it and reloading.");
-        }
-        if(version < currentVersion) {
-            Saml.logger().info("Your " + fileName + " is out of date. Will attempt to perform upgrades...");
-            for(int i = version; i < currentVersion; i++) {
-                if(ConfigUpdater.update(configFile, saml.getResource("resources/" + fileNameDashed +"-updates/" + i), i)) {
-                    Saml.logger().info("Applied changes for " + fileName + " version " + i + " to " + (i+1) + ".");
-                } else {
-                    Saml.logger().warning("Failed to apply changes for " + fileName + " version " + i + " to " + (i+1) + ".");
-                    return;
-                }
+        if(config.contains("version")) {
+            int version = config.getInt("version");
+            if (version > currentVersion) {
+                Saml.logger().warning("Your're using a " + fileName + " for a higher version. This may lead to some issues.");
+                Saml.logger().info("You may wish to regenerate this file by deleting it and reloading.");
             }
-            Saml.logger().info(fileName + " successfully updated!");
-            config = YamlConfiguration.loadConfiguration(configFile);
+            if (version < currentVersion) {
+                Saml.logger().info("Your " + fileName + " is out of date. Will attempt to perform upgrades...");
+                for (int i = version; i < currentVersion; i++) {
+                    if (ConfigUpdater.update(configFile, saml.getResource("resources/" + fileNameDashed + "-updates/" + i), i)) {
+                        Saml.logger().info("Applied changes for " + fileName + " version " + i + " to " + (i + 1) + ".");
+                    } else {
+                        Saml.logger().warning("Failed to apply changes for " + fileName + " version " + i + " to " + (i + 1) + ".");
+                        return;
+                    }
+                }
+                Saml.logger().info(fileName + " successfully updated!");
+                config = YamlConfiguration.loadConfiguration(configFile);
+            }
+        } else {
+            Saml.logger().warning("Your " + fileName + " either hasn't loaded properly or is not versioned. This may lead to problems.");
         }
     }
 
