@@ -25,6 +25,14 @@ ignore-leashed-tps-threshold: 0
 # Set to 0 to disable this option.
 ignore-love-mode-tps-threshold: 0
 
+# At what distance (in blocks) should we not freeze mobs that are within that distance of a player?
+# Set to 0 to disable this option.
+ignore-player-proximity: 0.0
+
+# Below that TPS should we ignore the option above and start freezing mobs that are close to players?
+# Set to 0 to disable this option.
+ignore-player-proximity-tps-threshold: 0
+
 # Below what TPS should we ignore the never-freeze option and start freezing mobs on this list?
 # Set to 0 to disable this option.
 never-freeze-tps-threshold: 0
