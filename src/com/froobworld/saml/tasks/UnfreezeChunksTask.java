@@ -6,10 +6,8 @@ import com.froobworld.saml.utils.ChunkCoordinates;
 import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.UnfreezeChunkConsumer;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class UnfreezeChunksTask implements Runnable {
