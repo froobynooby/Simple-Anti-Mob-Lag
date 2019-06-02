@@ -42,6 +42,10 @@ use-paper-get-chunk-async: false
 # This is good if you want to freeze large player-made farms, but don't want to freeze random monsters in the world.
 group-bias: true
 
+# Below what TPS should we ignore the option above and freeze EVERYTHING in accordance to the other options?
+# Set to 0 to disable this option.
+group-bias-tps-threshold: 0
+
 # If there are any more than the group-minimum-size number of mobs within group-maximum-radius of each other this will constitute a group of mobs, which will be frozen if the server starts lagging.
 group-minimum-size: 10
 group-maximum-radius: 8
@@ -57,29 +61,53 @@ broadcast-to-console: true
 broadcast-to-ops: false
 
 
-# Should we unfreeze mobs when interacted with by a player?
-unfreeze-on-interact: true
-
-# Should we unfreeze mobs when they take damage?
-unfreeze-on-damage: true
-
 # Should we unfreeze mobs when the chunk they are in is unloaded?
 unfreeze-on-unload: true
 
 # Should we unfreeze all the loaded mobs when the plugin shuts down?
 unfreeze-on-shutdown: true
 
+# Should we unfreeze mobs when interacted with by a player?
+unfreeze-on-interact: true
+
+# Below what TPS should we ignore the option above and never unfreeze mobs that are interacted with?
+# Set to 0 to disable this option.
+unfreeze-on-interact-tps-threshold: 0
+
+# Should we unfreeze mobs when they take damage?
+unfreeze-on-damage: true
+
+# Below what TPS should we ignore the option above and never unfreeze mobs that are damaged?
+# Set to 0 to disable this option.
+unfreeze-on-damage-tps-threshold: 0
+
 # Should tamed mobs (cats, dogs, horses, etc.) never be frozen?
 ignore-tamed: true
+
+# Below what TPS should we ignore the option above and not ignore mobs that are tamed?
+# Set to 0 to disable this option.
+ignore-tamed-tps-threshold: 0
 
 # Should we ignore mobs named with a name tag?
 ignore-named: true
 
+# Below what TPS should we ignore the option above and not ignore mobs that are named?
+# Set to 0 to disable this option.
+ignore-named-tps-threshold: 0
+
 # Should mobs that are leashed never be frozen?
 ignore-leashed: true
 
+# Below what TPS should we ignore the option above and not ignore mobs that are leashed?
+# Set to 0 to disable this option.
+ignore-leashed-tps-threshold: 0
+
 # Should mobs that are in love mode (breeding mode) never be frozen?
 ignore-love-mode: true
+
+# Below what TPS should we ignore the option above and not ignore mobs that are in love mode?
+# Set to 0 to disable this option.
+ignore-love-mode-tps-threshold: 0
 
 
 # We will never freeze mobs of this type.
@@ -96,6 +124,10 @@ never-freeze:
   - RAVAGER
   - ILLUSIONER
   - EVOKER
+
+# Below what TPS should we ignore the option above and start freezing mobs on this list?
+# Set to 0 to disable this option.
+never-freeze-tps-threshold: 0
 
 # If the server is lagging, we will always freeze mobs of this type. Even if they're not in a large group.
 # Put mobs that are resource hogs here, like water mobs.

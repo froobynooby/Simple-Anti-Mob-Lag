@@ -85,7 +85,7 @@ public class MobFreezeTask implements Runnable {
         int numberFrozen = 0;
         int totalFrozen = 0;
         int totalMobs = 0;
-        boolean groupBias = config.getBoolean("group-bias");
+        boolean groupBias = config.getBoolean("group-bias") && tps >= config.getDouble("group-bias-tps-threshold");
         boolean smartScaling = config.getBoolean("use-smart-scaling");
         double baseMinimumSize = config.getDouble("group-minimum-size");
         double baseMaximumRadiusSq = Math.pow(config.getDouble("group-maximum-radius"), 2);

@@ -49,6 +49,13 @@ public class SamlListener implements Listener {
         boolean ignoreLoveMode = saml.getSamlConfig().getBoolean("ignore-love-mode");
         Set<String> neverFreeze = new HashSet<String>(saml.getSamlConfig().getStringList("never-freeze"));
 
+        double ignoreTamedTpsThreshold = saml.getSamlConfig().getDouble("ignore-tamed-tps-threshold");
+        double ignoreNamedTpsThreshold = saml.getSamlConfig().getDouble("ignore-named-tps-threshold");
+        double ignoreLeashedTpsThreshold = saml.getSamlConfig().getDouble("ignore-leashed-tps-threshold");
+        double ignoreLoveModeTpsThreshold = saml.getSamlConfig().getDouble("ignore-love-mode-tps-threshold");
+        double neverFreezeTpsThreshold = saml.getSamlConfig().getDouble("never-freeze-tps-threshold");
+
+
         HashMap<EntityType, Boolean> typedIgnoreTamed = new HashMap<EntityType, Boolean>();
         HashMap<EntityType, Boolean> typedIgnoreNamed = new HashMap<EntityType, Boolean>();
         HashMap<EntityType, Boolean> typedIgnoreLeashed = new HashMap<EntityType, Boolean>();
@@ -70,11 +77,36 @@ public class SamlListener implements Listener {
             }
         }
 
-        event.addShouldIgnorePredicate( e -> (neverFreeze.contains(e.getType().name())) );
-        event.addShouldIgnorePredicate( e -> (typedIgnoreTamed.getOrDefault(e.getType(), ignoreTamed) && e instanceof Tameable && ((Tameable) e).getOwner() != null) );
-        event.addShouldIgnorePredicate( e -> (typedIgnoreNamed.getOrDefault(e.getType(), ignoreNamed) && e.getCustomName() != null) );
-        event.addShouldIgnorePredicate( e -> (typedIgnoreLeashed.getOrDefault(e.getType(), ignoreLeashed) && e.isLeashed()) );
-        event.addShouldIgnorePredicate( e -> (CompatibilityUtils.ANIMAL_LOVE_MODE && typedIgnoreLoveMode.getOrDefault(e.getType(), ignoreLoveMode) && e instanceof Animals && ((Animals) e).isLoveMode()) );
+        HashMap<EntityType, Double> typedIgnoreTamedTpsThreshold = new HashMap<EntityType, Double>();
+        HashMap<EntityType, Double> typedIgnoreNamedTpsThreshold = new HashMap<EntityType, Double>();
+        HashMap<EntityType, Double> typedIgnoreLeashedTpsThreshold = new HashMap<EntityType, Double>();
+        HashMap<EntityType, Double> typedIgnoreLoveModeTpsThreshold = new HashMap<EntityType, Double>();
+        HashMap<EntityType, Double> typedNeverFreezeTpsThreshold = new HashMap<EntityType, Double>();
+        if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
+            for(EntityType entityType : EntityType.values()) {
+                if(saml.getAdvancedConfig().keyExists("ignore-tamed-tps-threshold." + entityType.name())) {
+                    typedIgnoreTamedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-tamed-tps-threshold." + entityType.name()));
+                }
+                if(saml.getAdvancedConfig().keyExists("ignore-named-tps-threshold." + entityType.name())) {
+                    typedIgnoreNamedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-named-tps-threshold." + entityType.name()));
+                }
+                if(saml.getAdvancedConfig().keyExists("ignore-leashed-tps-threshold." + entityType.name())) {
+                    typedIgnoreLeashedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-leashed-tps-threshold." + entityType.name()));
+                }
+                if(saml.getAdvancedConfig().keyExists("ignore-love-mode-tps-threshold." + entityType.name())) {
+                    typedIgnoreLoveModeTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-love-mode-tps-threshold." + entityType.name()));
+                }
+                if(saml.getAdvancedConfig().keyExists("never-freeze-tps-threshold." + entityType.name())) {
+                    typedNeverFreezeTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("never-freeze-tps-threshold." + entityType.name()));
+                }
+            }
+        }
+
+        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreTamedTpsThreshold.getOrDefault(e.getType(), neverFreezeTpsThreshold) && neverFreeze.contains(e.getType().name())) );
+        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreNamedTpsThreshold.getOrDefault(e.getType(), ignoreTamedTpsThreshold) && typedIgnoreTamed.getOrDefault(e.getType(), ignoreTamed) && e instanceof Tameable && ((Tameable) e).getOwner() != null) );
+        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreLeashedTpsThreshold.getOrDefault(e.getType(), ignoreNamedTpsThreshold) && typedIgnoreNamed.getOrDefault(e.getType(), ignoreNamed) && e.getCustomName() != null) );
+        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreLoveModeTpsThreshold.getOrDefault(e.getType(), ignoreLeashedTpsThreshold) && typedIgnoreLeashed.getOrDefault(e.getType(), ignoreLeashed) && e.isLeashed()) );
+        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedNeverFreezeTpsThreshold.getOrDefault(e.getType(), ignoreLoveModeTpsThreshold) && CompatibilityUtils.ANIMAL_LOVE_MODE && typedIgnoreLoveMode.getOrDefault(e.getType(), ignoreLoveMode) && e instanceof Animals && ((Animals) e).isLoveMode()) );
     }
 
 }

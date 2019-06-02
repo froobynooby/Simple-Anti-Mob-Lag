@@ -7,6 +7,8 @@ version: 1
 
 
 # Be sure to remove any comment markers (the #'s) to activate an option!
+# You can find a list of entity types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+# Make sure to use all caps for the entity types. It is case sensitive.
 
 # Should we unfreeze mobs of the following types when they are interacted with?
 unfreeze-on-interact:
@@ -15,11 +17,26 @@ unfreeze-on-interact:
 #  MULE: true
 #  SKELETON_HORSE: true
 
+# For mobs of the following type, below what TPS should we ignore the unfreeze-on-interact option and never unfreeze those that are interacted with?
+# Set to 0 to disable this option.
+unfreeze-on-interact-tps-threshold:
+#  HORSE: 10.0
+#  DONKEY: 10.0
+#  MULE: 10.0
+
 # Should we unfreeze mobs of the following types when they take damage?
 unfreeze-on-damage:
 #  ZOMBIE: true
 #  SKELETON: true
 #  CREEPER: true
+
+
+# For mobs of the following type, below what TPS should we ignore the unfreeze-on-damage option and never unfreeze those that are damaged?
+# Set to 0 to disable this option.
+unfreeze-on-damage-tps-threshold:
+#  ZOMBIE: 10
+#  SKELETON: 10
+#  CREEPER: 10
 
 # Should we ignore tamed mobs of the following types?
 ignore-tamed:
@@ -30,10 +47,26 @@ ignore-tamed:
 #  WOLF: false
 #  CAT: false
 
+# For mobs of the following type, below what TPS should we ignore the ignore-tamed option and not ignore those that are tamed?
+# Set to 0 to disable this option.
+ignore-tamed-tps-threshold:
+#  HORSE: 10.0
+#  DONKEY: 10.0
+#  MULE: 10.0
+#  SKELETON_HORSE: 10.0
+#  WOLF: 15.0
+#  CAT: 15.0
+
 # Should we ignore mobs of the following types that are named with a name tag?
 ignore-named:
 #  WOLF: true
 #  CAT: true
+
+# For mobs of the following type, below what TPS should we ignore the ignore-named option and not ignore those that are named?
+# Set to 0 to disable this option.
+ignore-named-tps-threshold:
+#  WOLF: 10.0
+#  CAT: 10.0
 
 # Should mobs of the following types that are leashed never be frozen?
 ignore-leashed:
@@ -41,9 +74,44 @@ ignore-leashed:
 #  DONKEY: true
 #  MULE: true
 
+# For mobs of the following type, below what TPS should we ignore the ignore-leashed option and not ignore those that are leashed?
+# Set to 0 to disable this option.
+ignore-leashed-tps-threshold:
+#  COW: 10.0
+#  PIG: 10.0
+#  SHEEP: 10.0
+#  CHICKEN: 10.0
+#  HORSE: 5.0
+#  DONKEY: 5.0
+#  MULE: 5.0
+
 # Should mobs that are in love mode (breeding mode) never be frozen?
 ignore-love-mode:
 #  CHICKEN: false
 #  COW: false
 #  PIG: false
 #  HORSE: true
+
+# For mobs of the following type, below what TPS should we ignore the ignore-love-mode option and not ignore those that are in love mode?
+# Set to 0 to disable this option.
+ignore-love-mode-tps-threshold:
+#  COW: 10.0
+#  PIG: 10.0
+#  SHEEP: 10.0
+#  CHICKEN: 10.0
+#  HORSE: 5.0
+#  DONKEY: 5.0
+#  MULE: 5.0
+
+# For mobs of the following type, below what TPS should we ignore the never-freeze list and start freezing those mobs?
+# Set to 0 to disable this option.
+never-freeze-tps-threshold:
+#  VILLAGER: 10.0
+#  WANDERING_TRADER: 10.0
+#  PILLAGER: 10.0
+#  VINDICATOR: 10.0
+#  VEX: 10.0
+#  WITCH: 10.0
+#  RAVAGER: 10.0
+#  ILLUSIONER: 10.0
+#  EVOKER: 10.0

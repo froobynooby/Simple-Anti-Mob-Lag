@@ -1,2 +1,30 @@
 # Do you want a config file with more options to generate?
 use-advanced-config: false
+
+# Below what TPS should we ignore the unfreeze-on-interact option and never unfreeze mobs that are interacted with?
+# Set to 0 to disable this option.
+unfreeze-on-interact-tps-threshold: 0
+
+# Below what TPS should we ignore the unfreeze-on-damage option and never unfreeze mobs that are damaged?
+# Set to 0 to disable this option.
+unfreeze-on-damage-tps-threshold: 0
+
+# Below what TPS should we ignore the ignore-tamed option and not ignore mobs that are tamed?
+# Set to 0 to disable this option.
+ignore-tamed-tps-threshold: 0
+
+# Below what TPS should we ignore the ignore-named option and not ignore mobs that are named?
+# Set to 0 to disable this option.
+ignore-named-tps-threshold: 0
+
+# Below what TPS should we ignore the ignore-leashed option and not ignore mobs that are leashed?
+# Set to 0 to disable this option.
+ignore-leashed-tps-threshold: 0
+
+# Below what TPS should we ignore the ignore-love-mode option and not ignore mobs that are in love mode?
+# Set to 0 to disable this option.
+ignore-love-mode-tps-threshold: 0
+
+# Below what TPS should we ignore the never-freeze option and start freezing mobs on this list?
+# Set to 0 to disable this option.
+never-freeze-tps-threshold: 0
