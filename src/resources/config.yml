@@ -98,7 +98,7 @@ ignore-named-tps-threshold: 0
 # Should mobs that are leashed never be frozen?
 ignore-leashed: true
 
-# Below what TPS should we ignore the option above and and start freezing mobs that are leashed?
+# Below what TPS should we ignore the option above and start freezing mobs that are leashed?
 # Set to 0 to disable this option.
 ignore-leashed-tps-threshold: 0
 
