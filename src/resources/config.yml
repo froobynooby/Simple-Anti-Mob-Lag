@@ -70,42 +70,42 @@ unfreeze-on-shutdown: true
 # Should we unfreeze mobs when interacted with by a player?
 unfreeze-on-interact: true
 
-# Below what TPS should we ignore the option above and never unfreeze mobs that are interacted with?
+# Below what TPS should we ignore the option above and not unfreeze mobs that are interacted with?
 # Set to 0 to disable this option.
 unfreeze-on-interact-tps-threshold: 0
 
 # Should we unfreeze mobs when they take damage?
 unfreeze-on-damage: true
 
-# Below what TPS should we ignore the option above and never unfreeze mobs that are damaged?
+# Below what TPS should we ignore the option above and not unfreeze mobs that take damage?
 # Set to 0 to disable this option.
 unfreeze-on-damage-tps-threshold: 0
 
 # Should tamed mobs (cats, dogs, horses, etc.) never be frozen?
 ignore-tamed: true
 
-# Below what TPS should we ignore the option above and not ignore mobs that are tamed?
+# Below what TPS should we ignore the option above and start freezing mobs that are tamed?
 # Set to 0 to disable this option.
 ignore-tamed-tps-threshold: 0
 
 # Should we ignore mobs named with a name tag?
 ignore-named: true
 
-# Below what TPS should we ignore the option above and not ignore mobs that are named?
+# Below what TPS should we ignore the option above and start freezing mobs that are named?
 # Set to 0 to disable this option.
 ignore-named-tps-threshold: 0
 
 # Should mobs that are leashed never be frozen?
 ignore-leashed: true
 
-# Below what TPS should we ignore the option above and not ignore mobs that are leashed?
+# Below what TPS should we ignore the option above and and start freezing mobs that are leashed?
 # Set to 0 to disable this option.
 ignore-leashed-tps-threshold: 0
 
 # Should mobs that are in love mode (breeding mode) never be frozen?
 ignore-love-mode: true
 
-# Below what TPS should we ignore the option above and not ignore mobs that are in love mode?
+# Below what TPS should we ignore the option above and start freezing mobs that are in love mode?
 # Set to 0 to disable this option.
 ignore-love-mode-tps-threshold: 0
 

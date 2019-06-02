@@ -30,7 +30,6 @@ unfreeze-on-damage:
 #  SKELETON: true
 #  CREEPER: true
 
-
 # For mobs of the following type, below what TPS should we ignore the unfreeze-on-damage option and never unfreeze those that are damaged?
 # Set to 0 to disable this option.
 unfreeze-on-damage-tps-threshold:
@@ -38,7 +37,7 @@ unfreeze-on-damage-tps-threshold:
 #  SKELETON: 10
 #  CREEPER: 10
 
-# Should we ignore tamed mobs of the following types?
+# Should mobs of the following types that are tamed never be frozen?
 ignore-tamed:
 #  HORSE: true
 #  DONKEY: true
@@ -57,7 +56,7 @@ ignore-tamed-tps-threshold:
 #  WOLF: 15.0
 #  CAT: 15.0
 
-# Should we ignore mobs of the following types that are named with a name tag?
+# Should mobs of the following types that are named with a name tag never be frozen?
 ignore-named:
 #  WOLF: true
 #  CAT: true
@@ -85,7 +84,7 @@ ignore-leashed-tps-threshold:
 #  DONKEY: 5.0
 #  MULE: 5.0
 
-# Should mobs that are in love mode (breeding mode) never be frozen?
+# Should mobs of the following types that are in love mode (breeding mode) never be frozen?
 ignore-love-mode:
 #  CHICKEN: false
 #  COW: false
