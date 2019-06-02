@@ -102,6 +102,20 @@ ignore-love-mode-tps-threshold:
 #  DONKEY: 5.0
 #  MULE: 5.0
 
+# Should mobs of the following type not be frozen when they are within the specified distance of a player?
+# Set to 0 to disable this option.
+ignore-player-proximity:
+#  ZOMBIE: 5
+#  SKELETON: 5
+#  CREEPER: 5
+
+# For mobs of the following type, below what TPS should we ignore the ignore-player-proximity distance and start freezing those mobs?
+# Set to 0 to disable this option.
+ignore-player-proximity-tps-threshold:
+#  ZOMBIE: 10
+#  SKELETON: 10
+#  CREEPER: 10
+
 # For mobs of the following type, below what TPS should we ignore the never-freeze list and start freezing those mobs?
 # Set to 0 to disable this option.
 never-freeze-tps-threshold:
