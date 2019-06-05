@@ -48,7 +48,8 @@ public class MobFreezeTask implements Runnable {
 
     @Override
     public void run() {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this, config.getLong("ticks-per-operation"));
+        long ticksPerOperation = config.getLong("ticks-per-operation");
+        Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this, ticksPerOperation <= 0 ? 1200:ticksPerOperation);
         double tps = tpsSupplier.get();
         long startTime = System.currentTimeMillis();
         long maxOperationTime = config.getLong("maximum-operation-time");
