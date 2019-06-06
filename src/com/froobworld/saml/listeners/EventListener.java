@@ -21,7 +21,7 @@ public class EventListener implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof LivingEntity) {
             if(!((LivingEntity) event.getRightClicked()).hasAI()) {
@@ -46,7 +46,7 @@ public class EventListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof LivingEntity) {
             if(!((LivingEntity) event.getEntity()).hasAI()) {

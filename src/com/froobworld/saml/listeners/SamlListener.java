@@ -23,7 +23,7 @@ public class SamlListener implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onSamlConfigReload(SamlConfigReloadEvent event) {
         if(event.getConfig().getBoolean("use-advanced-config")) {
             if(!saml.getAdvancedConfig().isLoaded()) {
@@ -40,7 +40,7 @@ public class SamlListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onSamlPreMobFreeze(SamlPreMobFreezeEvent event) {
         boolean ignoreTamed = saml.getSamlConfig().getBoolean("ignore-tamed");
         boolean ignoreNamed = saml.getSamlConfig().getBoolean("ignore-named");
