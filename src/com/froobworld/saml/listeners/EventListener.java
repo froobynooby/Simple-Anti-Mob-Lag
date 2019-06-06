@@ -28,7 +28,14 @@ public class EventListener implements Listener {
                     unfreezeOnInteract = saml.getSamlConfig().getBoolean("unfreeze-on-interact");
                 }
 
-                if(unfreezeOnInteract) {
+                double unfreezeOnInteractTpsThreshold;
+                if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-interact-tps-threshold." + event.getRightClicked().getType().name())) {
+                    unfreezeOnInteractTpsThreshold = saml.getAdvancedConfig().getDouble("unfreeze-on-interact-tps-threshold." + event.getRightClicked().getType().name());
+                } else {
+                    unfreezeOnInteractTpsThreshold = saml.getSamlConfig().getDouble("unfreeze-on-interact-tps-threshold");
+                }
+
+                if(unfreezeOnInteract && saml.getTpsSupplier().get() > unfreezeOnInteractTpsThreshold) {
                     ((LivingEntity) event.getRightClicked()).setAI(true);
                 }
             }
@@ -46,7 +53,14 @@ public class EventListener implements Listener {
                     unfreezeOnDamage = saml.getSamlConfig().getBoolean("unfreeze-on-damage");
                 }
 
-                if(unfreezeOnDamage) {
+                double unfreezeOnDamageTpsThreshold;
+                if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-damage-tps-threshold." + event.getEntity().getType().name())) {
+                    unfreezeOnDamageTpsThreshold = saml.getAdvancedConfig().getDouble("unfreeze-on-damage-tps-threshold." + event.getEntity().getType().name());
+                } else {
+                    unfreezeOnDamageTpsThreshold = saml.getSamlConfig().getDouble("unfreeze-on-damage-tps-threshold");
+                }
+
+                if(unfreezeOnDamage && saml.getTpsSupplier().get() > unfreezeOnDamageTpsThreshold) {
                     ((LivingEntity) event.getEntity()).setAI(true);
                 }
             }
