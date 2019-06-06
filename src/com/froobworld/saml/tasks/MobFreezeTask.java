@@ -106,7 +106,7 @@ public class MobFreezeTask implements Runnable {
             if(!groupBias) {
                 for(LivingEntity entity : world.getLivingEntities()) {
                     totalMobs++;
-                    if(entity instanceof Mob) {
+                    if(CompatibilityUtils.MOB_TARGET && entity instanceof Mob) {
                         if(((Mob) entity).getTarget() != null) {
                             mobsWithTargets.add((Mob) entity);
                         }
