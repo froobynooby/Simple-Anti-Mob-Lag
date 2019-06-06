@@ -10,6 +10,22 @@ version: 1
 # You can find a list of entity types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
 # Make sure to use all caps for the entity types. It is case sensitive.
 
+# Should we stop mobs from targeting mobs of the following type that are frozen?
+prevent-targeting-frozen:
+#  VILLAGER: true
+#  WANDERING_TRADER: true
+
+# Should we stop mobs from being able to damage frozen mobs of the following type?
+prevent-damaging-frozen:
+#  VILLAGER: true
+#  WANDERING_TRADER: true
+
+# Should we stop players from being able to damage frozen mobs of the following type?
+prevent-player-damaging-frozen:
+#  WOLF: true
+#  CAT: true
+
+
 # Should we unfreeze mobs of the following types when they are interacted with?
 unfreeze-on-interact:
 #  HORSE: true

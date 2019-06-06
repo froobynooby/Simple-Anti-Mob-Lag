@@ -3,9 +3,13 @@ package com.froobworld.saml.listeners;
 import com.froobworld.saml.Saml;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
@@ -63,6 +67,58 @@ public class EventListener implements Listener {
                 if(unfreezeOnDamage && saml.getTpsSupplier().get() > unfreezeOnDamageTpsThreshold) {
                     ((LivingEntity) event.getEntity()).setAI(true);
                 }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
+        if(event.getTarget() == null) {
+            return;
+        }
+        boolean preventTargetingFrozen;
+        if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("prevent-targeting-frozen." + event.getTarget().getType().name())) {
+            preventTargetingFrozen = saml.getAdvancedConfig().getBoolean("prevent-targeting-frozen." + event.getTarget().getType().name());
+        } else {
+            preventTargetingFrozen = saml.getSamlConfig().getBoolean("prevent-targeting-frozen");
+        }
+
+        if(preventTargetingFrozen && !event.getTarget().hasAI()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityDamageByEntityEntity(EntityDamageByEntityEvent event) {
+        if(!(event.getEntity() instanceof LivingEntity)) {
+            return;
+        }
+        Entity damager = event.getDamager();
+        if(event.getDamager() instanceof Projectile) {
+            if(((Projectile) event.getDamager()).getShooter() instanceof Entity) {
+                damager = (Entity) ((Projectile) event.getDamager()).getShooter();
+            }
+        }
+
+        if(damager instanceof Player) {
+            boolean preventPlayerDamagingFrozen;
+            if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().getBoolean("prevent-player-damaging-frozen." + event.getEntity().getType().name())) {
+                preventPlayerDamagingFrozen = saml.getAdvancedConfig().getBoolean("prevent-player-damaging-frozen." + event.getEntity().getType().name());
+            } else {
+                preventPlayerDamagingFrozen = saml.getSamlConfig().getBoolean("prevent-player-damaging-frozen");
+            }
+            if(preventPlayerDamagingFrozen && !((LivingEntity) event.getEntity()).hasAI()) {
+                event.setCancelled(true);
+            }
+        } else {
+            boolean preventDamagingFrozen;
+            if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().getBoolean("prevent-damaging-frozen." + event.getEntity().getType().name())) {
+                preventDamagingFrozen = saml.getAdvancedConfig().getBoolean("prevent-damaging-frozen." + event.getEntity().getType().name());
+            } else {
+                preventDamagingFrozen = saml.getSamlConfig().getBoolean("prevent-damaging-frozen");
+            }
+            if(preventDamagingFrozen && !((LivingEntity) event.getEntity()).hasAI()) {
+                event.setCancelled(true);
             }
         }
     }

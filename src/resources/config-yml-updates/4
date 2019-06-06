@@ -1,6 +1,16 @@
 # Do you want a config file with more options to generate?
 use-advanced-config: false
 
+# Should we stop mobs from targeting mobs that are frozen?
+# This includes things like zombies attacking frozen villagers and baby animals following frozen adult animals.
+prevent-targeting-frozen: true
+
+# Should we stop mobs from being able to damage frozen mobs?
+prevent-damaging-frozen: true
+
+# Should we stop players from being able to damage frozen mobs?
+prevent-player-damaging-frozen: false
+
 # Below what TPS should we ignore the unfreeze-on-interact option and never unfreeze mobs that are interacted with?
 # Set to 0 to disable this option.
 unfreeze-on-interact-tps-threshold: 0

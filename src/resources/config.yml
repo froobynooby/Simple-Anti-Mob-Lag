@@ -61,6 +61,16 @@ broadcast-to-console: true
 broadcast-to-ops: false
 
 
+# Should we stop mobs from targeting mobs that are frozen?
+# This includes things like zombies attacking frozen villagers and baby animals following frozen adult animals.
+prevent-targeting-frozen: true
+
+# Should we stop mobs from being able to damage frozen mobs?
+prevent-damaging-frozen: true
+
+# Should we stop players from being able to damage frozen mobs?
+prevent-player-damaging-frozen: false
+
 # Should we unfreeze mobs when the chunk they are in is unloaded?
 unfreeze-on-unload: true
 
