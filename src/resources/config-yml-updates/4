@@ -1,6 +1,10 @@
 # Do you want a config file with more options to generate?
 use-advanced-config: false
 
+# Below what TPS should we ignore the group-bias option and freeze EVERYTHING in accordance to the other options?
+# Set to 0 to disable this option.
+group-bias-tps-threshold: 0
+
 # Should we stop mobs from targeting mobs that are frozen?
 # This includes things like zombies attacking frozen villagers and baby animals following frozen adult animals.
 prevent-targeting-frozen: true
