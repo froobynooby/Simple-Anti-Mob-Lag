@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 public class CompatibilityUtils {
     public static final boolean ANIMAL_LOVE_MODE;
     public static final boolean USE_PAPER_GET_CHUNK_ASYNC;
+    public static final boolean MOB_TARGET;
     static {
         boolean loveModeMethodExists;
         try {
@@ -23,5 +24,14 @@ public class CompatibilityUtils {
             asyncChunkGetMethodExists = false;
         }
         USE_PAPER_GET_CHUNK_ASYNC = asyncChunkGetMethodExists;
+
+        boolean mobClassExists;
+        try {
+            org.bukkit.entity.Mob.class.getClass();
+            mobClassExists = true;
+        } catch (NoClassDefFoundError e) {
+            mobClassExists = false;
+        }
+        MOB_TARGET = mobClassExists;
     }
 }

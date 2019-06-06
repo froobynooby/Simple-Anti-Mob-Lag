@@ -3,6 +3,7 @@ package com.froobworld.saml.tasks;
 import com.froobworld.saml.*;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
 import com.froobworld.saml.events.SamlPreMobFreezeEvent;
+import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.TpsSupplier;
 import com.froobworld.saml.utils.MessageUtils;
 import org.bukkit.Bukkit;
@@ -128,7 +129,7 @@ public class MobFreezeTask implements Runnable {
             List<NeighbouredEntity> neighbouredEntities = new ArrayList<NeighbouredEntity>();
             for(LivingEntity entity : world.getLivingEntities()) {
                 totalMobs++;
-                if(entity instanceof Mob) {
+                if(CompatibilityUtils.MOB_TARGET && entity instanceof Mob) {
                     if(((Mob) entity).getTarget() != null) {
                         mobsWithTargets.add((Mob) entity);
                     }
@@ -207,11 +208,13 @@ public class MobFreezeTask implements Runnable {
                 }
             }
         }
-        for(Mob mob : mobsWithTargets) {
-            if(mob.getTarget() != null) {
-                if(!mob.getTarget().hasAI()) {
-                    if(typedPreventTargetingFrozen.getOrDefault(mob.getTarget().getType(), preventTargetingFrozen)) {
-                        mob.setTarget(null);
+        if(CompatibilityUtils.MOB_TARGET) {
+            for (Mob mob : mobsWithTargets) {
+                if (mob.getTarget() != null) {
+                    if (!mob.getTarget().hasAI()) {
+                        if (typedPreventTargetingFrozen.getOrDefault(mob.getTarget().getType(), preventTargetingFrozen)) {
+                            mob.setTarget(null);
+                        }
                     }
                 }
             }
