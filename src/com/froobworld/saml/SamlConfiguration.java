@@ -36,7 +36,7 @@ public class SamlConfiguration {
         saml.getLogger().info("Loading " + fileName + "...");
         File configFile = new File(saml.getDataFolder(), fileName);
         if(!configFile.exists()) {
-            Saml.logger().info(fileName + " does not exist, copying default from jar...");
+            Saml.logger().info("Couldn't find existing " + fileName + ", copying default from jar...");
             try {
                 saml.getDataFolder().mkdirs();
                 Files.copy(saml.getResource("resources/" + fileName), configFile.toPath());
@@ -49,7 +49,7 @@ public class SamlConfiguration {
             }
         }
         config = YamlConfiguration.loadConfiguration(configFile);
-        Saml.logger().info(fileName + " successfully loaded.");
+        Saml.logger().info("Successfully loaded " + fileName + ".");
 
         if(config.contains("version")) {
             int version = config.getInt("version");
@@ -67,7 +67,7 @@ public class SamlConfiguration {
                         return;
                     }
                 }
-                Saml.logger().info(fileName + " successfully updated!");
+                Saml.logger().info("Successfully updated " + fileName + "!");
                 config = YamlConfiguration.loadConfiguration(configFile);
             }
         } else {
