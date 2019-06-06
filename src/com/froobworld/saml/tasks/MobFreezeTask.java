@@ -7,13 +7,12 @@ import com.froobworld.saml.utils.TpsSupplier;
 import com.froobworld.saml.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class MobFreezeTask implements Runnable {
     private Saml saml;
@@ -97,6 +96,8 @@ public class MobFreezeTask implements Runnable {
         Set<String> alwaysFreeze = new HashSet<String>(config.getStringList("always-freeze"));
 
         List<LivingEntity> mobsToFreeze = new ArrayList<LivingEntity>();
+
+        List<Mob> mobsWithTargets = new ArrayList<Mob>();
         for(World world : Bukkit.getWorlds()) {
             if(config.getStringList("ignore-worlds").contains(world.getName())) {
                 continue;
@@ -104,6 +105,11 @@ public class MobFreezeTask implements Runnable {
             if(!groupBias) {
                 for(LivingEntity entity : world.getLivingEntities()) {
                     totalMobs++;
+                    if(entity instanceof Mob) {
+                        if(((Mob) entity).getTarget() != null) {
+                            mobsWithTargets.add((Mob) entity);
+                        }
+                    }
                     if(!entity.hasAI()) {
                         totalFrozen++;
                         continue;
@@ -122,6 +128,11 @@ public class MobFreezeTask implements Runnable {
             List<NeighbouredEntity> neighbouredEntities = new ArrayList<NeighbouredEntity>();
             for(LivingEntity entity : world.getLivingEntities()) {
                 totalMobs++;
+                if(entity instanceof Mob) {
+                    if(((Mob) entity).getTarget() != null) {
+                        mobsWithTargets.add((Mob) entity);
+                    }
+                }
                 if(!entity.hasAI()) {
                     totalFrozen++;
                     continue;
@@ -184,6 +195,25 @@ public class MobFreezeTask implements Runnable {
             }
             if(frozenChunkCache != null) {
                 frozenChunkCache.saveToFile();
+            }
+        }
+
+        boolean preventTargetingFrozen = config.getBoolean("prevent-targeting-frozen");
+        HashMap<EntityType, Boolean> typedPreventTargetingFrozen = new HashMap<EntityType, Boolean>();
+        if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
+            for (EntityType entityType : EntityType.values()) {
+                if (saml.getAdvancedConfig().keyExists("prevent-target-frozen." + entityType.name())) {
+                    typedPreventTargetingFrozen.put(entityType, saml.getAdvancedConfig().getBoolean("prevent-target-frozen." + entityType.name()));
+                }
+            }
+        }
+        for(Mob mob : mobsWithTargets) {
+            if(mob.getTarget() != null) {
+                if(!mob.getTarget().hasAI()) {
+                    if(typedPreventTargetingFrozen.getOrDefault(mob.getTarget().getType(), preventTargetingFrozen)) {
+                        mob.setTarget(null);
+                    }
+                }
             }
         }
 
