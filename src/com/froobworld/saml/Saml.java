@@ -6,6 +6,7 @@ import com.froobworld.saml.listeners.EventListener;
 import com.froobworld.saml.listeners.SamlListener;
 import com.froobworld.saml.metrics.Metrics;
 import com.froobworld.saml.tasks.*;
+import com.froobworld.saml.utils.TpsSupplier;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,6 +18,7 @@ public class Saml extends JavaPlugin {
     private SamlConfiguration advancedConfig;
     private SamlConfiguration messages;
     private MobFreezeTask mobFreezeTask;
+    private TpsSupplier tpsSupplier;
 
     private UnfreezeOnShutdownTask unfreezeOnShutdownTask;
     private HandleCacheOnShutdownTask handleCacheOnShutdownTask;
@@ -31,6 +33,7 @@ public class Saml extends JavaPlugin {
         }
         messages = new SamlConfiguration(this, SamlConfiguration.MESSAGES_CURRENT_VERSION, "messages.yml");
         messages.loadFromFile();
+        tpsSupplier = new TpsSupplier(this);
 
         registerCommands();
         registerListeners();
@@ -85,6 +88,10 @@ public class Saml extends JavaPlugin {
 
     public MobFreezeTask getMobFreezeTask() {
         return mobFreezeTask;
+    }
+
+    public TpsSupplier getTpsSupplier() {
+        return tpsSupplier;
     }
 
     @Override

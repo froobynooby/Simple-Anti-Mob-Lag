@@ -26,7 +26,7 @@ public class MobFreezeTask implements Runnable {
         this.saml = saml;
         this.config = saml.getSamlConfig();
         this.messages = saml.getSamlMessages();
-        this.tpsSupplier = new TpsSupplier(saml);
+        this.tpsSupplier = saml.getTpsSupplier();
         if(saml.getSamlConfig().getBoolean("keep-frozen-chunk-cache")) {
             createChunkCacheIfNotExist();
         } else {
