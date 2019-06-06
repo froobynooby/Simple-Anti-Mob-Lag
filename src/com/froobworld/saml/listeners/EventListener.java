@@ -102,7 +102,7 @@ public class EventListener implements Listener {
 
         if(damager instanceof Player) {
             boolean preventPlayerDamagingFrozen;
-            if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().getBoolean("prevent-player-damaging-frozen." + event.getEntity().getType().name())) {
+            if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("prevent-player-damaging-frozen." + event.getEntity().getType().name())) {
                 preventPlayerDamagingFrozen = saml.getAdvancedConfig().getBoolean("prevent-player-damaging-frozen." + event.getEntity().getType().name());
             } else {
                 preventPlayerDamagingFrozen = saml.getSamlConfig().getBoolean("prevent-player-damaging-frozen");
@@ -112,7 +112,7 @@ public class EventListener implements Listener {
             }
         } else {
             boolean preventDamagingFrozen;
-            if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().getBoolean("prevent-damaging-frozen." + event.getEntity().getType().name())) {
+            if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("prevent-damaging-frozen." + event.getEntity().getType().name())) {
                 preventDamagingFrozen = saml.getAdvancedConfig().getBoolean("prevent-damaging-frozen." + event.getEntity().getType().name());
             } else {
                 preventDamagingFrozen = saml.getSamlConfig().getBoolean("prevent-damaging-frozen");
