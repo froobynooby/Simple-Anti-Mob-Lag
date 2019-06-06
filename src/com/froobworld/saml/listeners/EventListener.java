@@ -1,10 +1,7 @@
 package com.froobworld.saml.listeners;
 
 import com.froobworld.saml.Saml;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -73,7 +70,7 @@ public class EventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
-        if(event.getTarget() == null) {
+        if(event.getTarget() == null || event.getTarget() instanceof Player) {
             return;
         }
         boolean preventTargetingFrozen;
@@ -90,7 +87,7 @@ public class EventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntityEntity(EntityDamageByEntityEvent event) {
-        if(!(event.getEntity() instanceof LivingEntity)) {
+        if(!(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof Player || event.getEntity() instanceof ArmorStand) {
             return;
         }
         Entity damager = event.getDamager();
