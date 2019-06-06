@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.*;
@@ -107,7 +108,7 @@ public class MobFreezeTask implements Runnable {
                 for(LivingEntity entity : world.getLivingEntities()) {
                     totalMobs++;
                     if(CompatibilityUtils.MOB_TARGET && entity instanceof Mob) {
-                        if(((Mob) entity).getTarget() != null) {
+                        if(((Mob) entity).getTarget() != null && !(((Mob) entity).getTarget() instanceof Player)) {
                             mobsWithTargets.add((Mob) entity);
                         }
                     }
