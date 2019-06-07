@@ -77,7 +77,7 @@ public class UnfreezeChunksTask implements Runnable {
             lastCompleted = completed;
             Saml.logger().info("We have unfrozen " + completed + " of " + frozenChunkCaches.size() + " of the old frozen chunk caches.");
         }
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this, saml.getSamlConfig().getLong("ticks-per-cached-chunk-unfreeze"));
+        long ticksPerCachedChunkUnfreeze = saml.getSamlConfig().getLong("ticks-per-cached-chunk-unfreeze");
+        Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this, ticksPerCachedChunkUnfreeze <= 0 ? 40:ticksPerCachedChunkUnfreeze);
     }
 }
