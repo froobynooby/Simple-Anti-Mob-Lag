@@ -49,9 +49,9 @@ unfreeze-on-damage:
 # For mobs of the following type, below what TPS should we ignore the unfreeze-on-damage option and never unfreeze those that are damaged?
 # Set to 0 to disable this option.
 unfreeze-on-damage-tps-threshold:
-#  ZOMBIE: 10
-#  SKELETON: 10
-#  CREEPER: 10
+#  ZOMBIE: 10.0
+#  SKELETON: 10.0
+#  CREEPER: 10.0
 
 # Should mobs of the following types that are tamed never be frozen?
 ignore-tamed:
@@ -122,16 +122,16 @@ ignore-love-mode-tps-threshold:
 # Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
 # Set to 0 to disable this option.
 ignore-player-proximity:
-#  ZOMBIE: 5
-#  SKELETON: 5
-#  CREEPER: 5
+#  ZOMBIE: 5.0
+#  SKELETON: 5.0
+#  CREEPER: 5.0
 
 # For mobs of the following type, below what TPS should we ignore the ignore-player-proximity distance and start freezing those mobs?
 # Set to 0 to disable this option.
 ignore-player-proximity-tps-threshold:
-#  ZOMBIE: 10
-#  SKELETON: 10
-#  CREEPER: 10
+#  ZOMBIE: 10.0
+#  SKELETON: 10.0
+#  CREEPER: 10.0
 
 # For mobs of the following type, below what TPS should we ignore the never-freeze list and start freezing those mobs?
 # Set to 0 to disable this option.

@@ -48,7 +48,7 @@ group-bias-tps-threshold: 0
 
 # If there are any more than the group-minimum-size number of mobs within group-maximum-radius of each other this will constitute a group of mobs, which will be frozen if the server starts lagging.
 group-minimum-size: 10
-group-maximum-radius: 8
+group-maximum-radius: 8.0
 
 # Should we scale the maximum radius and minimum size required of a group depending on how much the server is lagging?
 use-smart-scaling: true
@@ -121,7 +121,7 @@ ignore-love-mode-tps-threshold: 0
 
 # At what distance (in blocks) should we not freeze mobs that are within that distance of a player?
 # Set to 0 to disable this option.
-ignore-player-proximity: 0.0
+ignore-player-proximity: 0
 
 # Below that TPS should we ignore the option above and start freezing mobs that are close to players?
 # Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
