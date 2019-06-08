@@ -30,7 +30,7 @@ public class Saml_StatsCommand implements CommandExecutor {
                     continue;
                 }
                 worldMobCount++;
-                if(livingEntity.hasAI()) {
+                if(!livingEntity.hasAI()) {
                     worldFrozenMobCount++;
                 }
             }
