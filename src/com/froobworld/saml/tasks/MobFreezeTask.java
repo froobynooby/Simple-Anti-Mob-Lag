@@ -101,7 +101,7 @@ public class MobFreezeTask implements Runnable {
 
         List<Mob> mobsWithTargets = new ArrayList<Mob>();
         for(World world : Bukkit.getWorlds()) {
-            if(config.getStringList("ignore-worlds").contains(world.getName())) {
+            if(config.getStringList("ignore-world").contains(world.getName())) {
                 continue;
             }
             if(!groupBias) {
