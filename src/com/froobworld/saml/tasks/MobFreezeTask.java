@@ -4,6 +4,7 @@ import com.froobworld.saml.*;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
 import com.froobworld.saml.events.SamlPreMobFreezeEvent;
 import com.froobworld.saml.utils.CompatibilityUtils;
+import com.froobworld.saml.utils.EntityFreezer;
 import com.froobworld.saml.utils.TpsSupplier;
 import com.froobworld.saml.utils.MessageUtils;
 import org.bukkit.Bukkit;
@@ -63,9 +64,9 @@ public class MobFreezeTask implements Runnable {
                     if(unfrozen >= unfreezeLimit) {
                         break;
                     }
-                    if(!entity.hasAI()) {
+                    if(EntityFreezer.isFrozen(entity)) {
                         unfrozen++;
-                        entity.setAI(true);
+                        EntityFreezer.freezeEntity(entity);
                     }
                 }
             }
@@ -112,7 +113,7 @@ public class MobFreezeTask implements Runnable {
                             mobsWithTargets.add((Mob) entity);
                         }
                     }
-                    if(!entity.hasAI()) {
+                    if(EntityFreezer.isFrozen(entity)) {
                         totalFrozen++;
                         continue;
                     }
@@ -135,7 +136,7 @@ public class MobFreezeTask implements Runnable {
                         mobsWithTargets.add((Mob) entity);
                     }
                 }
-                if(!entity.hasAI()) {
+                if(EntityFreezer.isFrozen(entity)) {
                     totalFrozen++;
                     continue;
                 }
@@ -180,8 +181,8 @@ public class MobFreezeTask implements Runnable {
         Bukkit.getPluginManager().callEvent(mobFreezeEvent);
         if(!mobFreezeEvent.isCancelled()) {
             for(LivingEntity entity : mobFreezeEvent.getMobsToFreeze()) {
-                if(entity.hasAI()) {
-                    entity.setAI(false);
+                if(!EntityFreezer.isFrozen(entity)) {
+                    EntityFreezer.freezeEntity(entity);
                     if(frozenChunkCache != null) {
                         frozenChunkCache.addChunk(entity.getLocation());
                     }
@@ -206,7 +207,7 @@ public class MobFreezeTask implements Runnable {
         if(CompatibilityUtils.MOB_TARGET) {
             for (Mob mob : mobsWithTargets) {
                 if (mob.getTarget() != null) {
-                    if (!mob.getTarget().hasAI()) {
+                    if (EntityFreezer.isFrozen(mob.getTarget())) {
                         if (typedPreventTargetingFrozen.getOrDefault(mob.getTarget().getType(), preventTargetingFrozen)) {
                             mob.setTarget(null);
                         }

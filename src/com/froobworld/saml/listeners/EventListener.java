@@ -1,6 +1,7 @@
 package com.froobworld.saml.listeners;
 
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.utils.EntityFreezer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,7 +22,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof LivingEntity) {
-            if(!((LivingEntity) event.getRightClicked()).hasAI()) {
+            if(EntityFreezer.isFrozen((LivingEntity) event.getRightClicked())) {
                 boolean unfreezeOnInteract;
                 if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-interact." + event.getRightClicked().getType().name())) {
                     unfreezeOnInteract = saml.getAdvancedConfig().getBoolean("unfreeze-on-interact." + event.getRightClicked().getType().name());
@@ -37,7 +38,7 @@ public class EventListener implements Listener {
                 }
 
                 if(unfreezeOnInteract && saml.getTpsSupplier().get() > unfreezeOnInteractTpsThreshold) {
-                    ((LivingEntity) event.getRightClicked()).setAI(true);
+                    EntityFreezer.unfreezeEntity((LivingEntity) event.getRightClicked());
                 }
             }
         }
@@ -46,7 +47,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof LivingEntity) {
-            if(!((LivingEntity) event.getEntity()).hasAI()) {
+            if(EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
                 boolean unfreezeOnDamage;
                 if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-damage." + event.getEntity().getType().name())) {
                     unfreezeOnDamage = saml.getAdvancedConfig().getBoolean("unfreeze-on-damage." + event.getEntity().getType().name());
@@ -62,7 +63,7 @@ public class EventListener implements Listener {
                 }
 
                 if(unfreezeOnDamage && saml.getTpsSupplier().get() > unfreezeOnDamageTpsThreshold) {
-                    ((LivingEntity) event.getEntity()).setAI(true);
+                    EntityFreezer.unfreezeEntity((LivingEntity) event.getEntity());
                 }
             }
         }
@@ -104,7 +105,7 @@ public class EventListener implements Listener {
             } else {
                 preventPlayerDamagingFrozen = saml.getSamlConfig().getBoolean("prevent-player-damaging-frozen");
             }
-            if(preventPlayerDamagingFrozen && !((LivingEntity) event.getEntity()).hasAI()) {
+            if(preventPlayerDamagingFrozen && EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
                 event.setCancelled(true);
             }
         } else {
@@ -114,7 +115,7 @@ public class EventListener implements Listener {
             } else {
                 preventDamagingFrozen = saml.getSamlConfig().getBoolean("prevent-damaging-frozen");
             }
-            if(preventDamagingFrozen && !((LivingEntity) event.getEntity()).hasAI()) {
+            if(preventDamagingFrozen && EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
                 event.setCancelled(true);
             }
         }
@@ -125,8 +126,8 @@ public class EventListener implements Listener {
         if(saml.getSamlConfig().getBoolean("unfreeze-on-unload")) {
             for(Entity entity : event.getChunk().getEntities()) {
                 if(entity instanceof LivingEntity) {
-                    if(!((LivingEntity) entity).hasAI()) {
-                        ((LivingEntity) entity).setAI(true);
+                    if(EntityFreezer.isFrozen((LivingEntity) entity)) {
+                        EntityFreezer.unfreezeEntity((LivingEntity) entity);
                     }
                 }
             }

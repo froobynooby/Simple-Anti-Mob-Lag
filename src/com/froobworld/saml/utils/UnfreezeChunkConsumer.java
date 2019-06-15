@@ -1,7 +1,6 @@
 package com.froobworld.saml.utils;
 
 import com.froobworld.saml.FrozenChunkCache;
-import com.froobworld.saml.tasks.UnfreezeChunksTask;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -23,8 +22,8 @@ public class UnfreezeChunkConsumer implements Consumer<Chunk> {
         }
         for(Entity entity : chunk.getEntities()) {
             if(entity instanceof LivingEntity) {
-                if(!((LivingEntity) entity).hasAI()) {
-                    ((LivingEntity) entity).setAI(true);
+                if(EntityFreezer.isFrozen((LivingEntity) entity)) {
+                    EntityFreezer.unfreezeEntity((LivingEntity) entity);
                 }
             }
         }
