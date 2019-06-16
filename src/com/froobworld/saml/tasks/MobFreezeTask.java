@@ -69,7 +69,7 @@ public class MobFreezeTask implements Runnable {
                             continue;
                         }
                         unfrozen++;
-                        EntityFreezer.freezeEntity(entity);
+                        EntityFreezer.unfreezeEntity(entity);
                     }
                 }
             }
