@@ -120,11 +120,11 @@ ignore-love-mode: true
 ignore-love-mode-tps-threshold: 0
 
 # At what distance (in blocks) should we not freeze mobs that are within that distance of a player?
+# Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
 # Set to 0 to disable this option.
 ignore-player-proximity: 0
 
 # Below that TPS should we ignore the option above and start freezing mobs that are close to players?
-# Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
 # Set to 0 to disable this option.
 ignore-player-proximity-tps-threshold: 0
 
