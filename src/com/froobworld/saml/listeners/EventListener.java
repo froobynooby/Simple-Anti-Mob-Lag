@@ -23,6 +23,9 @@ public class EventListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof LivingEntity) {
             if(EntityFreezer.isFrozen((LivingEntity) event.getRightClicked())) {
+                if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getRightClicked()::hasMetadata)) {
+                    return;
+                }
                 boolean unfreezeOnInteract;
                 if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-interact." + event.getRightClicked().getType().name())) {
                     unfreezeOnInteract = saml.getAdvancedConfig().getBoolean("unfreeze-on-interact." + event.getRightClicked().getType().name());
@@ -48,6 +51,9 @@ public class EventListener implements Listener {
     public void onEntityDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof LivingEntity) {
             if(EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
+                if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getEntity()::hasMetadata)) {
+                    return;
+                }
                 boolean unfreezeOnDamage;
                 if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-damage." + event.getEntity().getType().name())) {
                     unfreezeOnDamage = saml.getAdvancedConfig().getBoolean("unfreeze-on-damage." + event.getEntity().getType().name());
@@ -74,6 +80,9 @@ public class EventListener implements Listener {
         if(event.getTarget() == null || event.getTarget() instanceof Player) {
             return;
         }
+        if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getTarget()::hasMetadata)) {
+            return;
+        }
         boolean preventTargetingFrozen;
         if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("prevent-targeting-frozen." + event.getTarget().getType().name())) {
             preventTargetingFrozen = saml.getAdvancedConfig().getBoolean("prevent-targeting-frozen." + event.getTarget().getType().name());
@@ -89,6 +98,9 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntityEntity(EntityDamageByEntityEvent event) {
         if(!(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof Player || event.getEntity() instanceof ArmorStand) {
+            return;
+        }
+        if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getEntity()::hasMetadata)) {
             return;
         }
         Entity damager = event.getDamager();
@@ -127,6 +139,9 @@ public class EventListener implements Listener {
             for(Entity entity : event.getChunk().getEntities()) {
                 if(entity instanceof LivingEntity) {
                     if(EntityFreezer.isFrozen((LivingEntity) entity)) {
+                        if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
+                            continue;
+                        }
                         EntityFreezer.unfreezeEntity((LivingEntity) entity);
                     }
                 }

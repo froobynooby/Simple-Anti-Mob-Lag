@@ -1,0 +1,7 @@
+# Plugins can add metadata to entities that allows other plugins to identify them with that plugin.
+# This option allows you to completely ignore such entities, so that SAML does not interfere with them.
+# If SAML interferes with some other plugin's entities, please ask that plugin's developer to add identifying metadata to them.
+# We will never freeze (or unfreeze) entities that have metadata on the following list.
+ignore-metadata:
+  - Elitemob  # This ignores elite mobs from the plugin EliteMobs.
+#  - Supermob  # This ignores super mobs from the plugin EliteMobs.

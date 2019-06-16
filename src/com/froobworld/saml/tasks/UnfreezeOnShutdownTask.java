@@ -20,6 +20,9 @@ public class UnfreezeOnShutdownTask implements Runnable {
             for(World world : Bukkit.getWorlds()) {
                 for(LivingEntity entity : world.getLivingEntities()) {
                     if(EntityFreezer.isFrozen(entity)) {
+                        if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
+                            continue;
+                        }
                         EntityFreezer.unfreezeEntity(entity);
                     }
                 }

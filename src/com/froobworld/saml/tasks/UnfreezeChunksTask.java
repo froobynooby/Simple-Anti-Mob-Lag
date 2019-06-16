@@ -33,7 +33,7 @@ public class UnfreezeChunksTask implements Runnable {
                     for(FrozenChunkCache frozenChunkCache : cacheCopy) {
                         List<ChunkCoordinates> coordsCopy = new ArrayList<ChunkCoordinates>(frozenChunkCache.getFrozenChunkCoordinates());
                         coordsCopy.forEach(c -> c.getWorld().getChunkAtAsync(
-                                c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(frozenChunkCache)
+                                c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(frozenChunkCache, saml.getSamlConfig())
                         ));
                     }
                 } else {
@@ -70,7 +70,7 @@ public class UnfreezeChunksTask implements Runnable {
                 currentCache = frozenChunkCaches.get(place);
 
             }
-            new UnfreezeChunkConsumer(currentCache).accept(currentCache.getFrozenChunkCoordinates().iterator().next().toChunk());
+            new UnfreezeChunkConsumer(currentCache, saml.getSamlConfig()).accept(currentCache.getFrozenChunkCoordinates().iterator().next().toChunk());
         }
         int completed = (int) frozenChunkCaches.stream().filter(f -> f.getFrozenChunkCoordinates().isEmpty() ).count();
         if(completed > lastCompleted) {

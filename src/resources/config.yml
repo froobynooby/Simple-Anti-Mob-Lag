@@ -1,5 +1,5 @@
 # Don't change this!
-version: 5
+version: 6
 
 # Do you want a config file with more options to generate?
 use-advanced-config: false
@@ -127,6 +127,14 @@ ignore-player-proximity: 0
 # Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
 # Set to 0 to disable this option.
 ignore-player-proximity-tps-threshold: 0
+
+# Plugins can add metadata to entities that allows other plugins to identify them with that plugin.
+# This option allows you to completely ignore such entities, so that SAML does not interfere with them.
+# If SAML interferes with some other plugin's entities, please ask that plugin's developer to add identifying metadata to them.
+# We will never freeze (or unfreeze) entities that have metadata on the following list.
+ignore-metadata:
+  - Elitemob  # This ignores elite mobs from the plugin EliteMobs.
+#  - Supermob  # This ignores super mobs from the plugin EliteMobs.
 
 
 # We will never freeze mobs of this type.

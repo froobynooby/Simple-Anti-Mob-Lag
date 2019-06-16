@@ -65,6 +65,9 @@ public class MobFreezeTask implements Runnable {
                         break;
                     }
                     if(EntityFreezer.isFrozen(entity)) {
+                        if(config.getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
+                            continue;
+                        }
                         unfrozen++;
                         EntityFreezer.freezeEntity(entity);
                     }
@@ -207,8 +210,14 @@ public class MobFreezeTask implements Runnable {
         if(CompatibilityUtils.MOB_TARGET) {
             for (Mob mob : mobsWithTargets) {
                 if (mob.getTarget() != null) {
+                    if(config.getStringList("ignore-metadata").stream().anyMatch(mob::hasMetadata)) {
+                        continue;
+                    }
                     if (EntityFreezer.isFrozen(mob.getTarget())) {
                         if (typedPreventTargetingFrozen.getOrDefault(mob.getTarget().getType(), preventTargetingFrozen)) {
+                            if(config.getStringList("ignore-metadata").stream().anyMatch(mob.getTarget()::hasMetadata)) {
+                                continue;
+                            }
                             mob.setTarget(null);
                         }
                     }
