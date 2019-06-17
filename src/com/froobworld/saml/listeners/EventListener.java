@@ -90,7 +90,7 @@ public class EventListener implements Listener {
             preventTargetingFrozen = saml.getSamlConfig().getBoolean("prevent-targeting-frozen");
         }
 
-        if(preventTargetingFrozen && !event.getTarget().hasAI()) {
+        if(preventTargetingFrozen && EntityFreezer.isFrozen(event.getTarget())) {
             event.setCancelled(true);
         }
     }
