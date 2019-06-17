@@ -1,6 +1,7 @@
 package com.froobworld.saml.tasks;
 
 import com.froobworld.saml.*;
+import com.froobworld.saml.data.FrozenEntityData;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
 import com.froobworld.saml.events.SamlPreMobFreezeEvent;
 import com.froobworld.saml.utils.CompatibilityUtils;
@@ -56,6 +57,8 @@ public class MobFreezeTask implements Runnable {
         long startTime = System.currentTimeMillis();
         long maxOperationTime = config.getLong("maximum-operation-time");
 
+        boolean onlyUnfreezeTagged = config.getBoolean("only-unfreeze-tagged");
+
         if(tps > config.getDouble("tps-unfreezing-threshold")) {
             int unfrozen = 0;
             double unfreezeLimit = config.getDouble("unfreeze-limit");
@@ -64,12 +67,12 @@ public class MobFreezeTask implements Runnable {
                     if(unfrozen >= unfreezeLimit) {
                         break;
                     }
-                    if(EntityFreezer.isFrozen(entity)) {
+                    if(onlyUnfreezeTagged ? EntityFreezer.isSamlFrozen(saml, entity) : EntityFreezer.isFrozen(entity)) {
                         if(config.getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
                             continue;
                         }
                         unfrozen++;
-                        EntityFreezer.unfreezeEntity(entity);
+                        EntityFreezer.unfreezeEntity(saml, entity);
                     }
                 }
             }
@@ -185,7 +188,11 @@ public class MobFreezeTask implements Runnable {
         if(!mobFreezeEvent.isCancelled()) {
             for(LivingEntity entity : mobFreezeEvent.getMobsToFreeze()) {
                 if(!EntityFreezer.isFrozen(entity)) {
-                    EntityFreezer.freezeEntity(entity);
+                    FrozenEntityData frozenEntityData = new FrozenEntityData.Builder()
+                            .addGroup(groupBias ? "default_group" : "default_single")
+                            .build();
+
+                    EntityFreezer.freezeEntity(saml, entity, frozenEntityData);
                     if(frozenChunkCache != null) {
                         frozenChunkCache.addChunk(entity.getLocation());
                     }

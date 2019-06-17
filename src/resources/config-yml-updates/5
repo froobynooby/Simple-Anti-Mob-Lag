@@ -5,3 +5,11 @@
 ignore-metadata:
   - Elitemob  # This ignores elite mobs from the plugin EliteMobs.
 #  - Supermob  # This ignores super mobs from the plugin EliteMobs.
+
+# Whenever we freeze a mob we add some data to it that lets us know a few things.
+# Should we only unfreeze mobs which have been tagged by the plugin (i.e. mobs we are sure that we have frozen)?
+# Keep this option as true if you use another plugin that freezes mobs, or if you summon in mobs with the 'NoAI' tag.
+# NOTE: This option is enabled by default in a newly generated config.yml.
+# It is disabled by default here because, in the version preceding this, SAML did not add any data to mobs.
+# So if you enable this and have any frozen mobs throughout the world then SAML will not unfreeze them unless this option is disabled again.
+only-unfreeze-tagged: false

@@ -1,7 +1,7 @@
 package com.froobworld.saml.utils;
 
 import com.froobworld.saml.FrozenChunkCache;
-import com.froobworld.saml.SamlConfiguration;
+import com.froobworld.saml.Saml;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -9,12 +9,12 @@ import org.bukkit.entity.LivingEntity;
 import java.util.function.Consumer;
 
 public class UnfreezeChunkConsumer implements Consumer<Chunk> {
+    private Saml saml;
     private FrozenChunkCache frozenChunkCache;
-    private SamlConfiguration config;
 
-    public UnfreezeChunkConsumer(FrozenChunkCache frozenChunkCache, SamlConfiguration config) {
+    public UnfreezeChunkConsumer(Saml saml, FrozenChunkCache frozenChunkCache) {
+        this.saml = saml;
         this.frozenChunkCache = frozenChunkCache;
-        this.config = config;
     }
 
 
@@ -25,11 +25,11 @@ public class UnfreezeChunkConsumer implements Consumer<Chunk> {
         }
         for(Entity entity : chunk.getEntities()) {
             if(entity instanceof LivingEntity) {
-                if(EntityFreezer.isFrozen((LivingEntity) entity)) {
-                    if(config.getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
+                if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
+                    if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
                         continue;
                     }
-                    EntityFreezer.unfreezeEntity((LivingEntity) entity);
+                    EntityFreezer.unfreezeEntity(saml, (LivingEntity) entity);
                 }
             }
         }

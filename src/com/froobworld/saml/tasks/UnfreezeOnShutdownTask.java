@@ -19,11 +19,11 @@ public class UnfreezeOnShutdownTask implements Runnable {
         if(saml.getSamlConfig().getBoolean("unfreeze-on-shutdown")) {
             for(World world : Bukkit.getWorlds()) {
                 for(LivingEntity entity : world.getLivingEntities()) {
-                    if(EntityFreezer.isFrozen(entity)) {
+                    if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, entity) : EntityFreezer.isFrozen(entity)) {
                         if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
                             continue;
                         }
-                        EntityFreezer.unfreezeEntity(entity);
+                        EntityFreezer.unfreezeEntity(saml, entity);
                     }
                 }
             }

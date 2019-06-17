@@ -22,7 +22,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof LivingEntity) {
-            if(EntityFreezer.isFrozen((LivingEntity) event.getRightClicked())) {
+            if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getRightClicked()) : EntityFreezer.isFrozen((LivingEntity) event.getRightClicked())) {
                 if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getRightClicked()::hasMetadata)) {
                     return;
                 }
@@ -41,7 +41,7 @@ public class EventListener implements Listener {
                 }
 
                 if(unfreezeOnInteract && saml.getTpsSupplier().get() > unfreezeOnInteractTpsThreshold) {
-                    EntityFreezer.unfreezeEntity((LivingEntity) event.getRightClicked());
+                    EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getRightClicked());
                 }
             }
         }
@@ -50,7 +50,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof LivingEntity) {
-            if(EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
+            if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getEntity()) : EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
                 if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getEntity()::hasMetadata)) {
                     return;
                 }
@@ -69,7 +69,7 @@ public class EventListener implements Listener {
                 }
 
                 if(unfreezeOnDamage && saml.getTpsSupplier().get() > unfreezeOnDamageTpsThreshold) {
-                    EntityFreezer.unfreezeEntity((LivingEntity) event.getEntity());
+                    EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getEntity());
                 }
             }
         }
@@ -138,11 +138,11 @@ public class EventListener implements Listener {
         if(saml.getSamlConfig().getBoolean("unfreeze-on-unload")) {
             for(Entity entity : event.getChunk().getEntities()) {
                 if(entity instanceof LivingEntity) {
-                    if(EntityFreezer.isFrozen((LivingEntity) entity)) {
+                    if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
                         if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
                             continue;
                         }
-                        EntityFreezer.unfreezeEntity((LivingEntity) entity);
+                        EntityFreezer.unfreezeEntity(saml, (LivingEntity) entity);
                     }
                 }
             }

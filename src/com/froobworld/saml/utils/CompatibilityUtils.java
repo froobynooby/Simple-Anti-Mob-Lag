@@ -6,6 +6,7 @@ public class CompatibilityUtils {
     public static final boolean ANIMAL_LOVE_MODE;
     public static final boolean USE_PAPER_GET_CHUNK_ASYNC;
     public static final boolean MOB_TARGET;
+    public static final boolean PERSISTENT_DATA;
     static {
         boolean loveModeMethodExists;
         try {
@@ -33,5 +34,14 @@ public class CompatibilityUtils {
             mobClassExists = false;
         }
         MOB_TARGET = mobClassExists;
+
+        boolean persistentDataHolderClassExists;
+        try {
+            org.bukkit.persistence.PersistentDataHolder.class.getClass();
+            persistentDataHolderClassExists = true;
+        } catch (NoClassDefFoundError e) {
+            persistentDataHolderClassExists = false;
+        }
+        PERSISTENT_DATA = persistentDataHolderClassExists;
     }
 }
