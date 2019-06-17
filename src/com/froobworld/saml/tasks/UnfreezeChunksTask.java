@@ -42,6 +42,8 @@ public class UnfreezeChunksTask implements Runnable {
             }
         } else {
             paper = false;
+        }
+        if(!paper) {
             if(!frozenChunkCaches.isEmpty()) {
                 currentCache = frozenChunkCaches.get(0);
                 place = 0;
