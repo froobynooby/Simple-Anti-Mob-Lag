@@ -26,25 +26,19 @@ public class UnfreezeChunksTask implements Runnable {
 
     private void start() {
         if(saml.getSamlConfig().getBoolean("use-paper-get-chunk-async")) {
-            if(Bukkit.getServer().getVersion().contains("Paper")) {
-                if(CompatibilityUtils.USE_PAPER_GET_CHUNK_ASYNC) {
-                    paper = true;
-                    List<FrozenChunkCache> cacheCopy = new ArrayList<FrozenChunkCache>(frozenChunkCaches);
-                    for(FrozenChunkCache frozenChunkCache : cacheCopy) {
-                        List<ChunkCoordinates> coordsCopy = new ArrayList<ChunkCoordinates>(frozenChunkCache.getFrozenChunkCoordinates());
-                        coordsCopy.forEach(c -> c.getWorld().getChunkAtAsync(
-                                c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(saml, frozenChunkCache)
-                        ));
-                    }
-                } else {
-                    paper = false;
-                    Saml.logger().warning("You elected to use Paper's async chunk fetcher, but this is not supported on your version.");
-                    Saml.logger().info("We will use the regular method instead.");
+            if(CompatibilityUtils.USE_PAPER_GET_CHUNK_ASYNC) {
+                paper = true;
+                List<FrozenChunkCache> cacheCopy = new ArrayList<FrozenChunkCache>(frozenChunkCaches);
+                for(FrozenChunkCache frozenChunkCache : cacheCopy) {
+                    List<ChunkCoordinates> coordsCopy = new ArrayList<ChunkCoordinates>(frozenChunkCache.getFrozenChunkCoordinates());
+                    coordsCopy.forEach(c -> c.getWorld().getChunkAtAsync(
+                            c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(saml, frozenChunkCache)
+                    ));
                 }
             } else {
-                Saml.logger().warning("You elected to use Paper's async chunk fetcher, but you don't seem to be using Paper!");
-                Saml.logger().info("We will use the regular method instead.");
                 paper = false;
+                Saml.logger().warning("You elected to use Paper's async chunk fetcher, but this is not supported on your version.");
+                Saml.logger().info("We will use the regular method instead.");
             }
         } else {
             paper = false;
