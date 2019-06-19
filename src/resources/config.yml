@@ -143,11 +143,10 @@ only-unfreeze-tagged: true
 
 
 # We will never freeze mobs of this type.
-# Put mobs that might be in danger if frozen here, like villagers.
+# This is good for things, like raids, that you don't want to be interrupted - even if the server is lagging a bit.
 # See https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html for a list of types.
 # This is CaSE SenSiTIVe, it needs to be in all CAPS!
 never-freeze:
-  - VILLAGER
   - WANDERING_TRADER
   - PILLAGER
   - VINDICATOR
