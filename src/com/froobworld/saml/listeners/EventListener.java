@@ -1,7 +1,9 @@
 package com.froobworld.saml.listeners;
 
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.events.SamlMobUnfreezeEvent;
 import com.froobworld.saml.utils.EntityFreezer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,6 +12,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EventListener implements Listener {
     private Saml saml;
@@ -42,6 +47,9 @@ public class EventListener implements Listener {
 
                 if(unfreezeOnInteract && saml.getTpsSupplier().get() > unfreezeOnInteractTpsThreshold) {
                     EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getRightClicked());
+
+                    SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getRightClicked(), SamlMobUnfreezeEvent.UnfreezeReason.INTERACTION);
+                    Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
                 }
             }
         }
@@ -70,6 +78,9 @@ public class EventListener implements Listener {
 
                 if(unfreezeOnDamage && saml.getTpsSupplier().get() > unfreezeOnDamageTpsThreshold) {
                     EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getEntity());
+
+                    SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getEntity(), SamlMobUnfreezeEvent.UnfreezeReason.DAMAGE);
+                    Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
                 }
             }
         }
@@ -136,6 +147,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent event) {
         if(saml.getSamlConfig().getBoolean("unfreeze-on-unload")) {
+            List<LivingEntity> mobsToUnfreeze = new ArrayList<LivingEntity>();
             for(Entity entity : event.getChunk().getEntities()) {
                 if(entity instanceof LivingEntity) {
                     if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
@@ -143,10 +155,14 @@ public class EventListener implements Listener {
                             continue;
                         }
                         EntityFreezer.unfreezeEntity(saml, (LivingEntity) entity);
+                        mobsToUnfreeze.add((LivingEntity) entity);
                     }
                 }
             }
-            if(saml.getMobFreezeTask().getFrozenChunkCache() != null) {
+            SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(mobsToUnfreeze, SamlMobUnfreezeEvent.UnfreezeReason.CHUNK_UNLOAD);
+            Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
+
+            if (saml.getMobFreezeTask().getFrozenChunkCache() != null) {
                 saml.getMobFreezeTask().getFrozenChunkCache().removeChunk(event.getChunk());
             }
         }

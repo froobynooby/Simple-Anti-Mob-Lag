@@ -3,6 +3,7 @@ package com.froobworld.saml.tasks;
 import com.froobworld.saml.*;
 import com.froobworld.saml.data.FrozenEntityData;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
+import com.froobworld.saml.events.SamlMobUnfreezeEvent;
 import com.froobworld.saml.events.SamlPreMobFreezeEvent;
 import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.EntityFreezer;
@@ -62,6 +63,7 @@ public class MobFreezeTask implements Runnable {
         if(tps > config.getDouble("tps-unfreezing-threshold")) {
             int unfrozen = 0;
             double unfreezeLimit = config.getDouble("unfreeze-limit");
+            List<LivingEntity> unfrozenMobs = new ArrayList<LivingEntity>();
             for(World world : Bukkit.getWorlds()) {
                 for(LivingEntity entity : world.getLivingEntities()) {
                     if(unfrozen >= unfreezeLimit) {
@@ -73,9 +75,12 @@ public class MobFreezeTask implements Runnable {
                         }
                         unfrozen++;
                         EntityFreezer.unfreezeEntity(saml, entity);
+                        unfrozenMobs.add(entity);
                     }
                 }
             }
+            SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.MAIN_TASK);
+            Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
             return;
         }
         double thresholdTps = config.getDouble("tps-freezing-threshold");

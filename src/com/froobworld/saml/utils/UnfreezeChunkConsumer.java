@@ -2,10 +2,14 @@ package com.froobworld.saml.utils;
 
 import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.events.SamlMobUnfreezeEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class UnfreezeChunkConsumer implements Consumer<Chunk> {
@@ -23,6 +27,7 @@ public class UnfreezeChunkConsumer implements Consumer<Chunk> {
         if(!chunk.isLoaded()) {
             chunk.load(false);
         }
+        List<LivingEntity> unfrozenMobs = new ArrayList<LivingEntity>();
         for(Entity entity : chunk.getEntities()) {
             if(entity instanceof LivingEntity) {
                 if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
@@ -30,9 +35,13 @@ public class UnfreezeChunkConsumer implements Consumer<Chunk> {
                         continue;
                     }
                     EntityFreezer.unfreezeEntity(saml, (LivingEntity) entity);
+                    unfrozenMobs.add((LivingEntity) entity);
                 }
             }
         }
+        SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.UNFREEZE_CACHED_CHUNK);
+        Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
+
         frozenChunkCache.removeChunk(chunk);
     }
 }
