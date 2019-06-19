@@ -79,8 +79,10 @@ public class MobFreezeTask implements Runnable {
                     }
                 }
             }
-            SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.MAIN_TASK);
-            Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
+            if(!unfrozenMobs.isEmpty()) {
+                SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.MAIN_TASK);
+                Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
+            }
             return;
         }
         double thresholdTps = config.getDouble("tps-freezing-threshold");

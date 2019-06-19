@@ -33,8 +33,10 @@ public class UnfreezeOnShutdownTask implements Runnable {
                     }
                 }
             }
-            SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.SHUTDOWN);
-            Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
+            if(!unfrozenMobs.isEmpty()) {
+                SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.SHUTDOWN);
+                Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
+            }
         }
     }
 }

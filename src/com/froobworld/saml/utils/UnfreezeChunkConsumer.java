@@ -39,8 +39,10 @@ public class UnfreezeChunkConsumer implements Consumer<Chunk> {
                 }
             }
         }
-        SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.UNFREEZE_CACHED_CHUNK);
-        Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
+        if(!unfrozenMobs.isEmpty()) {
+            SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.UNFREEZE_CACHED_CHUNK);
+            Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
+        }
 
         frozenChunkCache.removeChunk(chunk);
     }
