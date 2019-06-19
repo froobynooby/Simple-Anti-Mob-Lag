@@ -46,6 +46,7 @@ public class SamlMobUnfreezeEvent extends Event{
         DAMAGE,
         CHUNK_UNLOAD,
         UNFREEZE_CACHED_CHUNK,
+        SHUTDOWN,
         CUSTOM
     }
 }
