@@ -139,6 +139,7 @@ ignore-metadata:
 # Whenever we freeze a mob we add some data to it that lets us know a few things.
 # Should we only unfreeze mobs which have been tagged by the plugin (i.e. mobs we are sure that we have frozen)?
 # Keep this option as true if you use another plugin that freezes mobs, or if you summon in mobs with the 'NoAI' tag.
+# This feature only works for version 1.14+.
 only-unfreeze-tagged: true
 
 

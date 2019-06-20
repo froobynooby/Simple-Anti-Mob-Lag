@@ -12,4 +12,5 @@ ignore-metadata:
 # NOTE: This option is enabled by default in a newly generated config.yml.
 # It is disabled by default here because, in the version preceding this, SAML did not add any data to mobs.
 # So if you enable this and have any frozen mobs throughout the world then SAML will not unfreeze them unless this option is disabled again.
+# This feature only works for version 1.14+.
 only-unfreeze-tagged: false
