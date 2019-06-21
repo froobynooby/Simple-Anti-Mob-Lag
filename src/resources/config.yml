@@ -134,6 +134,7 @@ ignore-player-proximity-tps-threshold: 0
 # We will never freeze (or unfreeze) entities that have metadata on the following list.
 ignore-metadata:
   - Elitemob  # This ignores elite mobs from the plugin EliteMobs.
+  - infernalMetadata # This ignores infernal mobs from the plugin InfernalMobs.
 #  - Supermob  # This ignores super mobs from the plugin EliteMobs.
 
 # Whenever we freeze a mob we add some data to it that lets us know a few things.
