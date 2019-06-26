@@ -3,7 +3,7 @@
 # The options in the standard config.yml will still be used as a default when you have not specified something in here.
 
 # Don't change this!
-version: 1
+version: 2
 
 
 # Be sure to remove any comment markers (the #'s) to activate an option!
@@ -117,6 +117,18 @@ ignore-love-mode-tps-threshold:
 #  HORSE: 5.0
 #  DONKEY: 5.0
 #  MULE: 5.0
+
+ignore-younger-than-ticks:
+#  ZOMBIE: 600
+#  SKELETON: 600
+#  CREEPER: 600
+#  SPIDER: 600
+
+ignore-younger-than-ticks-tps-threshold:
+#  ZOMBIE: 10.0
+#  SKELETON: 10.0
+#  CREEPER: 10.0
+#  SPIDER: 10.0
 
 # Should mobs of the following type not be frozen when they are within the specified distance of a player?
 # Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.

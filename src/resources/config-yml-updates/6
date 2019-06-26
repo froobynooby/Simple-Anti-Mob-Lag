@@ -1,0 +1,7 @@
+# For what age in (in ticks) should we ignore mobs that are younger than that age?
+# This option effectively allows you to ignore recently spawned mobs. It is good for preventing certain types of farms or grinders clogging up.
+ignore-younger-than-ticks: 600
+
+# Below what TPS should we ignore the option above and start freezing mobs of any age?
+# Set to 0 to disable this option.
+ignore-younger-than-ticks-tps-threshold: 0

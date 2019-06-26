@@ -1,5 +1,5 @@
 # Don't change this!
-version: 6
+version: 7
 
 # Do you want a config file with more options to generate?
 use-advanced-config: false
@@ -127,6 +127,15 @@ ignore-player-proximity: 0
 # Below that TPS should we ignore the option above and start freezing mobs that are close to players?
 # Set to 0 to disable this option.
 ignore-player-proximity-tps-threshold: 0
+
+# For what age in (in ticks) should we ignore mobs that are younger than that age?
+# This option effectively allows you to ignore recently spawned mobs. It is good for preventing certain types of farms or grinders clogging up.
+# Set to 0 to disable this option.
+ignore-younger-than-ticks: 600
+
+# Below what TPS should we ignore the option above and start freezing mobs of any age?
+# Set to 0 to disable this option.
+ignore-younger-than-ticks-tps-threshold: 0
 
 # Plugins can add metadata to entities that allows other plugins to identify them with that plugin.
 # This option allows you to completely ignore such entities, so that SAML does not interfere with them.

@@ -1,0 +1,11 @@
+ignore-younger-than-ticks:
+#  ZOMBIE: 600
+#  SKELETON: 600
+#  CREEPER: 600
+#  SPIDER: 600
+
+ignore-younger-than-ticks-tps-threshold:
+#  ZOMBIE: 10.0
+#  SKELETON: 10.0
+#  CREEPER: 10.0
+#  SPIDER: 10.0

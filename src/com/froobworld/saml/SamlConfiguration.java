@@ -11,8 +11,8 @@ import java.nio.file.Files;
 import java.util.List;
 
 public class SamlConfiguration {
-    public static final int CONFIG_CURRENT_VERSION = 6;
-    public static final int ADVANCED_CONFIG_CURRENT_VERSION = 1;
+    public static final int CONFIG_CURRENT_VERSION = 7;
+    public static final int ADVANCED_CONFIG_CURRENT_VERSION = 2;
     public static final int MESSAGES_CURRENT_VERSION = 1;
 
     private Saml saml;
