@@ -1,4 +1,4 @@
-# Should mobs of the following type that are younger than the given number of ticks not be frozen?
+# For what age (in ticks) should we ignore mobs of the following type that are younger than that age?
 ignore-younger-than-ticks:
 #  ZOMBIE: 600
 #  SKELETON: 600
