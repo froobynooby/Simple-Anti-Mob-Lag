@@ -26,7 +26,7 @@ prevent-player-damaging-frozen:
 #  CAT: true
 
 
-# Should we unfreeze mobs of the following types when they are interacted with?
+# Should we unfreeze mobs of the following type when they are interacted with?
 unfreeze-on-interact:
 #  HORSE: true
 #  DONKEY: true
@@ -53,7 +53,7 @@ unfreeze-on-damage-tps-threshold:
 #  SKELETON: 10.0
 #  CREEPER: 10.0
 
-# Should mobs of the following types that are tamed never be frozen?
+# Should mobs of the following type that are tamed never be frozen?
 ignore-tamed:
 #  HORSE: true
 #  DONKEY: true
@@ -72,7 +72,7 @@ ignore-tamed-tps-threshold:
 #  WOLF: 15.0
 #  CAT: 15.0
 
-# Should mobs of the following types that are named with a name tag never be frozen?
+# Should mobs of the following type that are named with a name tag never be frozen?
 ignore-named:
 #  WOLF: true
 #  CAT: true
@@ -83,7 +83,7 @@ ignore-named-tps-threshold:
 #  WOLF: 10.0
 #  CAT: 10.0
 
-# Should mobs of the following types that are leashed never be frozen?
+# Should mobs of the following type that are leashed never be frozen?
 ignore-leashed:
 #  HORSE: true
 #  DONKEY: true
@@ -100,7 +100,7 @@ ignore-leashed-tps-threshold:
 #  DONKEY: 5.0
 #  MULE: 5.0
 
-# Should mobs of the following types that are in love mode (breeding mode) never be frozen?
+# Should mobs of the following type that are in love mode (breeding mode) never be frozen?
 ignore-love-mode:
 #  CHICKEN: false
 #  COW: false
@@ -118,12 +118,30 @@ ignore-love-mode-tps-threshold:
 #  DONKEY: 5.0
 #  MULE: 5.0
 
+# Should mobs of the following type not be frozen when they are within the specified distance of a player?
+# Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
+# Set to 0 to disable this option.
+ignore-player-proximity:
+#  ZOMBIE: 5.0
+#  SKELETON: 5.0
+#  CREEPER: 5.0
+
+# For mobs of the following type, below what TPS should we ignore the ignore-player-proximity distance and start freezing those mobs?
+# Set to 0 to disable this option.
+ignore-player-proximity-tps-threshold:
+#  ZOMBIE: 10.0
+#  SKELETON: 10.0
+#  CREEPER: 10.0
+
+# Should mobs of the following type that are younger than the given number of ticks not be frozen?
 ignore-younger-than-ticks:
 #  ZOMBIE: 600
 #  SKELETON: 600
 #  CREEPER: 600
 #  SPIDER: 600
 
+# For mobs of the following type, below what TPS should we ignore the option above and start freezing mobs with ages above the given number of ticks.
+# Set to 0 to disable this option.
 ignore-younger-than-ticks-tps-threshold:
 #  ZOMBIE: 10.0
 #  SKELETON: 10.0
@@ -150,22 +168,6 @@ ignore-target-player-tps-threshold:
 #  PIG: 15.0
 #  COW: 15.0
 #  CHICKEN: 15.0
-
-
-# Should mobs of the following type not be frozen when they are within the specified distance of a player?
-# Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
-# Set to 0 to disable this option.
-ignore-player-proximity:
-#  ZOMBIE: 5.0
-#  SKELETON: 5.0
-#  CREEPER: 5.0
-
-# For mobs of the following type, below what TPS should we ignore the ignore-player-proximity distance and start freezing those mobs?
-# Set to 0 to disable this option.
-ignore-player-proximity-tps-threshold:
-#  ZOMBIE: 10.0
-#  SKELETON: 10.0
-#  CREEPER: 10.0
 
 # For mobs of the following type, below what TPS should we ignore the never-freeze list and start freezing those mobs?
 # Set to 0 to disable this option.

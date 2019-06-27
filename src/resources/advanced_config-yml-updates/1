@@ -1,9 +1,12 @@
+# Should mobs of the following type that are younger than the given number of ticks not be frozen?
 ignore-younger-than-ticks:
 #  ZOMBIE: 600
 #  SKELETON: 600
 #  CREEPER: 600
 #  SPIDER: 600
 
+# For mobs of the following type, below what TPS should we ignore the option above and start freezing mobs with ages above the given number of ticks.
+# Set to 0 to disable this option.
 ignore-younger-than-ticks-tps-threshold:
 #  ZOMBIE: 10.0
 #  SKELETON: 10.0

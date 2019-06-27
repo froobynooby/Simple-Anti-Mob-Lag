@@ -124,7 +124,7 @@ ignore-love-mode-tps-threshold: 0
 # Set to 0 to disable this option.
 ignore-player-proximity: 0
 
-# Below that TPS should we ignore the option above and start freezing mobs that are close to players?
+# Below what TPS should we ignore the option above and start freezing mobs that are close to players?
 # Set to 0 to disable this option.
 ignore-player-proximity-tps-threshold: 0
 
