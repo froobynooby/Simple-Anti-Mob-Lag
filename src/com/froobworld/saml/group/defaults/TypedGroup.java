@@ -17,7 +17,7 @@ public class TypedGroup implements Group {
         this.separationDistanceSquared = Math.pow(separationDistance, 2);
         this.minimumSize = minimumSize;
     }
-    
+
 
     @Override
     public String getName() {
