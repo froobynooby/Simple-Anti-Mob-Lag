@@ -137,6 +137,13 @@ ignore-younger-than-ticks: 600
 # Set to 0 to disable this option.
 ignore-younger-than-ticks-tps-threshold: 0
 
+# Should mobs that are targeting players (e.g. mobs attacking or following players holding seeds) never be frozen?
+ignore-target-player: true
+
+# Below what TPS should we ignore the option above and start freezing mobs that are targeting a player?
+# Set to 0 to disable this option.
+ignore-target-player-tps-threshold: 0
+
 # Plugins can add metadata to entities that allows other plugins to identify them with that plugin.
 # This option allows you to completely ignore such entities, so that SAML does not interfere with them.
 # If SAML interferes with some other plugin's entities, please ask that plugin's developer to add identifying metadata to them.

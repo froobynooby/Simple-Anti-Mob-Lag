@@ -130,6 +130,28 @@ ignore-younger-than-ticks-tps-threshold:
 #  CREEPER: 10.0
 #  SPIDER: 10.0
 
+# Should mobs of the following type that are targeting a player never be frozen?
+ignore-target-player:
+#  ZOMBIE: true
+#  SKELETON: true
+#  CREEPER: true
+#  SPIDER: true
+#  PIG: true
+#  COW: true
+#  CHICKEN: true
+
+# For mobs of the following type, below what TPS should we ignore the option above and start freezing mobs that are targeting a player?
+# Set to 0 to disable this option.
+ignore-target-player-tps-threshold:
+#  ZOMBIE: 10.0
+#  SKELETON: 10.0
+#  CREEPER: 10.0
+#  SPIDER: 10.0
+#  PIG: 15.0
+#  COW: 15.0
+#  CHICKEN: 15.0
+
+
 # Should mobs of the following type not be frozen when they are within the specified distance of a player?
 # Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
 # Set to 0 to disable this option.

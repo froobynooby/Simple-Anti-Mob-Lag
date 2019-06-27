@@ -5,9 +5,7 @@ import com.froobworld.saml.events.SamlConfigReloadEvent;
 import com.froobworld.saml.events.SamlPreMobFreezeEvent;
 import com.froobworld.saml.utils.CompatibilityUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Tameable;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -49,6 +47,7 @@ public class SamlListener implements Listener {
         Set<String> neverFreeze = new HashSet<String>(saml.getSamlConfig().getStringList("never-freeze"));
         double ignorePlayerProximityDistanceSquared = Math.pow(saml.getSamlConfig().getDouble("ignore-player-proximity"), 2);
         double ignoreYoungerThanTicks = saml.getSamlConfig().getDouble("ignore-younger-than-ticks");
+        boolean ignoreTargetPlayer = saml.getConfig().getBoolean("ignore-target-player");
 
         double ignoreTamedTpsThreshold = saml.getSamlConfig().getDouble("ignore-tamed-tps-threshold");
         double ignoreNamedTpsThreshold = saml.getSamlConfig().getDouble("ignore-named-tps-threshold");
@@ -57,6 +56,7 @@ public class SamlListener implements Listener {
         double neverFreezeTpsThreshold = saml.getSamlConfig().getDouble("never-freeze-tps-threshold");
         double ignorePlayerProximityTpsThreshold = saml.getSamlConfig().getDouble("ignore-player-proximity-tps-threshold");
         double ignoreYoungerThanTicksTpsThreshold = saml.getSamlConfig().getDouble("ignore-younger-than-ticks-tps-threshold");
+        double ignoreTargetPlayerTpsThreshold = saml.getSamlConfig().getDouble("ignore-target-player-tps-threshold");
 
         HashMap<EntityType, Boolean> typedIgnoreTamed = new HashMap<EntityType, Boolean>();
         HashMap<EntityType, Boolean> typedIgnoreNamed = new HashMap<EntityType, Boolean>();
@@ -64,6 +64,7 @@ public class SamlListener implements Listener {
         HashMap<EntityType, Boolean> typedIgnoreLoveMode = new HashMap<EntityType, Boolean>();
         HashMap<EntityType, Double> typedIgnorePlayerProximityDistanceSquared = new HashMap<EntityType, Double>();
         HashMap<EntityType, Double> typedIgnoreYoungerThanTicks = new HashMap<EntityType, Double>();
+        HashMap<EntityType, Boolean> typedIgnoreTargetPlayer = new HashMap<EntityType, Boolean>();
         if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
             for(EntityType entityType : EntityType.values()) {
                 if(saml.getAdvancedConfig().keyExists("ignore-tamed." + entityType.name())) {
@@ -84,6 +85,9 @@ public class SamlListener implements Listener {
                 if(saml.getAdvancedConfig().keyExists("ignore-younger-than-ticks." + entityType.name())) {
                     typedIgnoreYoungerThanTicks.put(entityType, saml.getAdvancedConfig().getDouble("ignore-younger-than-ticks." + entityType.name()));
                 }
+                if(saml.getAdvancedConfig().keyExists("ignore-target-player." + entityType.name())) {
+                    typedIgnoreTargetPlayer.put(entityType, saml.getAdvancedConfig().getBoolean("ignore-target-player." + entityType.name()));
+                }
             }
         }
 
@@ -94,6 +98,7 @@ public class SamlListener implements Listener {
         HashMap<EntityType, Double> typedNeverFreezeTpsThreshold = new HashMap<EntityType, Double>();
         HashMap<EntityType, Double> typedIgnorePlayerProximityTpsThreshold = new HashMap<EntityType, Double>();
         HashMap<EntityType, Double> typedIgnoreYoungerThanTicksTpsThreshold = new HashMap<EntityType, Double>();
+        HashMap<EntityType, Double> typedIgnoreTargetPlayerTpsThreshold = new HashMap<EntityType, Double>();
         if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
             for(EntityType entityType : EntityType.values()) {
                 if(saml.getAdvancedConfig().keyExists("ignore-tamed-tps-threshold." + entityType.name())) {
@@ -117,6 +122,9 @@ public class SamlListener implements Listener {
                 if(saml.getAdvancedConfig().keyExists("ignore-younger-than-ticks-tps-threshold." + entityType.name())) {
                     typedIgnoreYoungerThanTicks.put(entityType, saml.getAdvancedConfig().getDouble("ignore-younger-than-ticks-tps-threshold." + entityType.name()));
                 }
+                if(saml.getAdvancedConfig().keyExists("ignore-target-player-tps-threshold." + entityType.name())) {
+                    typedIgnoreTargetPlayerTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-target-player-tps-threshold." + entityType.name()));
+                }
             }
         }
 
@@ -128,6 +136,7 @@ public class SamlListener implements Listener {
         event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnorePlayerProximityTpsThreshold.getOrDefault(e.getType(), ignorePlayerProximityTpsThreshold) && typedIgnorePlayerProximityDistanceSquared.getOrDefault(e.getType(), ignorePlayerProximityDistanceSquared) > 0 && Bukkit.getOnlinePlayers().stream().anyMatch( p -> (p.getWorld().equals(e.getWorld()) && p.getLocation().distanceSquared(e.getLocation()) < typedIgnorePlayerProximityDistanceSquared.getOrDefault(e.getType(), ignorePlayerProximityDistanceSquared)) )) );
         event.addShouldIgnorePredicate( e -> (saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(e::hasMetadata)) );
         event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreYoungerThanTicksTpsThreshold.getOrDefault(e.getType(), ignoreYoungerThanTicksTpsThreshold) && e.getTicksLived() < typedIgnoreYoungerThanTicks.getOrDefault(e.getType(), ignoreYoungerThanTicks)) );
+        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreTargetPlayerTpsThreshold.getOrDefault(e.getType(), ignoreTargetPlayerTpsThreshold) && e instanceof Mob && ((Mob) e).getTarget() instanceof Player) );
     }
 
 }
