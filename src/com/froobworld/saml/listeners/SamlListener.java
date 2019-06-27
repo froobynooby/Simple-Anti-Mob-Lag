@@ -120,7 +120,7 @@ public class SamlListener implements Listener {
                     typedIgnorePlayerProximityTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-player-proximity-tps-threshold." + entityType.name()));
                 }
                 if(saml.getAdvancedConfig().keyExists("ignore-younger-than-ticks-tps-threshold." + entityType.name())) {
-                    typedIgnoreYoungerThanTicks.put(entityType, saml.getAdvancedConfig().getDouble("ignore-younger-than-ticks-tps-threshold." + entityType.name()));
+                    typedIgnoreYoungerThanTicksTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-younger-than-ticks-tps-threshold." + entityType.name()));
                 }
                 if(saml.getAdvancedConfig().keyExists("ignore-target-player-tps-threshold." + entityType.name())) {
                     typedIgnoreTargetPlayerTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-target-player-tps-threshold." + entityType.name()));
