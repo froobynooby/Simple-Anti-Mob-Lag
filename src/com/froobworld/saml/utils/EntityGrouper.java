@@ -1,6 +1,7 @@
 package com.froobworld.saml.utils;
 
 import com.froobworld.saml.group.Group;
+import com.froobworld.saml.group.GroupedEntity;
 import com.froobworld.saml.group.ProtoGroup;
 import org.bukkit.entity.LivingEntity;
 
@@ -8,64 +9,64 @@ import java.util.*;
 
 public class EntityGrouper {
 
-    public static Map<LivingEntity, Set<Group>> groupEntities(Iterator<LivingEntity> entities, Set<Group> groups) {
-        Map<LivingEntity, Set<Group>> groupEntities = new HashMap<LivingEntity, Set<Group>>();
-        Map<Group, List<ProtoGroup>> protoGroups = new HashMap<Group, List<ProtoGroup>>();
-        Map<Group, Map<LivingEntity, GroupedEntity>> groupedGroupEntities = new HashMap<Group, Map<LivingEntity,GroupedEntity>>();
+    public static List<GroupedEntity> groupEntities(Collection<LivingEntity> entities, Set<Group> groups) {
+        List<ProtoGroupedEntity> protogroupedEntities = new ArrayList<ProtoGroupedEntity>(entities.size());
 
-        for(Group group : groups) {
-            protoGroups.put(group, new ArrayList<ProtoGroup>());
-            groupedGroupEntities.put(group, new HashMap<LivingEntity, GroupedEntity>());
-        }
-
-        while(entities.hasNext()) {
-            LivingEntity next = entities.next();
-            groupEntities.put(next, new HashSet<Group>());
+        for(LivingEntity entity : entities) {
+            ProtoGroupedEntity nextProtoGroupedEntity = new ProtoGroupedEntity(entity);
             for(Group group : groups) {
-                if(group.canBeCentre(next)) {
-                    ProtoGroup nextProtoGroup = new ProtoGroup(group, next);
-                    List<ProtoGroup> otherProtoGroups = protoGroups.get(group);
-                    Map<LivingEntity, GroupedEntity> groupedEntities = groupedGroupEntities.get(group);
-                    GroupedEntity nextGroupedEntity = new GroupedEntity(next);
-                    nextGroupedEntity.protoGroups.add(nextProtoGroup);
-                    groupedEntities.put(next, nextGroupedEntity);
-                    for(ProtoGroup otherProtoGroup : otherProtoGroups) {
-                        if(!(nextProtoGroup.isGroup() && otherProtoGroup.isGroup())) {
-                            if(otherProtoGroup.symmetricAddMemberConditional(nextProtoGroup)) {
-                                GroupedEntity otherGroupedEntity = groupedEntities.get(otherProtoGroup.getCentre());
-                                nextGroupedEntity.protoGroups.add(otherProtoGroup);
-                                otherGroupedEntity.protoGroups.add(nextProtoGroup);
+                nextProtoGroupedEntity.protoGroups.put(group, new ArrayList<ProtoGroup>());
+                if(group.canBeCentre(entity)) {
+                    ProtoGroup nextProtoGroup = new ProtoGroup(group, entity);
+                    nextProtoGroupedEntity.centres.put(group, nextProtoGroup);
+
+                    for(ProtoGroupedEntity otherProtoGroupedEntity : protogroupedEntities) {
+                        ProtoGroup otherProtoGroup = otherProtoGroupedEntity.centres.get(group);
+                        if(otherProtoGroup != null) {
+                            if(!otherProtoGroup.isGroup() || !nextProtoGroup.isGroup()) {
+                                if(otherProtoGroup.symmetricAddMemberConditional(nextProtoGroup)) {
+                                    otherProtoGroupedEntity.protoGroups.get(group).add(nextProtoGroup);
+                                    nextProtoGroupedEntity.protoGroups.get(group).add(otherProtoGroup);
+                                }
                             }
                         }
                     }
-                    otherProtoGroups.add(nextProtoGroup);
                 }
             }
+            protogroupedEntities.add(nextProtoGroupedEntity);
         }
 
-        for(Map.Entry<Group,Map<LivingEntity, GroupedEntity>> entry1 : groupedGroupEntities.entrySet()) {
-            for(Map.Entry<LivingEntity, GroupedEntity> entry2 : entry1.getValue().entrySet()) {
-                if(entry2.getValue().inGroup()) {
-                    groupEntities.get(entry2.getKey()).add(entry1.getKey());
+        ArrayList<GroupedEntity> groupedEntities = new ArrayList<GroupedEntity>(entities.size());
+        for(ProtoGroupedEntity protoGroupedEntity : protogroupedEntities) {
+            GroupedEntity groupedEntity = new GroupedEntity(protoGroupedEntity.entity);
+            for(Group group : groups) {
+                if(protoGroupedEntity.inGroup(group)) {
+                    groupedEntity.getGroups().add(group);
                 }
             }
+            groupedEntities.add(groupedEntity);
         }
 
-        return groupEntities;
+        return groupedEntities;
     }
 
-    private static class GroupedEntity {
+    private static class ProtoGroupedEntity {
         private LivingEntity entity;
-        private List<ProtoGroup> protoGroups;
+        private HashMap<Group, ProtoGroup> centres;
+        private HashMap<Group, List<ProtoGroup>> protoGroups;
 
-        public GroupedEntity(LivingEntity entity) {
+        public ProtoGroupedEntity(LivingEntity entity) {
             this.entity = entity;
-            this.protoGroups = new ArrayList<ProtoGroup>();
+            this.centres = new HashMap<Group, ProtoGroup>();
+            this.protoGroups = new HashMap<Group, List<ProtoGroup>>();
         }
 
 
-        public boolean inGroup() {
-            for(ProtoGroup protoGroup : protoGroups) {
+        public boolean inGroup(Group group) {
+            if(centres.get(group) != null && centres.get(group).isGroup()) {
+                return true;
+            }
+            for(ProtoGroup protoGroup : protoGroups.getOrDefault(group, Collections.emptyList())) {
                 if(protoGroup.isGroup()) {
                     return true;
                 }
