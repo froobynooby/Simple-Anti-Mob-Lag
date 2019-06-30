@@ -1,7 +1,7 @@
 package com.froobworld.saml.utils;
 
 import com.froobworld.saml.Saml;
-import com.froobworld.saml.SamlConfiguration;
+import com.froobworld.saml.config.SamlConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

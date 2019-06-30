@@ -1,6 +1,6 @@
 package com.froobworld.saml.events;
 
-import com.froobworld.saml.SamlConfiguration;
+import com.froobworld.saml.config.SamlConfiguration;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

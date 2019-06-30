@@ -1,6 +1,7 @@
 package com.froobworld.saml;
 
 import com.froobworld.saml.commands.SamlCommand;
+import com.froobworld.saml.config.SamlConfiguration;
 import com.froobworld.saml.events.SamlConfigReloadEvent;
 import com.froobworld.saml.listeners.EventListener;
 import com.froobworld.saml.listeners.SamlListener;

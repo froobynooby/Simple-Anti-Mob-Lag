@@ -1,4 +1,4 @@
-package com.froobworld.saml.utils;
+package com.froobworld.saml.config;
 
 import java.io.*;
 import java.util.ArrayList;

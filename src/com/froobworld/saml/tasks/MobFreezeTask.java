@@ -1,6 +1,7 @@
 package com.froobworld.saml.tasks;
 
 import com.froobworld.saml.*;
+import com.froobworld.saml.config.SamlConfiguration;
 import com.froobworld.saml.data.FrozenEntityData;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
 import com.froobworld.saml.events.SamlMobUnfreezeEvent;
