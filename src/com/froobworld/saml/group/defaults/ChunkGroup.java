@@ -3,7 +3,6 @@ package com.froobworld.saml.group.defaults;
 import com.froobworld.saml.group.Group;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
-import com.froobworld.saml.group.TypedEntity;
 import org.bukkit.entity.LivingEntity;
 
 public class ChunkGroup implements Group {
@@ -29,18 +28,13 @@ public class ChunkGroup implements Group {
     }
 
     @Override
-    public int assignTypeId(LivingEntity entity) {
-        return 0;
-    }
-
-    @Override
     public GroupStatusUpdater groupStatusUpdater() {
         return new GroupStatusUpdater() {
             private int count;
             private boolean group;
 
             @Override
-            public void updateStatus(TypedEntity typedEntity) {
+            public void updateStatus(LivingEntity entity) {
                 count++;
                 group = count >= minimumSize;
             }

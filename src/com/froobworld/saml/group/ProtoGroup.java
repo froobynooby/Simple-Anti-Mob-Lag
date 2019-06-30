@@ -8,20 +8,16 @@ public class ProtoGroup {
     private Group group;
     private GroupStatusUpdater groupStatusUpdater;
     private LivingEntity centre;
-    private Map<Integer, List<TypedEntity>> typedSpokes;
-    private List<TypedEntity> typedEntities;
+    private List<LivingEntity> entities;
 
     public ProtoGroup(Group group, LivingEntity centre) {
         this.group = group;
         this.groupStatusUpdater = group.groupStatusUpdater();
         this.centre = centre;
-        this.typedEntities = new ArrayList<TypedEntity>();
-        this.typedSpokes = new HashMap<Integer, List<TypedEntity>>();
+        this.entities = new ArrayList<LivingEntity>();
 
-        TypedEntity centreTypedEntity = new TypedEntity(centre, group.assignTypeId(centre));
-        typedEntities.add(centreTypedEntity);
-        typedSpokes.put(centreTypedEntity.getTypeId(), new ArrayList<TypedEntity>(Collections.singleton(centreTypedEntity)));
-        groupStatusUpdater.updateStatus(centreTypedEntity);
+        entities.add(centre);
+        groupStatusUpdater.updateStatus(centre);
     }
 
 
@@ -35,12 +31,8 @@ public class ProtoGroup {
     }
 
     private void addMember(LivingEntity entity) {
-        int typeId = group.assignTypeId(entity);
-        TypedEntity typedEntity = new TypedEntity(entity, typeId);
-        typedSpokes.putIfAbsent(typeId, new ArrayList<TypedEntity>());
-        typedSpokes.get(typeId).add(typedEntity);
-        typedEntities.add(typedEntity);
-        groupStatusUpdater.updateStatus(typedEntity);
+        entities.add(entity);
+        groupStatusUpdater.updateStatus(entity);
     }
 
     public LivingEntity getCentre() {
@@ -52,19 +44,11 @@ public class ProtoGroup {
     }
 
     public int size() {
-        return typedEntities.size();
+        return entities.size();
     }
 
-    public int size(int typeId) {
-        return typedSpokes.getOrDefault(typeId, Collections.emptyList()).size();
-    }
-
-    public Iterator<TypedEntity> membersIterator() {
-        return typedEntities.iterator();
-    }
-
-    public Iterator<TypedEntity> membersIterator(int typeId) {
-        return typedSpokes.getOrDefault(typeId, Collections.emptyList()).iterator();
+    public Iterator<LivingEntity> membersIterator() {
+        return entities.iterator();
     }
 
 }

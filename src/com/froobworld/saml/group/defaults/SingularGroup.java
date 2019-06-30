@@ -3,7 +3,6 @@ package com.froobworld.saml.group.defaults;
 import com.froobworld.saml.group.Group;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
-import com.froobworld.saml.group.TypedEntity;
 import org.bukkit.entity.LivingEntity;
 
 public class SingularGroup implements Group {
@@ -24,17 +23,12 @@ public class SingularGroup implements Group {
     }
 
     @Override
-    public int assignTypeId(LivingEntity entity) {
-        return 0;
-    }
-
-    @Override
     public GroupStatusUpdater groupStatusUpdater() {
         return new GroupStatusUpdater() {
             private boolean group;
 
             @Override
-            public void updateStatus(TypedEntity typedEntity) {
+            public void updateStatus(LivingEntity entity) {
                 group = true;
             }
 
