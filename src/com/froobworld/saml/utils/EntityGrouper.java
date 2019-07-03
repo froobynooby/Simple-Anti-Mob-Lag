@@ -9,10 +9,14 @@ import java.util.*;
 
 public class EntityGrouper {
 
-    public static List<GroupedEntity> groupEntities(Collection<LivingEntity> entities, Set<Group> groups) {
+    public static List<GroupedEntity> groupEntities(Collection<LivingEntity> entities, Set<Group> groups, long maxOperationTime) {
+        long startTime = System.currentTimeMillis();
         List<ProtoGroupedEntity> protoGroupedEntities = new ArrayList<ProtoGroupedEntity>(entities.size());
 
         for(LivingEntity entity : entities) {
+            if(maxOperationTime != 0 && System.currentTimeMillis() - startTime >= maxOperationTime) {
+                break;
+            }
             ProtoGroupedEntity nextProtoGroupedEntity = new ProtoGroupedEntity(entity);
             for(Group group : groups) {
                 nextProtoGroupedEntity.protoGroups.put(group, new ArrayList<ProtoGroup>());
@@ -48,6 +52,10 @@ public class EntityGrouper {
         }
 
         return groupedEntities;
+    }
+
+    public static List<GroupedEntity> groupEntities(Collection<LivingEntity> entities, Set<Group> groups) {
+        return groupEntities(entities, groups, 0);
     }
 
     private static class ProtoGroupedEntity {
