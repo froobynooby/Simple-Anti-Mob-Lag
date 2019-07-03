@@ -249,7 +249,7 @@ public class MobFreezeTask implements Runnable {
                 , config);
     }
 
-    private class NeighbouredEntity {
+    private static class NeighbouredEntity {
         private LivingEntity entity;
         private int neighbours;
         private NeighbouredEntity mostPopularNeighbour;
