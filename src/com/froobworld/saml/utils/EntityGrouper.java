@@ -10,7 +10,7 @@ import java.util.*;
 public class EntityGrouper {
 
     public static List<GroupedEntity> groupEntities(Collection<LivingEntity> entities, Set<Group> groups) {
-        List<ProtoGroupedEntity> protogroupedEntities = new ArrayList<ProtoGroupedEntity>(entities.size());
+        List<ProtoGroupedEntity> protoGroupedEntities = new ArrayList<ProtoGroupedEntity>(entities.size());
 
         for(LivingEntity entity : entities) {
             ProtoGroupedEntity nextProtoGroupedEntity = new ProtoGroupedEntity(entity);
@@ -20,7 +20,7 @@ public class EntityGrouper {
                     ProtoGroup nextProtoGroup = new ProtoGroup(group, entity);
                     nextProtoGroupedEntity.centres.put(group, nextProtoGroup);
 
-                    for(ProtoGroupedEntity otherProtoGroupedEntity : protogroupedEntities) {
+                    for(ProtoGroupedEntity otherProtoGroupedEntity : protoGroupedEntities) {
                         ProtoGroup otherProtoGroup = otherProtoGroupedEntity.centres.get(group);
                         if(otherProtoGroup != null) {
                             if(!otherProtoGroup.isGroup() || !nextProtoGroup.isGroup()) {
@@ -33,11 +33,11 @@ public class EntityGrouper {
                     }
                 }
             }
-            protogroupedEntities.add(nextProtoGroupedEntity);
+            protoGroupedEntities.add(nextProtoGroupedEntity);
         }
 
         ArrayList<GroupedEntity> groupedEntities = new ArrayList<GroupedEntity>(entities.size());
-        for(ProtoGroupedEntity protoGroupedEntity : protogroupedEntities) {
+        for(ProtoGroupedEntity protoGroupedEntity : protoGroupedEntities) {
             GroupedEntity groupedEntity = new GroupedEntity(protoGroupedEntity.entity);
             for(Group group : groups) {
                 if(protoGroupedEntity.inGroup(group)) {
