@@ -1,27 +1,25 @@
 package com.froobworld.saml.group;
 
-import org.bukkit.entity.LivingEntity;
-
 import java.util.*;
 
-public class ProtoGroup {
-    private Group group;
-    private GroupStatusUpdater groupStatusUpdater;
-    private LivingEntity centre;
-    private List<LivingEntity> entities;
+public class ProtoGroup<T> {
+    private Group<T> group;
+    private GroupStatusUpdater<T> groupStatusUpdater;
+    private T centre;
+    private List<T> members;
 
-    public ProtoGroup(Group group, LivingEntity centre) {
+    public ProtoGroup(Group<T> group, T centre) {
         this.group = group;
         this.groupStatusUpdater = group.groupStatusUpdater();
         this.centre = centre;
-        this.entities = new ArrayList<LivingEntity>();
+        this.members = new ArrayList<T>();
 
-        entities.add(centre);
+        members.add(centre);
         groupStatusUpdater.updateStatus(centre);
     }
 
 
-    public boolean symmetricAddMemberConditional(ProtoGroup otherProtogroup) {
+    public boolean symmetricAddMemberConditional(ProtoGroup<T> otherProtogroup) {
         if(group.inProtoGroup(centre, otherProtogroup)) {
             addMember(otherProtogroup.centre);
             otherProtogroup.addMember(centre);
@@ -30,12 +28,12 @@ public class ProtoGroup {
         return false;
     }
 
-    private void addMember(LivingEntity entity) {
-        entities.add(entity);
-        groupStatusUpdater.updateStatus(entity);
+    private void addMember(T member) {
+        members.add(member);
+        groupStatusUpdater.updateStatus(member);
     }
 
-    public LivingEntity getCentre() {
+    public T getCentre() {
         return centre;
     }
 
@@ -44,11 +42,11 @@ public class ProtoGroup {
     }
 
     public int size() {
-        return entities.size();
+        return members.size();
     }
 
-    public Iterator<LivingEntity> membersIterator() {
-        return entities.iterator();
+    public Iterator<T> membersIterator() {
+        return members.iterator();
     }
 
 }

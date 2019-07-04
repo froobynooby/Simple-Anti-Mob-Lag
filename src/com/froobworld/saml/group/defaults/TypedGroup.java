@@ -6,7 +6,7 @@ import com.froobworld.saml.group.ProtoGroup;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
-public class TypedGroup implements Group {
+public class TypedGroup implements Group<LivingEntity> {
     private EntityType type;
     private double separationDistanceSquared;
     private double minimumSize;
@@ -24,7 +24,7 @@ public class TypedGroup implements Group {
     }
 
     @Override
-    public boolean inProtoGroup(LivingEntity entity, ProtoGroup protoGroup) {
+    public boolean inProtoGroup(LivingEntity entity, ProtoGroup<LivingEntity> protoGroup) {
         return entity.getType() == type && entity.getLocation().distanceSquared(protoGroup.getCentre().getLocation()) <= separationDistanceSquared;
     }
 
@@ -34,8 +34,8 @@ public class TypedGroup implements Group {
     }
 
     @Override
-    public GroupStatusUpdater groupStatusUpdater() {
-        return new GroupStatusUpdater() {
+    public GroupStatusUpdater<LivingEntity> groupStatusUpdater() {
+        return new GroupStatusUpdater<LivingEntity>() {
             private int count;
             private boolean group;
 

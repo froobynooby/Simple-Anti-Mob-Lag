@@ -5,7 +5,7 @@ import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import org.bukkit.entity.LivingEntity;
 
-public class SingularGroup implements Group {
+public class SingularGroup implements Group<LivingEntity> {
 
     @Override
     public String getName() {
@@ -13,7 +13,7 @@ public class SingularGroup implements Group {
     }
 
     @Override
-    public boolean inProtoGroup(LivingEntity entity, ProtoGroup protoGroup) {
+    public boolean inProtoGroup(LivingEntity entity, ProtoGroup<LivingEntity> protoGroup) {
         return false;
     }
 
@@ -23,8 +23,8 @@ public class SingularGroup implements Group {
     }
 
     @Override
-    public GroupStatusUpdater groupStatusUpdater() {
-        return new GroupStatusUpdater() {
+    public GroupStatusUpdater<LivingEntity> groupStatusUpdater() {
+        return new GroupStatusUpdater<LivingEntity>() {
             private boolean group;
 
             @Override

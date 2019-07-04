@@ -1,10 +1,8 @@
 package com.froobworld.saml.group;
 
-import org.bukkit.entity.LivingEntity;
-
-public interface Group {
+public interface Group<T> {
     public String getName();
-    public boolean inProtoGroup(LivingEntity entity, ProtoGroup protoGroup);
-    public boolean canBeCentre(LivingEntity entity);
-    public GroupStatusUpdater groupStatusUpdater();
+    public boolean inProtoGroup(T entity, ProtoGroup<T> protoGroup);
+    public boolean canBeCentre(T candidate);
+    public GroupStatusUpdater<T> groupStatusUpdater();
 }

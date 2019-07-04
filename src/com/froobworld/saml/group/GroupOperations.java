@@ -1,35 +1,33 @@
 package com.froobworld.saml.group;
 
-import org.bukkit.entity.LivingEntity;
-
 public class GroupOperations {
 
-    public static Group conjunction(String resultName, Group group1, Group group2) {
-        return new Group() {
+    public static <T> Group<T> conjunction(String resultName, Group<T> group1, Group<T> group2) {
+        return new Group<T>() {
             @Override
             public String getName() {
                 return resultName;
             }
 
             @Override
-            public boolean inProtoGroup(LivingEntity entity, ProtoGroup protoGroup) {
-                return group1.inProtoGroup(entity, protoGroup) && group2.inProtoGroup(entity, protoGroup);
+            public boolean inProtoGroup(T candidate, ProtoGroup<T> protoGroup) {
+                return group1.inProtoGroup(candidate, protoGroup) && group2.inProtoGroup(candidate, protoGroup);
             }
 
             @Override
-            public boolean canBeCentre(LivingEntity entity) {
-                return group1.canBeCentre(entity) && group2.canBeCentre(entity);
+            public boolean canBeCentre(T candidate) {
+                return group1.canBeCentre(candidate) && group2.canBeCentre(candidate);
             }
 
             @Override
-            public GroupStatusUpdater groupStatusUpdater() {
-                GroupStatusUpdater groupStatusUpdater1 = group1.groupStatusUpdater();
-                GroupStatusUpdater groupStatusUpdater2 = group2.groupStatusUpdater();
-                return new GroupStatusUpdater() {
+            public GroupStatusUpdater<T> groupStatusUpdater() {
+                GroupStatusUpdater<T> groupStatusUpdater1 = group1.groupStatusUpdater();
+                GroupStatusUpdater<T> groupStatusUpdater2 = group2.groupStatusUpdater();
+                return new GroupStatusUpdater<T>() {
                     @Override
-                    public void updateStatus(LivingEntity entity) {
-                        groupStatusUpdater1.updateStatus(entity);
-                        groupStatusUpdater2.updateStatus(entity);
+                    public void updateStatus(T member) {
+                        groupStatusUpdater1.updateStatus(member);
+                        groupStatusUpdater2.updateStatus(member);
                     }
 
                     @Override
@@ -41,8 +39,8 @@ public class GroupOperations {
         };
     }
 
-    public static Group weakConjunction(String resultName, Group group1, Group group2) {
-        return new Group() {
+    public static <T> Group<T> weakConjunction(String resultName, Group<T> group1, Group<T> group2) {
+        return new Group<T>() {
             private boolean in1 = false;
             private boolean in2 = false;
 
@@ -52,35 +50,35 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean inProtoGroup(LivingEntity entity, ProtoGroup protoGroup) {
+            public boolean inProtoGroup(T candidate, ProtoGroup<T> protoGroup) {
                 in1 = false;
                 in2 = false;
-                if(group1.inProtoGroup(entity, protoGroup)) {
+                if(group1.inProtoGroup(candidate, protoGroup)) {
                     in1 = true;
                 }
-                if(group2.inProtoGroup(entity, protoGroup)) {
+                if(group2.inProtoGroup(candidate, protoGroup)) {
                     in2 = true;
                 }
                 return in1 || in2;
             }
 
             @Override
-            public boolean canBeCentre(LivingEntity entity) {
-                return group1.canBeCentre(entity) && group2.canBeCentre(entity);
+            public boolean canBeCentre(T candidate) {
+                return group1.canBeCentre(candidate) && group2.canBeCentre(candidate);
             }
 
             @Override
-            public GroupStatusUpdater groupStatusUpdater() {
-                GroupStatusUpdater groupStatusUpdater1 = group1.groupStatusUpdater();
-                GroupStatusUpdater groupStatusUpdater2 = group2.groupStatusUpdater();
-                return new GroupStatusUpdater() {
+            public GroupStatusUpdater<T> groupStatusUpdater() {
+                GroupStatusUpdater<T> groupStatusUpdater1 = group1.groupStatusUpdater();
+                GroupStatusUpdater<T> groupStatusUpdater2 = group2.groupStatusUpdater();
+                return new GroupStatusUpdater<T>() {
                     @Override
-                    public void updateStatus(LivingEntity entity) {
+                    public void updateStatus(T member) {
                         if(in1) {
-                            groupStatusUpdater1.updateStatus(entity);
+                            groupStatusUpdater1.updateStatus(member);
                         }
                         if(in2) {
-                            groupStatusUpdater2.updateStatus(entity);
+                            groupStatusUpdater2.updateStatus(member);
                         }
                     }
 
@@ -93,8 +91,8 @@ public class GroupOperations {
         };
     }
 
-    public static Group disjunction(String resultName, Group group1, Group group2) {
-        return new Group() {
+    public static <T> Group<T> disjunction(String resultName, Group<T> group1, Group<T> group2) {
+        return new Group<T>() {
             private boolean in1 = false;
             private boolean in2 = false;
 
@@ -104,35 +102,35 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean inProtoGroup(LivingEntity entity, ProtoGroup protoGroup) {
+            public boolean inProtoGroup(T candidate, ProtoGroup<T> protoGroup) {
                 in1 = false;
                 in2 = false;
-                if(group1.canBeCentre(protoGroup.getCentre()) && group1.inProtoGroup(entity, protoGroup)) {
+                if(group1.canBeCentre(protoGroup.getCentre()) && group1.inProtoGroup(candidate, protoGroup)) {
                     in1 = true;
                 }
-                if(group2.canBeCentre(protoGroup.getCentre()) && group2.inProtoGroup(entity, protoGroup)) {
+                if(group2.canBeCentre(protoGroup.getCentre()) && group2.inProtoGroup(candidate, protoGroup)) {
                     in2 = true;
                 }
                 return in1 || in2;
             }
 
             @Override
-            public boolean canBeCentre(LivingEntity entity) {
-                return group1.canBeCentre(entity) || group2.canBeCentre(entity);
+            public boolean canBeCentre(T candidate) {
+                return group1.canBeCentre(candidate) || group2.canBeCentre(candidate);
             }
 
             @Override
-            public GroupStatusUpdater groupStatusUpdater() {
-                GroupStatusUpdater groupStatusUpdater1 = group1.groupStatusUpdater();
-                GroupStatusUpdater groupStatusUpdater2 = group2.groupStatusUpdater();
-                return new GroupStatusUpdater() {
+            public GroupStatusUpdater<T> groupStatusUpdater() {
+                GroupStatusUpdater<T> groupStatusUpdater1 = group1.groupStatusUpdater();
+                GroupStatusUpdater<T> groupStatusUpdater2 = group2.groupStatusUpdater();
+                return new GroupStatusUpdater<T>() {
                     @Override
-                    public void updateStatus(LivingEntity entity) {
+                    public void updateStatus(T member) {
                         if(in1) {
-                            groupStatusUpdater1.updateStatus(entity);
+                            groupStatusUpdater1.updateStatus(member);
                         }
                         if(in2) {
-                            groupStatusUpdater2.updateStatus(entity);
+                            groupStatusUpdater2.updateStatus(member);
                         }
                     }
 

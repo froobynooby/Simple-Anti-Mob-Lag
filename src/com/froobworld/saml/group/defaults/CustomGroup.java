@@ -9,7 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomGroup implements Group {
+public class CustomGroup implements Group<LivingEntity> {
     private String name;
     private double separationDistanceSquared;
     private Map<EntityType, Integer> typedMinimumSize;
@@ -27,7 +27,7 @@ public class CustomGroup implements Group {
     }
 
     @Override
-    public boolean inProtoGroup(LivingEntity entity, ProtoGroup protoGroup) {
+    public boolean inProtoGroup(LivingEntity entity, ProtoGroup<LivingEntity> protoGroup) {
         return typedMinimumSize.containsKey(entity.getType()) && entity.getLocation().distanceSquared(protoGroup.getCentre().getLocation()) <= separationDistanceSquared;
     }
 
@@ -37,8 +37,8 @@ public class CustomGroup implements Group {
     }
 
     @Override
-    public GroupStatusUpdater groupStatusUpdater() {
-        return new GroupStatusUpdater() {
+    public GroupStatusUpdater<LivingEntity> groupStatusUpdater() {
+        return new GroupStatusUpdater<LivingEntity>() {
             private Map<EntityType, Integer> typedCounts = new HashMap<EntityType, Integer>();
             private boolean group = false;
 
