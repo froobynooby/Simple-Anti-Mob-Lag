@@ -29,7 +29,7 @@ public class TypedGroup implements Group<LivingEntity> {
     }
 
     @Override
-    public boolean canBeCentre(LivingEntity entity) {
+    public boolean canBeMember(LivingEntity entity) {
         return entity.getType() == type;
     }
 

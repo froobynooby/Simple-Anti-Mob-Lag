@@ -15,7 +15,7 @@ public class ObjectGrouper {
             ProtoGroupedObject<T> nextProtoGroupedObject = new ProtoGroupedObject<T>(object);
             for(Group<T> group : groups) {
                 nextProtoGroupedObject.protoGroups.put(group, new ArrayList<ProtoGroup<T>>());
-                if(group.canBeCentre(object)) {
+                if(group.canBeMember(object)) {
                     ProtoGroup<T> nextProtoGroup = new ProtoGroup<T>(group, object);
                     nextProtoGroupedObject.centres.put(group, nextProtoGroup);
 

@@ -15,8 +15,8 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean canBeCentre(T candidate) {
-                return group1.canBeCentre(candidate) && group2.canBeCentre(candidate);
+            public boolean canBeMember(T candidate) {
+                return group1.canBeMember(candidate) && group2.canBeMember(candidate);
             }
 
             @Override
@@ -63,8 +63,8 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean canBeCentre(T candidate) {
-                return group1.canBeCentre(candidate) && group2.canBeCentre(candidate);
+            public boolean canBeMember(T candidate) {
+                return group1.canBeMember(candidate) && group2.canBeMember(candidate);
             }
 
             @Override
@@ -105,18 +105,18 @@ public class GroupOperations {
             public boolean inProtoGroup(T candidate, ProtoGroup<T> protoGroup) {
                 in1 = false;
                 in2 = false;
-                if(group1.canBeCentre(protoGroup.getCentre()) && group1.inProtoGroup(candidate, protoGroup)) {
+                if(group1.canBeMember(protoGroup.getCentre()) && group1.inProtoGroup(candidate, protoGroup)) {
                     in1 = true;
                 }
-                if(group2.canBeCentre(protoGroup.getCentre()) && group2.inProtoGroup(candidate, protoGroup)) {
+                if(group2.canBeMember(protoGroup.getCentre()) && group2.inProtoGroup(candidate, protoGroup)) {
                     in2 = true;
                 }
                 return in1 || in2;
             }
 
             @Override
-            public boolean canBeCentre(T candidate) {
-                return group1.canBeCentre(candidate) || group2.canBeCentre(candidate);
+            public boolean canBeMember(T candidate) {
+                return group1.canBeMember(candidate) || group2.canBeMember(candidate);
             }
 
             @Override

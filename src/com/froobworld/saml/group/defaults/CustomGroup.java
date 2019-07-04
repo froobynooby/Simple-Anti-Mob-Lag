@@ -32,7 +32,7 @@ public class CustomGroup implements Group<LivingEntity> {
     }
 
     @Override
-    public boolean canBeCentre(LivingEntity entity) {
+    public boolean canBeMember(LivingEntity entity) {
         return typedMinimumSize.containsKey(entity.getType());
     }
 

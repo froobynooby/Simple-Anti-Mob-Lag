@@ -23,7 +23,7 @@ public class ChunkGroup implements Group<LivingEntity> {
     }
 
     @Override
-    public boolean canBeCentre(LivingEntity entity) {
+    public boolean canBeMember(LivingEntity entity) {
         return true;
     }
 

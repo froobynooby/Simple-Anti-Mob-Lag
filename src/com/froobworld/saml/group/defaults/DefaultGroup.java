@@ -26,7 +26,7 @@ public class DefaultGroup implements Group<LivingEntity> {
     }
 
     @Override
-    public boolean canBeCentre(LivingEntity entity) {
+    public boolean canBeMember(LivingEntity entity) {
         return true;
     }
 
