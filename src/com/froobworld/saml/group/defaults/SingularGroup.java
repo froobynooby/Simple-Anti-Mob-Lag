@@ -3,9 +3,12 @@ package com.froobworld.saml.group.defaults;
 import com.froobworld.saml.group.Group;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
+import com.froobworld.saml.utils.SnapshotEntity;
 import org.bukkit.entity.LivingEntity;
 
-public class SingularGroup implements Group<LivingEntity> {
+import java.util.Map;
+
+public class SingularGroup implements EntityGroup {
 
     @Override
     public String getName() {
@@ -13,22 +16,22 @@ public class SingularGroup implements Group<LivingEntity> {
     }
 
     @Override
-    public boolean inProtoGroup(LivingEntity entity, ProtoGroup<LivingEntity> protoGroup) {
+    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<SnapshotEntity> protoGroup) {
         return false;
     }
 
     @Override
-    public boolean canBeMember(LivingEntity entity) {
+    public boolean canBeMember(SnapshotEntity entity) {
         return true;
     }
 
     @Override
-    public GroupStatusUpdater<LivingEntity> groupStatusUpdater() {
-        return new GroupStatusUpdater<LivingEntity>() {
+    public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
+        return new GroupStatusUpdater<SnapshotEntity>() {
             private boolean group;
 
             @Override
-            public void updateStatus(LivingEntity entity) {
+            public void updateStatus(SnapshotEntity entity) {
                 group = true;
             }
 
@@ -37,5 +40,10 @@ public class SingularGroup implements Group<LivingEntity> {
                 return group;
             }
         };
+    }
+
+    @Override
+    public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
+        return null;
     }
 }

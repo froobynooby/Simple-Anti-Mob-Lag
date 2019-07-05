@@ -1,11 +1,13 @@
 package com.froobworld.saml.group.defaults;
 
-import com.froobworld.saml.group.Group;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
+import com.froobworld.saml.utils.SnapshotEntity;
 import org.bukkit.entity.LivingEntity;
 
-public class ChunkGroup implements Group<LivingEntity> {
+import java.util.Map;
+
+public class ChunkGroup implements EntityGroup {
     private double minimumSize;
 
     public ChunkGroup(double minimumSize) {
@@ -18,23 +20,23 @@ public class ChunkGroup implements Group<LivingEntity> {
     }
 
     @Override
-    public boolean inProtoGroup(LivingEntity entity, ProtoGroup<LivingEntity> protoGroup) {
+    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<SnapshotEntity> protoGroup) {
         return entity.getLocation().getBlockX() >> 4 == protoGroup.getCentre().getLocation().getBlockX() >> 4 && entity.getLocation().getBlockZ() >> 4 == protoGroup.getCentre().getLocation().getBlockZ() >> 4;
     }
 
     @Override
-    public boolean canBeMember(LivingEntity entity) {
+    public boolean canBeMember(SnapshotEntity entity) {
         return true;
     }
 
     @Override
-    public GroupStatusUpdater<LivingEntity> groupStatusUpdater() {
-        return new GroupStatusUpdater<LivingEntity>() {
+    public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
+        return new GroupStatusUpdater<SnapshotEntity>() {
             private int count;
             private boolean group;
 
             @Override
-            public void updateStatus(LivingEntity entity) {
+            public void updateStatus(SnapshotEntity entity) {
                 count++;
                 group = count >= minimumSize;
             }
@@ -44,5 +46,10 @@ public class ChunkGroup implements Group<LivingEntity> {
                 return group;
             }
         };
+    }
+
+    @Override
+    public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
+        return null;
     }
 }
