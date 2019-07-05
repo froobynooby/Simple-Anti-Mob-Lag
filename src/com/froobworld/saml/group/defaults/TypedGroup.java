@@ -6,45 +6,44 @@ import com.froobworld.saml.utils.SnapshotEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class TypedGroup implements EntityGroup {
-    private EntityType type;
     private double separationDistanceSquared;
-    private double minimumSize;
+    private Map<EntityType, Integer> typedMinimumSize;
 
-    public TypedGroup(EntityType type, double separationDistance, double minimumSize) {
-        this.type = type;
+
+    public TypedGroup(double separationDistance, Map<EntityType, Integer> typedMinimumSize) {
         this.separationDistanceSquared = Math.pow(separationDistance, 2);
-        this.minimumSize = minimumSize;
+        this.typedMinimumSize = typedMinimumSize;
     }
-
 
     @Override
     public String getName() {
-        return "default_typed_" + type.name().toLowerCase();
+        return "default_typed";
     }
 
     @Override
     public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<SnapshotEntity> protoGroup) {
-        return entity.getType() == type && entity.getLocation().distanceSquared(protoGroup.getCentre().getLocation()) <= separationDistanceSquared;
+        return typedMinimumSize.containsKey(entity.getType()) && entity.getLocation().distanceSquared(protoGroup.getCentre().getLocation()) <= separationDistanceSquared;
     }
 
     @Override
     public boolean canBeMember(SnapshotEntity entity) {
-        return entity.getType() == type;
+        return typedMinimumSize.containsKey(entity.getType());
     }
 
     @Override
     public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
         return new GroupStatusUpdater<SnapshotEntity>() {
-            private int count;
-            private boolean group;
+            private Map<EntityType, Integer> typedCounts = new HashMap<EntityType, Integer>();
+            private boolean group = false;
 
             @Override
             public void updateStatus(SnapshotEntity entity) {
-                count++;
-                group = count >= minimumSize;
+                typedCounts.put(entity.getType(), typedCounts.getOrDefault(entity.getType(), 0) + 1);
+                group = typedMinimumSize.entrySet().stream().allMatch( e -> typedCounts.getOrDefault(e.getKey(), 0) >= e.getValue() );
             }
 
             @Override
