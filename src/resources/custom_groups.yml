@@ -1,0 +1,31 @@
+version: 1
+
+# Group name requirements:
+#  - Allowed characters: 0-9, a-z AND _
+#  - Name must not start with 'default_'
+group:
+  egg_farm:
+    definition: |-
+      default_specific_type{"acceptedTypes": ["CHICKEN"]}
+      & default_distance{"separationDistance": 2}
+      & default_total_count{"minimumSize": 5}
+
+  1_13_iron_farm_villagers:
+    definition: |-
+      default_specific_type{"acceptedTypes": ["VILLAGER"]}
+      & default_distance{"separationDistance": 2}
+      & default_total_count{"minimumSize": 5}
+
+  animal_farm:
+    definition: |-
+      default_specific_type{"acceptedTypes": ["COW", "PIG", "SHEEP", "CHICKEN"]}
+      & default_distance{"separationDistance": 10}
+      & default_total_count{"minimumSize": 20}
+
+  enderman_grinder:
+    definition: |-
+      default_specific_type{"acceptedTypes": ["ENDERMAN", "ENDERMITE"]}
+      & default_distance{"separationDistance": 20}
+      & default_type_count{"typedMinimumSize": {"ENDERMAN": 10}}
+
+helper:

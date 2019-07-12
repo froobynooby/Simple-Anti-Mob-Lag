@@ -5,11 +5,15 @@ import java.util.Set;
 
 public class GroupedObject<T> {
     private T object;
-    private Set<Group<T>> groups;
+    private Set<Group> groups;
 
     public GroupedObject(T object) {
+        this(object, new HashSet<Group>());
+    }
+
+    public GroupedObject(T object, Set<Group> groups) {
         this.object = object;
-        this.groups = new HashSet<Group<T>>();
+        this.groups = groups;
     }
 
 
@@ -17,7 +21,7 @@ public class GroupedObject<T> {
         return object;
     }
 
-    public Set<Group<T>> getGroups() {
+    public Set<Group> getGroups() {
         return groups;
     }
 

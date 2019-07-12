@@ -3,6 +3,7 @@ package com.froobworld.saml;
 import com.froobworld.saml.commands.SamlCommand;
 import com.froobworld.saml.config.SamlConfiguration;
 import com.froobworld.saml.events.SamlConfigReloadEvent;
+import com.froobworld.saml.group.entity.EntityGroupStore;
 import com.froobworld.saml.listeners.EventListener;
 import com.froobworld.saml.listeners.SamlListener;
 import com.froobworld.saml.metrics.Metrics;
@@ -17,9 +18,11 @@ import java.util.logging.Logger;
 public class Saml extends JavaPlugin {
     private SamlConfiguration config;
     private SamlConfiguration advancedConfig;
+    private SamlConfiguration customGroups;
     private SamlConfiguration messages;
     private MobFreezeTask mobFreezeTask;
     private TpsSupplier tpsSupplier;
+    private EntityGroupStore groupStore;
 
     private UnfreezeOnShutdownTask unfreezeOnShutdownTask;
     private HandleCacheOnShutdownTask handleCacheOnShutdownTask;
@@ -32,9 +35,12 @@ public class Saml extends JavaPlugin {
         if(config.getBoolean("use-advanced-config")) {
             advancedConfig.loadFromFile();
         }
+        customGroups = new SamlConfiguration(this, SamlConfiguration.CUSTOM_GROUPS_CURRENT_VERSION, "custom_groups.yml");
+        customGroups.loadFromFile();
         messages = new SamlConfiguration(this, SamlConfiguration.MESSAGES_CURRENT_VERSION, "messages.yml");
         messages.loadFromFile();
         tpsSupplier = new TpsSupplier(this);
+        groupStore = new EntityGroupStore(this);
 
         registerCommands();
         registerListeners();
@@ -74,8 +80,16 @@ public class Saml extends JavaPlugin {
         return advancedConfig;
     }
 
+    public SamlConfiguration getCustomGroups() {
+        return customGroups;
+    }
+
     public SamlConfiguration getSamlMessages() {
         return messages;
+    }
+
+    public EntityGroupStore getGroupStore() {
+        return groupStore;
     }
 
     public void reloadSamlConfiguration() {

@@ -1,6 +1,7 @@
 package com.froobworld.saml.config;
 
 import com.froobworld.saml.Saml;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.BufferedReader;
@@ -8,11 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class SamlConfiguration {
     public static final int CONFIG_CURRENT_VERSION = 7;
     public static final int ADVANCED_CONFIG_CURRENT_VERSION = 2;
+    public static final int CUSTOM_GROUPS_CURRENT_VERSION = 1;
     public static final int MESSAGES_CURRENT_VERSION = 1;
 
     private Saml saml;
@@ -101,6 +105,11 @@ public class SamlConfiguration {
 
     public List<String> getStringList(String key) {
         return config.getStringList(key);
+    }
+
+    public Map<String, Object> getSection(String key) {
+        ConfigurationSection section = config.getConfigurationSection(key);
+        return section != null ? section.getValues(true) : Collections.emptyMap();
     }
 
 }

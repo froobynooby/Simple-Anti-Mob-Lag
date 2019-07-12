@@ -1,7 +1,6 @@
-package com.froobworld.saml.utils;
+package com.froobworld.saml.group.entity;
 
 import com.froobworld.saml.group.Group;
-import com.froobworld.saml.group.defaults.EntityGroup;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;

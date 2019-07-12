@@ -1,18 +1,16 @@
-package com.froobworld.saml.group.defaults;
+package com.froobworld.saml.group.entity.helpergroups;
 
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
-import com.froobworld.saml.utils.SnapshotEntity;
+import com.froobworld.saml.group.entity.EntityGroup;
+import com.froobworld.saml.group.entity.EntityGroupParser;
+import com.froobworld.saml.group.entity.SnapshotEntity;
+import com.google.gson.JsonObject;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.Map;
 
 public class ChunkGroup implements EntityGroup {
-    private double minimumSize;
-
-    public ChunkGroup(double minimumSize) {
-        this.minimumSize = minimumSize;
-    }
 
     @Override
     public String getName() {
@@ -25,25 +23,19 @@ public class ChunkGroup implements EntityGroup {
     }
 
     @Override
-    public boolean canBeMember(SnapshotEntity entity) {
+    public boolean canBeMember(SnapshotEntity candidate) {
         return true;
     }
 
     @Override
     public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
         return new GroupStatusUpdater<SnapshotEntity>() {
-            private int count;
-            private boolean group;
-
             @Override
-            public void updateStatus(SnapshotEntity entity) {
-                count++;
-                group = count >= minimumSize;
-            }
+            public void updateStatus(SnapshotEntity member) {}
 
             @Override
             public boolean isGroup() {
-                return group;
+                return true;
             }
         };
     }
@@ -52,4 +44,14 @@ public class ChunkGroup implements EntityGroup {
     public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
         return null;
     }
+
+    public static EntityGroupParser<ChunkGroup> parser() {
+        return new EntityGroupParser<ChunkGroup>() {
+            @Override
+            public ChunkGroup fromJson(JsonObject jsonObject) {
+                return new ChunkGroup();
+            }
+        };
+    }
+
 }
