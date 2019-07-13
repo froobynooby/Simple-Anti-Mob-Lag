@@ -22,10 +22,19 @@ public class ObjectGrouper {
                     for(ProtoGroupedObject<T> otherProtoGroupedObject : protoGroupedObjects) {
                         ProtoGroup<T> otherProtoGroup = otherProtoGroupedObject.centres.get(group);
                         if(otherProtoGroup != null) {
-                            if(!otherProtoGroup.isGroup() || !nextProtoGroup.isGroup()) {
-                                if(otherProtoGroup.symmetricAddMemberConditional(nextProtoGroup)) {
-                                    otherProtoGroupedObject.protoGroups.get(group).add(nextProtoGroup);
-                                    nextProtoGroupedObject.protoGroups.get(group).add(otherProtoGroup);
+                            boolean otherIsGroup = otherProtoGroup.isGroup();
+                            boolean nextIsGroup = nextProtoGroup.isGroup();
+                            if(!otherIsGroup || !nextIsGroup) {
+                                boolean shouldBeMembers = group.inProtoGroup(nextProtoGroup.getCentre(), otherProtoGroup);
+                                if(shouldBeMembers) {
+                                    if(!otherIsGroup) {
+                                        otherProtoGroup.addMember(nextProtoGroup.getCentre());
+                                        otherProtoGroupedObject.protoGroups.get(group).add(nextProtoGroup);
+                                    }
+                                    if(!nextIsGroup) {
+                                        nextProtoGroup.addMember(otherProtoGroup.getCentre());
+                                        nextProtoGroupedObject.protoGroups.get(group).add(otherProtoGroup);
+                                    }
                                 }
                             }
                         }

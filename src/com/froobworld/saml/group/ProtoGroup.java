@@ -18,17 +18,7 @@ public class ProtoGroup<T> {
         groupStatusUpdater.updateStatus(centre);
     }
 
-
-    public boolean symmetricAddMemberConditional(ProtoGroup<T> otherProtogroup) {
-        if(group.inProtoGroup(centre, otherProtogroup)) {
-            addMember(otherProtogroup.centre);
-            otherProtogroup.addMember(centre);
-            return true;
-        }
-        return false;
-    }
-
-    private void addMember(T member) {
+    public void addMember(T member) {
         members.add(member);
         groupStatusUpdater.updateStatus(member);
     }
