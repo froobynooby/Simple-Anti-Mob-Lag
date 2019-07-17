@@ -4,7 +4,7 @@ import java.util.*;
 
 public class ObjectGrouper {
 
-    public static <T> List<GroupedObject<T>> groupObjects(Collection<T> objects, Set<Group<T>> groups, long maxOperationTime) {
+    public static <T> List<GroupedObject<T>> groupObjects(Collection<T> objects, Set<? extends Group<? super T>> groups, long maxOperationTime) {
         long startTime = System.currentTimeMillis();
         List<ProtoGroupedObject<T>> protoGroupedObjects = new ArrayList<ProtoGroupedObject<T>>(objects.size());
 
@@ -13,7 +13,7 @@ public class ObjectGrouper {
                 break;
             }
             ProtoGroupedObject<T> nextProtoGroupedObject = new ProtoGroupedObject<T>(object);
-            for(Group<T> group : groups) {
+            for(Group<? super T> group : groups) {
                 nextProtoGroupedObject.protoGroups.put(group, new ArrayList<ProtoGroup<T>>());
                 if(group.canBeMember(object)) {
                     ProtoGroup<T> nextProtoGroup = new ProtoGroup<T>(group, object);
@@ -47,7 +47,7 @@ public class ObjectGrouper {
         ArrayList<GroupedObject<T>> groupedObjects = new ArrayList<GroupedObject<T>>(objects.size());
         for(ProtoGroupedObject<T> protoGroupedObject : protoGroupedObjects) {
             GroupedObject<T> groupedObject = new GroupedObject<T>(protoGroupedObject.object);
-            for(Group<T> group : groups) {
+            for(Group<? super T> group : groups) {
                 if(protoGroupedObject.inGroup(group)) {
                     groupedObject.getGroups().add(group);
                 }
@@ -58,23 +58,23 @@ public class ObjectGrouper {
         return groupedObjects;
     }
 
-    public static <T> List<GroupedObject<T>> groupObjects(Collection<T> objects, Set<Group<T>> groups) {
+    public static <T> List<GroupedObject<T>> groupObjects(Collection<T> objects, Set<? extends Group<? super T>> groups) {
         return groupObjects(objects, groups, 0);
     }
 
     private static class ProtoGroupedObject<T> {
         private T object;
-        private HashMap<Group<T>, ProtoGroup<T>> centres;
-        private HashMap<Group<T>, List<ProtoGroup<T>>> protoGroups;
+        private HashMap<Group<? super T>, ProtoGroup<T>> centres;
+        private HashMap<Group<? super T>, List<ProtoGroup<T>>> protoGroups;
 
         public ProtoGroupedObject(T object) {
             this.object = object;
-            this.centres = new HashMap<Group<T>, ProtoGroup<T>>();
-            this.protoGroups = new HashMap<Group<T>, List<ProtoGroup<T>>>();
+            this.centres = new HashMap<Group<? super T>, ProtoGroup<T>>();
+            this.protoGroups = new HashMap<Group<? super T>, List<ProtoGroup<T>>>();
         }
 
 
-        public boolean inGroup(Group<T> group) {
+        public boolean inGroup(Group group) {
             if(centres.get(group) != null && centres.get(group).isGroup()) {
                 return true;
             }

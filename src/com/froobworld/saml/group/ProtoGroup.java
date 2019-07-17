@@ -3,13 +3,11 @@ package com.froobworld.saml.group;
 import java.util.*;
 
 public class ProtoGroup<T> {
-    private Group<T> group;
-    private GroupStatusUpdater<T> groupStatusUpdater;
+    private GroupStatusUpdater<? super T> groupStatusUpdater;
     private T centre;
     private List<T> members;
 
-    public ProtoGroup(Group<T> group, T centre) {
-        this.group = group;
+    public ProtoGroup(Group<? super T> group, T centre) {
         this.groupStatusUpdater = group.groupStatusUpdater();
         this.centre = centre;
         this.members = new ArrayList<T>();
