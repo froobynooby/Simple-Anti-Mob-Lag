@@ -162,7 +162,7 @@ public class CustomGroupParser {
                 }
 
                 @Override
-                public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<SnapshotEntity> protoGroup) {
+                public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
                     return tail.inProtoGroup(entity, protoGroup);
                 }
 

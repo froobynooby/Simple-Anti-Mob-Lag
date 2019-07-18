@@ -32,7 +32,7 @@ public class TotalCountGroup implements EntityGroup {
     }
 
     @Override
-    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<SnapshotEntity> protoGroup) {
+    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
         return true;
     }
 

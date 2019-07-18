@@ -41,7 +41,7 @@ public interface EntityGroup extends Group<SnapshotEntity> {
                     }
 
                     @Override
-                    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<SnapshotEntity> protoGroup) {
+                    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
                         return snapshotEntityGroup.inProtoGroup(entity, protoGroup);
                     }
 

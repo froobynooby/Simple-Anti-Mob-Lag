@@ -10,7 +10,7 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean inProtoGroup(T candidate, ProtoGroup<T> protoGroup) {
+            public boolean inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
                 return group1.inProtoGroup(candidate, protoGroup) && group2.inProtoGroup(candidate, protoGroup);
             }
 
@@ -50,7 +50,7 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean inProtoGroup(T candidate, ProtoGroup<T> protoGroup) {
+            public boolean inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
                 in1 = false;
                 in2 = false;
                 if(group1.inProtoGroup(candidate, protoGroup)) {
@@ -102,7 +102,7 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean inProtoGroup(T candidate, ProtoGroup<T> protoGroup) {
+            public boolean inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
                 in1 = false;
                 in2 = false;
                 if(group1.canBeMember(protoGroup.getCentre()) && group1.inProtoGroup(candidate, protoGroup)) {
