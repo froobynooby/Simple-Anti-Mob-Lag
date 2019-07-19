@@ -67,11 +67,20 @@ public class DistanceGroup implements EntityGroup {
     @Override
     public void scaleToTps(double tps, double expectedTps) {
         if(scaleToTps) {
-            if (tps <= expectedTps * minimumScaleTpsRatio) {
-                scaledSeparationDistanceSquared = Math.pow(maximumScaledSeparationDistance, 2.0);
+            if (tps <= expectedTps * minimumScaleTpsRatio || minimumScaleTpsRatio == 1) {
+                if(maximumScaledSeparationDistance == Double.POSITIVE_INFINITY) {
+                    scaledSeparationDistanceSquared = Double.POSITIVE_INFINITY;
+                } else {
+                    scaledSeparationDistanceSquared = Math.pow(maximumScaledSeparationDistance, 2.0);
+                }
                 return;
             }
-            scaledSeparationDistanceSquared = Math.pow(separationDistance + (expectedTps - tps) / (expectedTps - minimumScaleTpsRatio * expectedTps) * (maximumScaledSeparationDistance - separationDistance), 2.0);
+            if(maximumScaledSeparationDistance == Double.POSITIVE_INFINITY) {
+                scaledSeparationDistanceSquared = Math.pow(separationDistance - 1 + 1 / ((tps - expectedTps * minimumScaleTpsRatio) / (expectedTps - expectedTps * minimumScaleTpsRatio)), 2.0);
+            } else {
+                scaledSeparationDistanceSquared = Math.pow(separationDistance + (expectedTps - tps) / (expectedTps - minimumScaleTpsRatio * expectedTps) * (maximumScaledSeparationDistance - separationDistance), 2.0);
+            }
+
         }
     }
 
