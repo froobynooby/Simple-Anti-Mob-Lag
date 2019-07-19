@@ -37,7 +37,7 @@ public interface EntityGroup extends Group<SnapshotEntity> {
 
                     @Override
                     public String getName() {
-                        return null;
+                        return snapshotEntityGroup.getName();
                     }
 
                     @Override
