@@ -26,7 +26,7 @@ public class CustomGroupParser {
             if(!key.contains(".")) {
                 String replacement;
                 if(jsonPart.has(key)) {
-                    replacement = jsonPart.get(key).toString();
+                    replacement = jsonPart.get(key).getAsString();
                 } else {
                     if(arguments.containsKey(key + ".required") && arguments.get(key + ".required").equals(true)) {
                         throw new IllegalArgumentException("The argument '" + key + "' is required for custom group '" + resultName + "'");
