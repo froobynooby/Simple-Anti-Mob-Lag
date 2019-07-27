@@ -25,15 +25,19 @@ public class ObjectGrouper {
                             boolean otherIsGroup = otherProtoGroup.isGroup();
                             boolean nextIsGroup = nextProtoGroup.isGroup();
                             if(!otherIsGroup || !nextIsGroup) {
-                                boolean shouldBeMembers = group.inProtoGroup(nextProtoGroup.getCentre(), otherProtoGroup);
-                                if(shouldBeMembers) {
+                                Group.ProtoMemberStatus memberStatus = group.inProtoGroup(nextProtoGroup.getCentre(), otherProtoGroup);
+                                if(memberStatus == Group.ProtoMemberStatus.MEMBER || memberStatus == Group.ProtoMemberStatus.CONDITIONAL) {
                                     if(!otherIsGroup) {
                                         otherProtoGroup.addMember(nextProtoGroup.getCentre());
-                                        otherProtoGroupedObject.protoGroups.get(group).add(nextProtoGroup);
+                                        if(memberStatus != Group.ProtoMemberStatus.CONDITIONAL) {
+                                            otherProtoGroupedObject.protoGroups.get(group).add(nextProtoGroup);
+                                        }
                                     }
                                     if(!nextIsGroup) {
                                         nextProtoGroup.addMember(otherProtoGroup.getCentre());
-                                        nextProtoGroupedObject.protoGroups.get(group).add(otherProtoGroup);
+                                        if(memberStatus != Group.ProtoMemberStatus.CONDITIONAL) {
+                                            nextProtoGroupedObject.protoGroups.get(group).add(otherProtoGroup);
+                                        }
                                     }
                                 }
                             }

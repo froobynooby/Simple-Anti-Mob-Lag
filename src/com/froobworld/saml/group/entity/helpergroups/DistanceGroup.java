@@ -37,8 +37,8 @@ public class DistanceGroup implements EntityGroup {
     }
 
     @Override
-    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return metric.distanceSquared(entity.getLocation(), protoGroup.getCentre().getLocation()) <= scaledSeparationDistanceSquared;
+    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+        return (metric.distanceSquared(entity.getLocation(), protoGroup.getCentre().getLocation()) <= scaledSeparationDistanceSquared) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
     }
 
     @Override

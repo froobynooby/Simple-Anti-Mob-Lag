@@ -41,7 +41,7 @@ public interface EntityGroup extends Group<SnapshotEntity> {
                     }
 
                     @Override
-                    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
                         return snapshotEntityGroup.inProtoGroup(entity, protoGroup);
                     }
 
@@ -61,6 +61,35 @@ public interface EntityGroup extends Group<SnapshotEntity> {
                         entityGroup2.scaleToTps(tps, expectedTps);
                     }
                 };
+            }
+        };
+    }
+    public static EntityGroup conditionalise(EntityGroup entityGroup) {
+        return new EntityGroup() {
+            @Override
+            public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
+                return entityGroup.getSnapshotProperties(entity);
+            }
+
+            @Override
+            public String getName() {
+                return entityGroup.getName();
+            }
+
+            @Override
+            public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                ProtoMemberStatus originalProtoMemberStatus = entityGroup.inProtoGroup(entity, protoGroup);
+                return originalProtoMemberStatus == ProtoMemberStatus.MEMBER ? ProtoMemberStatus.CONDITIONAL : originalProtoMemberStatus;
+            }
+
+            @Override
+            public boolean canBeMember(SnapshotEntity candidate) {
+                return entityGroup.canBeMember(candidate);
+            }
+
+            @Override
+            public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
+                return entityGroup.groupStatusUpdater();
             }
         };
     }

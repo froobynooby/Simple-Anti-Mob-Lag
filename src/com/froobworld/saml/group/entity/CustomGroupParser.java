@@ -94,6 +94,7 @@ public class CustomGroupParser {
         public void openParen() {
             if(subEvaluator != null) {
                 subEvaluator.openParen();
+                return;
             }
             if(nextOperation == null) {
                 throw new IllegalStateException("Tried to open parenthesis without a preceding operation");
@@ -112,8 +113,9 @@ public class CustomGroupParser {
             if(subEvaluator.nextOperation != null) {
                 throw new IllegalStateException("Tried to close parenthesis containing an unapplied operation");
             }
-            applyGroup(subEvaluator.evaluate());
+            EntityGroup toApply = subEvaluator.evaluate();
             subEvaluator = null;
+            applyGroup(toApply);
         }
 
         public void nextOperation(BiFunction<EntityGroup, EntityGroup, EntityGroup> operation) {
@@ -130,6 +132,7 @@ public class CustomGroupParser {
         public void applyGroup(EntityGroup entityGroup) {
             if(subEvaluator != null) {
                 subEvaluator.applyGroup(entityGroup);
+                return;
             }
             if(tail == null) {
                 tail = entityGroup;
@@ -162,7 +165,7 @@ public class CustomGroupParser {
                 }
 
                 @Override
-                public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
                     return tail.inProtoGroup(entity, protoGroup);
                 }
 

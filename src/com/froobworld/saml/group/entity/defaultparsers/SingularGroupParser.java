@@ -25,8 +25,8 @@ public class SingularGroupParser implements EntityGroupParser {
             }
 
             @Override
-            public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-                return false;
+            public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                return ProtoMemberStatus.NON_MEMBER;
             }
 
             @Override

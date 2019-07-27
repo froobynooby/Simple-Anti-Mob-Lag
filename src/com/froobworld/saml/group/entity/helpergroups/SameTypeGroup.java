@@ -18,8 +18,8 @@ public class SameTypeGroup implements EntityGroup {
     }
 
     @Override
-    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return entity.getType() == protoGroup.getCentre().getType();
+    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+        return (entity.getType() == protoGroup.getCentre().getType()) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
     }
 
     @Override

@@ -31,18 +31,31 @@ public class EntityGroupStore {
 
         String groupPart = split[0].toLowerCase();
         JsonObject jsonPart = new JsonParser().parse("{" + (split.length == 1 ? "}" : split[1])).getAsJsonObject();
+        boolean conditionalise = false;
+        if(groupPart.endsWith("*")) {
+            groupPart = groupPart.substring(0, groupPart.length() - 1);
+            conditionalise = true;
+        }
 
         if(parsers.containsKey(groupPart)) {
-            return parsers.get(groupPart).fromJson(jsonPart);
+            EntityGroup entityGroup = parsers.get(groupPart).fromJson(jsonPart);
+
+            return conditionalise ? EntityGroup.conditionalise(entityGroup) : entityGroup;
         }
         if(includeHelpers && helperParsers.containsKey(groupPart)) {
-            return helperParsers.get(groupPart).fromJson(jsonPart);
+            EntityGroup entityGroup = helperParsers.get(groupPart).fromJson(jsonPart);
+
+            return conditionalise ? EntityGroup.conditionalise(entityGroup) : entityGroup;
         }
         if(isNameAcceptable(groupPart) && saml.getCustomGroups() != null && saml.getCustomGroups().keyExists("group." + groupPart)) {
-            return customGroupParser.parse(groupPart, saml.getCustomGroups().getString("group." + groupPart + ".definition"), jsonPart, saml.getCustomGroups().getSection("group." + groupPart + ".arguments"));
+            EntityGroup entityGroup = customGroupParser.parse(groupPart, saml.getCustomGroups().getString("group." + groupPart + ".definition"), jsonPart, saml.getCustomGroups().getSection("group." + groupPart + ".arguments"));
+
+            return conditionalise ? EntityGroup.conditionalise(entityGroup) : entityGroup;
         }
         if(isNameAcceptable(groupPart) && includeHelpers && saml.getCustomGroups() != null && saml.getCustomGroups().keyExists("helper." + groupPart)) {
-            return customGroupParser.parse(groupPart, saml.getCustomGroups().getString("helper." + groupPart + ".definition"), jsonPart, saml.getCustomGroups().getSection("helper." + groupPart + ".arguments"));
+            EntityGroup entityGroup = customGroupParser.parse(groupPart, saml.getCustomGroups().getString("helper." + groupPart + ".definition"), jsonPart, saml.getCustomGroups().getSection("helper." + groupPart + ".arguments"));
+
+            return conditionalise ? EntityGroup.conditionalise(entityGroup) : entityGroup;
         }
 
         return null;

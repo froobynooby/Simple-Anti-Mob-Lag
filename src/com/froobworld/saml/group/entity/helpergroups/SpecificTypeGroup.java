@@ -28,8 +28,8 @@ public class SpecificTypeGroup implements EntityGroup {
     }
 
     @Override
-    public boolean inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return true;
+    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+        return ProtoMemberStatus.MEMBER;
     }
 
     @Override

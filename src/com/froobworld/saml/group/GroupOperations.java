@@ -10,8 +10,15 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
-                return group1.inProtoGroup(candidate, protoGroup) && group2.inProtoGroup(candidate, protoGroup);
+            public ProtoMemberStatus inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
+                ProtoMemberStatus protoMemberStatus1 = group1.inProtoGroup(candidate, protoGroup);
+                ProtoMemberStatus protoMemberStatus2 = group2.inProtoGroup(candidate, protoGroup);
+
+                if(protoMemberStatus1 == ProtoMemberStatus.NON_MEMBER || protoMemberStatus2 == ProtoMemberStatus.NON_MEMBER) {
+                    return ProtoMemberStatus.NON_MEMBER;
+                }
+
+                return (protoMemberStatus1 == ProtoMemberStatus.CONDITIONAL && protoMemberStatus2 == ProtoMemberStatus.CONDITIONAL) ? ProtoMemberStatus.CONDITIONAL : ProtoMemberStatus.MEMBER;
             }
 
             @Override
@@ -50,16 +57,22 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
+            public ProtoMemberStatus inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
+                ProtoMemberStatus protoMemberStatus1 = group1.inProtoGroup(candidate, protoGroup);
+                ProtoMemberStatus protoMemberStatus2 = group2.inProtoGroup(candidate, protoGroup);
                 in1 = false;
                 in2 = false;
-                if(group1.inProtoGroup(candidate, protoGroup)) {
+                if(protoMemberStatus1 != ProtoMemberStatus.NON_MEMBER) {
                     in1 = true;
                 }
-                if(group2.inProtoGroup(candidate, protoGroup)) {
+                if(protoMemberStatus2 != ProtoMemberStatus.NON_MEMBER) {
                     in2 = true;
                 }
-                return in1 || in2;
+                if(!in1 && !in2) {
+                    return ProtoMemberStatus.NON_MEMBER;
+                }
+
+                return (protoMemberStatus1 == ProtoMemberStatus.MEMBER || protoMemberStatus2 == ProtoMemberStatus.MEMBER) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.CONDITIONAL;
             }
 
             @Override
@@ -102,16 +115,22 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
+            public ProtoMemberStatus inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
+                ProtoMemberStatus protoMemberStatus1 = group1.inProtoGroup(candidate, protoGroup);
+                ProtoMemberStatus protoMemberStatus2 = group2.inProtoGroup(candidate, protoGroup);
                 in1 = false;
                 in2 = false;
-                if(group1.canBeMember(protoGroup.getCentre()) && group1.inProtoGroup(candidate, protoGroup)) {
+                if(protoMemberStatus1 != ProtoMemberStatus.NON_MEMBER) {
                     in1 = true;
                 }
-                if(group2.canBeMember(protoGroup.getCentre()) && group2.inProtoGroup(candidate, protoGroup)) {
+                if(protoMemberStatus2 != ProtoMemberStatus.NON_MEMBER) {
                     in2 = true;
                 }
-                return in1 || in2;
+                if(!in1 && !in2) {
+                    return ProtoMemberStatus.NON_MEMBER;
+                }
+
+                return (protoMemberStatus1 == ProtoMemberStatus.MEMBER || protoMemberStatus2 == ProtoMemberStatus.MEMBER) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.CONDITIONAL;
             }
 
             @Override
