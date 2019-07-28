@@ -6,6 +6,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,22 +41,57 @@ public class FrozenEntityData {
     public static FrozenEntityData fromJsonObject(JsonObject jsonObject) {
         Builder builder = new Builder();
         Optional.ofNullable(jsonObject.get("time")).ifPresent( e -> builder.setTimeFrozen(e.getAsNumber().longValue()) );
-        Optional.ofNullable(jsonObject.get("groups")).ifPresent( e -> e.getAsJsonArray().forEach( o -> builder.addGroup(o.getAsString()) ) );
+        Optional.ofNullable(jsonObject.get("groups")).ifPresent( e -> e.getAsJsonArray().forEach( o -> {
+            if(!o.isJsonNull()) {
+                builder.addGroup(o.getAsString());
+            }
+        } ) );
         Optional.ofNullable(jsonObject.get("minimumFreezeTime")).ifPresent( e -> builder.setMinimumFreezeTime(e.getAsNumber().longValue()) );
 
         return builder.build();
     }
 
     public static Optional<FrozenEntityData> getFrozenEntityData(Saml saml, LivingEntity entity) {
-        return Optional.ofNullable(entity.getPersistentDataContainer().get(new NamespacedKey(saml, "frozenEntityData"), new FrozenEntityDataType()));
+        if (CompatibilityUtils.PERSISTENT_DATA) {
+            return Optional.ofNullable(entity.getPersistentDataContainer().get(new NamespacedKey(saml, "frozenEntityData"), new FrozenEntityDataType()));
+        } else {
+            List<MetadataValue> metadataValues = entity.getMetadata("frozenEntityData");
+            if(metadataValues.isEmpty()) {
+                return Optional.empty();
+            }
+            MetadataValue metadataValue = null;
+            for(MetadataValue value : metadataValues) {
+                if(value.getOwningPlugin() == saml) {
+                    metadataValue = value;
+                }
+            }
+            if(metadataValue == null) {
+                return Optional.empty();
+            }
+            if(metadataValue instanceof FixedMetadataValue) {
+                if(metadataValue.value() instanceof FrozenEntityData) {
+                    return Optional.ofNullable((FrozenEntityData) metadataValue.value());
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     public void setAsFrozenEntityData(Saml saml, LivingEntity entity) {
-        entity.getPersistentDataContainer().set(new NamespacedKey(saml, "frozenEntityData"), new FrozenEntityDataType(), this);
+        if(CompatibilityUtils.PERSISTENT_DATA) {
+            entity.getPersistentDataContainer().set(new NamespacedKey(saml, "frozenEntityData"), new FrozenEntityDataType(), this);
+        } else {
+            entity.setMetadata("frozenEntityData", new FixedMetadataValue(saml, this));
+        }
     }
 
     public static void stripOfFrozenEntityData(Saml saml, LivingEntity entity) {
-        entity.getPersistentDataContainer().remove(new NamespacedKey(saml, "frozenEntityData"));
+        if(CompatibilityUtils.PERSISTENT_DATA) {
+            entity.getPersistentDataContainer().remove(new NamespacedKey(saml, "frozenEntityData"));
+        } else {
+            entity.removeMetadata("frozenEntityData", saml);
+        }
     }
 
     public static class Builder {
@@ -85,9 +122,6 @@ public class FrozenEntityData {
         }
 
         public FrozenEntityData build() {
-            if(!CompatibilityUtils.PERSISTENT_DATA) {
-                return null;
-            }
             return new FrozenEntityData(time, groups, minimumFreezeTime);
         }
     }
