@@ -40,8 +40,8 @@ public class TypeCountGroup implements EntityGroup {
     }
 
     @Override
-    public boolean canBeMember(SnapshotEntity candidate) {
-        return true;
+    public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
+        return MembershipEligibility.CENTRE_OR_MEMBER;
     }
 
     @Override

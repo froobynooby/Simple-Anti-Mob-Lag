@@ -5,26 +5,36 @@ import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
 import com.froobworld.saml.group.entity.EntityGroupParser;
 import com.froobworld.saml.group.entity.SnapshotEntity;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-public class ChunkGroup implements EntityGroup {
+public class SpecificCentreTypeGroup implements EntityGroup {
+    private Set<EntityType> acceptedTypes;
+
+    public SpecificCentreTypeGroup(Set<EntityType> acceptedTypes) {
+        this.acceptedTypes = acceptedTypes;
+    }
+
 
     @Override
     public String getName() {
-        return "default_chunk";
+        return "default_specific_centre_type";
     }
 
     @Override
     public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return (entity.getLocation().getBlockX() >> 4 == protoGroup.getCentre().getLocation().getBlockX() >> 4 && entity.getLocation().getBlockZ() >> 4 == protoGroup.getCentre().getLocation().getBlockZ() >> 4) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
+        return ProtoMemberStatus.MEMBER;
     }
 
     @Override
     public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
-        return MembershipEligibility.CENTRE_OR_MEMBER;
+        return acceptedTypes.contains(candidate.getType()) ? MembershipEligibility.CENTRE_OR_MEMBER : MembershipEligibility.MEMBER;
     }
 
     @Override
@@ -45,13 +55,18 @@ public class ChunkGroup implements EntityGroup {
         return null;
     }
 
-    public static EntityGroupParser<ChunkGroup> parser() {
-        return new EntityGroupParser<ChunkGroup>() {
+    public static EntityGroupParser<SpecificCentreTypeGroup> parser() {
+        return new EntityGroupParser<SpecificCentreTypeGroup>() {
             @Override
-            public ChunkGroup fromJson(JsonObject jsonObject) {
-                return new ChunkGroup();
+            public SpecificCentreTypeGroup fromJson(JsonObject jsonObject) {
+                Set<EntityType> acceptedTypes = new HashSet<EntityType>();
+                for (JsonElement jsonElement : jsonObject.get("acceptedTypes").getAsJsonArray()) {
+                    EntityType entityType = EntityType.valueOf(jsonElement.getAsString());
+                    acceptedTypes.add(entityType);
+                }
+
+                return new SpecificCentreTypeGroup(acceptedTypes);
             }
         };
     }
-
 }

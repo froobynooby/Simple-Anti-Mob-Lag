@@ -46,8 +46,8 @@ public interface EntityGroup extends Group<SnapshotEntity> {
                     }
 
                     @Override
-                    public boolean canBeMember(SnapshotEntity candidate) {
-                        return snapshotEntityGroup.canBeMember(candidate);
+                    public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
+                        return snapshotEntityGroup.getMembershipEligibility(candidate);
                     }
 
                     @Override
@@ -83,8 +83,8 @@ public interface EntityGroup extends Group<SnapshotEntity> {
             }
 
             @Override
-            public boolean canBeMember(SnapshotEntity candidate) {
-                return entityGroup.canBeMember(candidate);
+            public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
+                return entityGroup.getMembershipEligibility(candidate);
             }
 
             @Override

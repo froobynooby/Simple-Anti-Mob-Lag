@@ -30,8 +30,8 @@ public class SingularGroupParser implements EntityGroupParser {
             }
 
             @Override
-            public boolean canBeMember(SnapshotEntity candidate) {
-                return true;
+            public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
+                return MembershipEligibility.CENTRE;
             }
 
             @Override

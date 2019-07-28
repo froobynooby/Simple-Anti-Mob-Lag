@@ -170,8 +170,8 @@ public class CustomGroupParser {
                 }
 
                 @Override
-                public boolean canBeMember(SnapshotEntity candidate) {
-                    return tail.canBeMember(candidate);
+                public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
+                    return tail.getMembershipEligibility(candidate);
                 }
 
                 @Override

@@ -22,8 +22,44 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean canBeMember(T candidate) {
-                return group1.canBeMember(candidate) && group2.canBeMember(candidate);
+            public MembershipEligibility getMembershipEligibility(T candidate) {
+                MembershipEligibility membershipEligibility1 = group1.getMembershipEligibility(candidate);
+                MembershipEligibility membershipEligibility2 = group2.getMembershipEligibility(candidate);
+                if(membershipEligibility1 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.CENTRE;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else {
+                        return MembershipEligibility.NONE;
+                    }
+                }
+                if(membershipEligibility1 == MembershipEligibility.CENTRE) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.CENTRE;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.CENTRE;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.NONE;
+                    } else {
+                        return MembershipEligibility.NONE;
+                    }
+                }
+                if(membershipEligibility1 == MembershipEligibility.MEMBER) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.NONE;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else {
+                        return MembershipEligibility.NONE;
+                    }
+                }
+
+                return MembershipEligibility.NONE;
             }
 
             @Override
@@ -48,8 +84,8 @@ public class GroupOperations {
 
     public static <T> Group<T> weakConjunction(String resultName, Group<T> group1, Group<T> group2) {
         return new Group<T>() {
-            private boolean in1 = false;
-            private boolean in2 = false;
+            private boolean in1 = true;
+            private boolean in2 = true;
 
             @Override
             public String getName() {
@@ -76,8 +112,56 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean canBeMember(T candidate) {
-                return group1.canBeMember(candidate) && group2.canBeMember(candidate);
+            public MembershipEligibility getMembershipEligibility(T candidate) {
+                MembershipEligibility membershipEligibility1 = group1.getMembershipEligibility(candidate);
+                MembershipEligibility membershipEligibility2 = group2.getMembershipEligibility(candidate);
+
+                if(membershipEligibility1 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else {
+                        return MembershipEligibility.MEMBER;
+                    }
+                }
+                if(membershipEligibility1 == MembershipEligibility.CENTRE) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.CENTRE;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else {
+                        return MembershipEligibility.NONE;
+                    }
+                }
+                if(membershipEligibility1 == MembershipEligibility.MEMBER) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else {
+                        return MembershipEligibility.MEMBER;
+                    }
+                }
+                if(membershipEligibility1 == MembershipEligibility.NONE) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.NONE;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else {
+                        return MembershipEligibility.NONE;
+                    }
+                }
+
+                return MembershipEligibility.NONE;
             }
 
             @Override
@@ -106,8 +190,8 @@ public class GroupOperations {
 
     public static <T> Group<T> disjunction(String resultName, Group<T> group1, Group<T> group2) {
         return new Group<T>() {
-            private boolean in1 = false;
-            private boolean in2 = false;
+            private boolean in1 = true;
+            private boolean in2 = true;
 
             @Override
             public String getName() {
@@ -134,8 +218,61 @@ public class GroupOperations {
             }
 
             @Override
-            public boolean canBeMember(T candidate) {
-                return group1.canBeMember(candidate) || group2.canBeMember(candidate);
+            public MembershipEligibility getMembershipEligibility(T candidate) {
+                MembershipEligibility membershipEligibility1 = group1.getMembershipEligibility(candidate);
+                MembershipEligibility membershipEligibility2 = group2.getMembershipEligibility(candidate);
+                if(membershipEligibility1 == MembershipEligibility.CENTRE || membershipEligibility1 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                    in1 = true;
+                }
+                if(membershipEligibility2 == MembershipEligibility.CENTRE || membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                    in2 = true;
+                }
+                if(membershipEligibility1 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    }
+                }
+                if(membershipEligibility1 == MembershipEligibility.CENTRE) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.CENTRE;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else {
+                        return MembershipEligibility.CENTRE;
+                    }
+                }
+                if(membershipEligibility1 == MembershipEligibility.MEMBER) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else {
+                        return MembershipEligibility.MEMBER;
+                    }
+                }
+                if(membershipEligibility1 == MembershipEligibility.NONE) {
+                    if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
+                        return MembershipEligibility.CENTRE_OR_MEMBER;
+                    } else if(membershipEligibility2 == MembershipEligibility.CENTRE) {
+                        return MembershipEligibility.CENTRE;
+                    } else if(membershipEligibility2 == MembershipEligibility.MEMBER) {
+                        return MembershipEligibility.MEMBER;
+                    } else {
+                        return MembershipEligibility.NONE;
+                    }
+                }
+
+                return MembershipEligibility.NONE;
             }
 
             @Override

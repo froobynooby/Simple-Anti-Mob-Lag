@@ -29,12 +29,15 @@ public class SpecificTypeGroup implements EntityGroup {
 
     @Override
     public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return ProtoMemberStatus.MEMBER;
+        if(acceptedTypes.contains(entity.getType())) {
+            return ProtoMemberStatus.MEMBER;
+        }
+        return ProtoMemberStatus.NON_MEMBER;
     }
 
     @Override
-    public boolean canBeMember(SnapshotEntity candidate) {
-        return acceptedTypes.contains(candidate.getType());
+    public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
+        return acceptedTypes.contains(candidate.getType()) ? MembershipEligibility.CENTRE_OR_MEMBER : MembershipEligibility.CENTRE;
     }
 
     @Override

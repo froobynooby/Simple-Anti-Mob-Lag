@@ -15,28 +15,41 @@ public class ObjectGrouper {
             ProtoGroupedObject<T> nextProtoGroupedObject = new ProtoGroupedObject<T>(object);
             for(Group<? super T> group : groups) {
                 nextProtoGroupedObject.protoGroups.put(group, new ArrayList<ProtoGroup<T>>());
-                if(group.canBeMember(object)) {
-                    ProtoGroup<T> nextProtoGroup = new ProtoGroup<T>(group, object);
-                    nextProtoGroupedObject.centres.put(group, nextProtoGroup);
+                Group.MembershipEligibility nextMembershipEligibility = group.getMembershipEligibility(object);
+                nextProtoGroupedObject.groupMembershipEligibility.put(group, nextMembershipEligibility);
+                if(nextMembershipEligibility != Group.MembershipEligibility.NONE) {
+                    ProtoGroup<T> nextProtoGroup = null;
+                    if(nextMembershipEligibility == Group.MembershipEligibility.CENTRE || nextMembershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER) {
+                        nextProtoGroup = new ProtoGroup<T>(group, object);
+                        nextProtoGroupedObject.centres.put(group, nextProtoGroup);
+                    }
 
                     for(ProtoGroupedObject<T> otherProtoGroupedObject : protoGroupedObjects) {
-                        ProtoGroup<T> otherProtoGroup = otherProtoGroupedObject.centres.get(group);
-                        if(otherProtoGroup != null) {
-                            boolean otherIsGroup = otherProtoGroup.isGroup();
-                            boolean nextIsGroup = nextProtoGroup.isGroup();
+                        Group.MembershipEligibility otherMembershipEligibility = otherProtoGroupedObject.groupMembershipEligibility.get(group);
+                        if(otherMembershipEligibility != Group.MembershipEligibility.NONE) {
+                            ProtoGroup<T> otherProtoGroup = otherProtoGroupedObject.centres.get(group);
+                            boolean nextIsGroup = nextProtoGroup != null && nextProtoGroup.isGroup();
+                            boolean otherIsGroup = otherProtoGroup != null && otherProtoGroup.isGroup();
                             if(!otherIsGroup || !nextIsGroup) {
-                                Group.ProtoMemberStatus memberStatus = group.inProtoGroup(nextProtoGroup.getCentre(), otherProtoGroup);
-                                if(memberStatus == Group.ProtoMemberStatus.MEMBER || memberStatus == Group.ProtoMemberStatus.CONDITIONAL) {
-                                    if(!otherIsGroup) {
-                                        otherProtoGroup.addMember(nextProtoGroup.getCentre());
-                                        if(memberStatus != Group.ProtoMemberStatus.CONDITIONAL) {
-                                            otherProtoGroupedObject.protoGroups.get(group).add(nextProtoGroup);
+                                if (otherProtoGroup != null && (nextMembershipEligibility == Group.MembershipEligibility.MEMBER || nextMembershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
+                                    Group.ProtoMemberStatus protoMemberStatus = group.inProtoGroup(nextProtoGroupedObject.object, otherProtoGroup);
+                                    if (protoMemberStatus == Group.ProtoMemberStatus.MEMBER || protoMemberStatus == Group.ProtoMemberStatus.CONDITIONAL) {
+                                        if (!otherIsGroup) {
+                                            otherProtoGroup.addMember(nextProtoGroupedObject.object);
+                                        }
+                                        if (protoMemberStatus != Group.ProtoMemberStatus.CONDITIONAL) {
+                                            nextProtoGroupedObject.protoGroups.get(group).add(otherProtoGroup);
                                         }
                                     }
-                                    if(!nextIsGroup) {
-                                        nextProtoGroup.addMember(otherProtoGroup.getCentre());
-                                        if(memberStatus != Group.ProtoMemberStatus.CONDITIONAL) {
-                                            nextProtoGroupedObject.protoGroups.get(group).add(otherProtoGroup);
+                                }
+                                if (nextProtoGroup != null && (otherMembershipEligibility == Group.MembershipEligibility.MEMBER || otherMembershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
+                                    Group.ProtoMemberStatus protoMemberStatus = group.inProtoGroup(otherProtoGroupedObject.object, nextProtoGroup);
+                                    if (protoMemberStatus == Group.ProtoMemberStatus.MEMBER || protoMemberStatus == Group.ProtoMemberStatus.CONDITIONAL) {
+                                        if (!nextIsGroup) {
+                                            nextProtoGroup.addMember(otherProtoGroupedObject.object);
+                                        }
+                                        if (protoMemberStatus != Group.ProtoMemberStatus.CONDITIONAL) {
+                                            otherProtoGroupedObject.protoGroups.get(group).add(nextProtoGroup);
                                         }
                                     }
                                 }
@@ -68,11 +81,13 @@ public class ObjectGrouper {
 
     private static class ProtoGroupedObject<T> {
         private T object;
+        private HashMap<Group<? super T>, Group.MembershipEligibility> groupMembershipEligibility;
         private HashMap<Group<? super T>, ProtoGroup<T>> centres;
         private HashMap<Group<? super T>, List<ProtoGroup<T>>> protoGroups;
 
         public ProtoGroupedObject(T object) {
             this.object = object;
+            this.groupMembershipEligibility = new HashMap<Group<? super T>, Group.MembershipEligibility>();
             this.centres = new HashMap<Group<? super T>, ProtoGroup<T>>();
             this.protoGroups = new HashMap<Group<? super T>, List<ProtoGroup<T>>>();
         }
