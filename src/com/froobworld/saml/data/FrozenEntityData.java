@@ -25,6 +25,18 @@ public class FrozenEntityData {
     }
 
 
+    public long getTimeAtFreeze() {
+        return time;
+    }
+
+    public List<String> getGroups() {
+        return groups;
+    }
+
+    public long getMinimumFreezeTime() {
+        return minimumFreezeTime;
+    }
+
     public JsonObject toJsonObject() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("time", time);
