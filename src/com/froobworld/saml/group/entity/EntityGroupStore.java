@@ -96,7 +96,7 @@ public class EntityGroupStore {
         helperParsers.put("default_total_count", TotalCountGroup.parser());
         helperParsers.put("default_type_count", TypeCountGroup.parser());
         helperParsers.put("default_specific_type", SpecificTypeGroup.parser());
-        helperParsers.put("default_same_type", ChunkGroup.parser());
+        helperParsers.put("default_same_type", SameTypeGroup.parser());
         helperParsers.put("default_chunk", ChunkGroup.parser());
         helperParsers.put("default_specific_centre_type", SpecificCentreTypeGroup.parser());
     }
