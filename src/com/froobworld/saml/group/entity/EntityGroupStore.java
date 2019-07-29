@@ -1,9 +1,9 @@
 package com.froobworld.saml.group.entity;
 
 import com.froobworld.saml.Saml;
-import com.froobworld.saml.group.entity.defaultparsers.DefaultGroupParser;
-import com.froobworld.saml.group.entity.defaultparsers.SingularGroupParser;
-import com.froobworld.saml.group.entity.helpergroups.*;
+import com.froobworld.saml.group.entity.groups.DefaultGroup;
+import com.froobworld.saml.group.entity.groups.SingularGroup;
+import com.froobworld.saml.group.entity.groups.helpers.*;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -102,8 +102,8 @@ public class EntityGroupStore {
     }
 
     private void addDefaults(Saml saml) {
-        parsers.put("default_group", new DefaultGroupParser(saml));
-        parsers.put("default_singular", new SingularGroupParser());
+        parsers.put("default_group", DefaultGroup.parser(saml));
+        parsers.put("default_singular", SingularGroup.parser());
     }
 
     private boolean isNameAcceptable(String name) {

@@ -1,4 +1,4 @@
-package com.froobworld.saml.group.entity.helpergroups;
+package com.froobworld.saml.group.entity.groups.helpers;
 
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;

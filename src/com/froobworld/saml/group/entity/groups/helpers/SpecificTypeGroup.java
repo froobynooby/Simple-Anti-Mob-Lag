@@ -1,4 +1,4 @@
-package com.froobworld.saml.group.entity.helpergroups;
+package com.froobworld.saml.group.entity.groups.helpers;
 
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
@@ -14,27 +14,30 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SpecificCentreTypeGroup implements EntityGroup {
+public class SpecificTypeGroup implements EntityGroup {
     private Set<EntityType> acceptedTypes;
 
-    public SpecificCentreTypeGroup(Set<EntityType> acceptedTypes) {
+    public SpecificTypeGroup(Set<EntityType> acceptedTypes) {
         this.acceptedTypes = acceptedTypes;
     }
 
 
     @Override
     public String getName() {
-        return "default_specific_centre_type";
+        return "default_specific_type";
     }
 
     @Override
     public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return ProtoMemberStatus.MEMBER;
+        if(acceptedTypes.contains(entity.getType())) {
+            return ProtoMemberStatus.MEMBER;
+        }
+        return ProtoMemberStatus.NON_MEMBER;
     }
 
     @Override
     public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
-        return acceptedTypes.contains(candidate.getType()) ? MembershipEligibility.CENTRE_OR_MEMBER : MembershipEligibility.MEMBER;
+        return acceptedTypes.contains(candidate.getType()) ? MembershipEligibility.CENTRE_OR_MEMBER : MembershipEligibility.CENTRE;
     }
 
     @Override
@@ -55,17 +58,17 @@ public class SpecificCentreTypeGroup implements EntityGroup {
         return null;
     }
 
-    public static EntityGroupParser<SpecificCentreTypeGroup> parser() {
-        return new EntityGroupParser<SpecificCentreTypeGroup>() {
+    public static EntityGroupParser<SpecificTypeGroup> parser() {
+        return new EntityGroupParser<SpecificTypeGroup>() {
             @Override
-            public SpecificCentreTypeGroup fromJson(JsonObject jsonObject) {
+            public SpecificTypeGroup fromJson(JsonObject jsonObject) {
                 Set<EntityType> acceptedTypes = new HashSet<EntityType>();
                 for (JsonElement jsonElement : jsonObject.get("acceptedTypes").getAsJsonArray()) {
                     EntityType entityType = EntityType.valueOf(jsonElement.getAsString());
                     acceptedTypes.add(entityType);
                 }
 
-                return new SpecificCentreTypeGroup(acceptedTypes);
+                return new SpecificTypeGroup(acceptedTypes);
             }
         };
     }

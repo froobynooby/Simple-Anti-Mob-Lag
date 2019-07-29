@@ -1,4 +1,4 @@
-package com.froobworld.saml.group.entity.helpergroups;
+package com.froobworld.saml.group.entity.groups.helpers;
 
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
@@ -10,16 +10,16 @@ import org.bukkit.entity.LivingEntity;
 
 import java.util.Map;
 
-public class SameTypeGroup implements EntityGroup {
+public class ChunkGroup implements EntityGroup {
 
     @Override
     public String getName() {
-        return "default_same_type";
+        return "default_chunk";
     }
 
     @Override
     public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return (entity.getType() == protoGroup.getCentre().getType()) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
+        return (entity.getLocation().getBlockX() >> 4 == protoGroup.getCentre().getLocation().getBlockX() >> 4 && entity.getLocation().getBlockZ() >> 4 == protoGroup.getCentre().getLocation().getBlockZ() >> 4) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
     }
 
     @Override
@@ -45,12 +45,13 @@ public class SameTypeGroup implements EntityGroup {
         return null;
     }
 
-    public static EntityGroupParser<SameTypeGroup> parser() {
-        return new EntityGroupParser<SameTypeGroup>() {
+    public static EntityGroupParser<ChunkGroup> parser() {
+        return new EntityGroupParser<ChunkGroup>() {
             @Override
-            public SameTypeGroup fromJson(JsonObject jsonObject) {
-                return new SameTypeGroup();
+            public ChunkGroup fromJson(JsonObject jsonObject) {
+                return new ChunkGroup();
             }
         };
     }
+
 }
