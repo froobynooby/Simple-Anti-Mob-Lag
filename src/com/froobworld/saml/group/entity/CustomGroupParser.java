@@ -72,9 +72,9 @@ public class CustomGroupParser {
     }
 
     private void addGroupOperations() {
-        groupOperations.put('&', EntityGroup.transformGroupOperation( (u, v) -> GroupOperations.conjunction(null, u, v) ));
-        groupOperations.put('^', EntityGroup.transformGroupOperation( (u, v) -> GroupOperations.weakConjunction(null, u, v) ));
-        groupOperations.put('|', EntityGroup.transformGroupOperation( (u, v) -> GroupOperations.disjunction(null, u, v) ));
+        groupOperations.put('&', (u, v) -> EntityGroupOperations.conjunction(null, u, v));
+        groupOperations.put('^', (u, v) -> EntityGroupOperations.weakConjunction(null, u, v));
+        groupOperations.put('|', (u, v) -> EntityGroupOperations.disjunction(null, u, v));
     }
 
     private static class Evaluator {
