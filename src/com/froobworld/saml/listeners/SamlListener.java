@@ -1,17 +1,21 @@
 package com.froobworld.saml.listeners;
 
 import com.froobworld.saml.Saml;
-import com.froobworld.saml.events.SamlConfigReloadEvent;
-import com.froobworld.saml.events.SamlPreMobFreezeEvent;
+import com.froobworld.saml.events.*;
+import com.froobworld.saml.group.entity.EntityGroupOperations;
+import com.froobworld.saml.group.entity.groups.DefaultGroup;
+import com.froobworld.saml.group.entity.groups.SingularGroup;
+import com.froobworld.saml.group.entity.groups.helpers.SpecificCentreTypeGroup;
 import com.froobworld.saml.utils.CompatibilityUtils;
+import com.froobworld.saml.utils.EntityFreezer;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class SamlListener implements Listener {
     private Saml saml;
@@ -29,17 +33,56 @@ public class SamlListener implements Listener {
             }
         }
         if(event.getConfig().getBoolean("keep-frozen-chunk-cache")) {
-            saml.getMobFreezeTask().createChunkCacheIfNotExist();
+            saml.createFrozenChunkCacheIfNotExist();
         }
         if(!event.getConfig().getBoolean("unfreeze-on-shutdown") || !event.getConfig().getBoolean("unfreeze-on-unload")) {
-            if(saml.getMobFreezeTask().getFrozenChunkCache() != null) {
-                saml.getMobFreezeTask().getFrozenChunkCache().setShouldSaveOnExit();
+            if(saml.getFrozenChunkCache() != null) {
+                saml.getFrozenChunkCache().setShouldSaveOnExit();
             }
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onSamlPreMobFreeze(SamlPreMobFreezeEvent event) {
+        if(event.getReason() == SamlMobFreezeEvent.FreezeReason.MAIN_TASK) {
+            for(World world : Bukkit.getWorlds()) {
+                if(!saml.getSamlConfig().getStringList("ignore-worlds").contains(world.getName())) {
+                    event.getFreezeParametersBuilder().addWorld(world);
+                }
+            }
+            event.getFreezeParametersBuilder().broadcastToConsole(saml.getSamlConfig().getBoolean("broadcast-to-console"));
+            event.getFreezeParametersBuilder().broadcastToOps(saml.getSamlConfig().getBoolean("broadcast-to-ops"));
+            event.getFreezeParametersBuilder().setDoAsync(saml.getSamlConfig().getBoolean("use-async-grouping"));
+            event.getFreezeParametersBuilder().setMinimumFreezeTime(saml.getConfig().getLong("minimum-freeze-time"));
+            event.getFreezeParametersBuilder().setMaximumOperationTime(saml.getConfig().getLong("maximum-operation-time"));
+            boolean customFreezeGroups = false;
+            if(saml.getSamlConfig().getBoolean("use-advanced.config")) {
+                customFreezeGroups = saml.getAdvancedConfig().getBoolean("use-custom-groups");
+            }
+            if (saml.getSamlConfig().getBoolean("group-bias") && event.getCurrentFreezeParameters().getCurrentTps() > saml.getSamlConfig().getDouble("group-bias-tps-threshold")) {
+                if(customFreezeGroups) {
+                    for(String group : saml.getAdvancedConfig().getStringList("freeze-groups")) {
+                        event.getFreezeParametersBuilder().includeGroup(saml.getGroupStore().getGroup(group, false));
+                    }
+                    for(String group : saml.getAdvancedConfig().getStringList("exclude-groups")) {
+                        event.getFreezeParametersBuilder().excludeGroup(saml.getGroupStore().getGroup(group, false));
+                    }
+                } else {
+                    event.getFreezeParametersBuilder().includeGroup(new DefaultGroup(saml));
+                }
+                List<String> alwaysFreezeList = saml.getSamlConfig().getStringList("always-freeze");
+                for(EntityType entityType : EntityType.values()) {
+                    if(alwaysFreezeList.contains(entityType.name())) {
+                        SpecificCentreTypeGroup centreTypeGroup = new SpecificCentreTypeGroup(Collections.singleton(entityType));
+                        SingularGroup singularGroup = new SingularGroup();
+                        event.getFreezeParametersBuilder().includeGroup(EntityGroupOperations.conjunction("default_always_freeze", centreTypeGroup, singularGroup));
+                    }
+                }
+            } else {
+                event.getFreezeParametersBuilder().includeGroup(new SingularGroup());
+            }
+        }
+
         boolean ignoreTamed = saml.getSamlConfig().getBoolean("ignore-tamed");
         boolean ignoreNamed = saml.getSamlConfig().getBoolean("ignore-named");
         boolean ignoreLeashed = saml.getSamlConfig().getBoolean("ignore-leashed");
@@ -128,15 +171,58 @@ public class SamlListener implements Listener {
             }
         }
 
-        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedNeverFreezeTpsThreshold.getOrDefault(e.getType(), neverFreezeTpsThreshold) && neverFreeze.contains(e.getType().name())) );
-        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreTamedTpsThreshold.getOrDefault(e.getType(), ignoreTamedTpsThreshold) && typedIgnoreTamed.getOrDefault(e.getType(), ignoreTamed) && e instanceof Tameable && ((Tameable) e).getOwner() != null) );
-        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreNamedTpsThreshold.getOrDefault(e.getType(), ignoreNamedTpsThreshold) && typedIgnoreNamed.getOrDefault(e.getType(), ignoreNamed) && e.getCustomName() != null) );
-        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreLeashedTpsThreshold.getOrDefault(e.getType(), ignoreLeashedTpsThreshold) && typedIgnoreLeashed.getOrDefault(e.getType(), ignoreLeashed) && e.isLeashed()) );
-        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreLoveModeTpsThreshold.getOrDefault(e.getType(), ignoreLoveModeTpsThreshold) && CompatibilityUtils.ANIMAL_LOVE_MODE && typedIgnoreLoveMode.getOrDefault(e.getType(), ignoreLoveMode) && e instanceof Animals && ((Animals) e).isLoveMode()) );
-        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnorePlayerProximityTpsThreshold.getOrDefault(e.getType(), ignorePlayerProximityTpsThreshold) && typedIgnorePlayerProximityDistanceSquared.getOrDefault(e.getType(), ignorePlayerProximityDistanceSquared) > 0 && Bukkit.getOnlinePlayers().stream().anyMatch( p -> (p.getWorld().equals(e.getWorld()) && p.getLocation().distanceSquared(e.getLocation()) < typedIgnorePlayerProximityDistanceSquared.getOrDefault(e.getType(), ignorePlayerProximityDistanceSquared)) )) );
-        event.addShouldIgnorePredicate( e -> (saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(e::hasMetadata)) );
-        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreYoungerThanTicksTpsThreshold.getOrDefault(e.getType(), ignoreYoungerThanTicksTpsThreshold) && e.getTicksLived() < typedIgnoreYoungerThanTicks.getOrDefault(e.getType(), ignoreYoungerThanTicks)) );
-        event.addShouldIgnorePredicate( e -> (event.getTps() >= typedIgnoreTargetPlayerTpsThreshold.getOrDefault(e.getType(), ignoreTargetPlayerTpsThreshold) && typedIgnoreTargetPlayer.getOrDefault(e.getType(), ignoreTargetPlayer) &&  CompatibilityUtils.MOB_TARGET && e instanceof Mob && ((Mob) e).getTarget() instanceof Player) );
+        double currentTps = event.getCurrentFreezeParameters().getCurrentTps();
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedNeverFreezeTpsThreshold.getOrDefault(e.getType(), neverFreezeTpsThreshold) && neverFreeze.contains(e.getType().name())) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreTamedTpsThreshold.getOrDefault(e.getType(), ignoreTamedTpsThreshold) && typedIgnoreTamed.getOrDefault(e.getType(), ignoreTamed) && e instanceof Tameable && ((Tameable) e).getOwner() != null) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreNamedTpsThreshold.getOrDefault(e.getType(), ignoreNamedTpsThreshold) && typedIgnoreNamed.getOrDefault(e.getType(), ignoreNamed) && e.getCustomName() != null) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreLeashedTpsThreshold.getOrDefault(e.getType(), ignoreLeashedTpsThreshold) && typedIgnoreLeashed.getOrDefault(e.getType(), ignoreLeashed) && e.isLeashed()) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreLoveModeTpsThreshold.getOrDefault(e.getType(), ignoreLoveModeTpsThreshold) && CompatibilityUtils.ANIMAL_LOVE_MODE && typedIgnoreLoveMode.getOrDefault(e.getType(), ignoreLoveMode) && e instanceof Animals && ((Animals) e).isLoveMode()) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnorePlayerProximityTpsThreshold.getOrDefault(e.getType(), ignorePlayerProximityTpsThreshold) && typedIgnorePlayerProximityDistanceSquared.getOrDefault(e.getType(), ignorePlayerProximityDistanceSquared) > 0 && Bukkit.getOnlinePlayers().stream().anyMatch( p -> (p.getWorld().equals(e.getWorld()) && p.getLocation().distanceSquared(e.getLocation()) < typedIgnorePlayerProximityDistanceSquared.getOrDefault(e.getType(), ignorePlayerProximityDistanceSquared)) )) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(e::hasMetadata)) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreYoungerThanTicksTpsThreshold.getOrDefault(e.getType(), ignoreYoungerThanTicksTpsThreshold) && e.getTicksLived() < typedIgnoreYoungerThanTicks.getOrDefault(e.getType(), ignoreYoungerThanTicks)) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreTargetPlayerTpsThreshold.getOrDefault(e.getType(), ignoreTargetPlayerTpsThreshold) && typedIgnoreTargetPlayer.getOrDefault(e.getType(), ignoreTargetPlayer) &&  CompatibilityUtils.MOB_TARGET && e instanceof Mob && ((Mob) e).getTarget() instanceof Player) );
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onSamlMobFreeze(SamlMobFreezeEvent event) {
+        if(CompatibilityUtils.MOB_TARGET) {
+            boolean preventTargetingFrozen = saml.getSamlConfig().getBoolean("prevent-targeting-frozen");
+            HashMap<EntityType, Boolean> typedPreventTargetingFrozen = new HashMap<EntityType, Boolean>();
+            if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
+                for (EntityType entityType : EntityType.values()) {
+                    if (saml.getAdvancedConfig().keyExists("prevent-target-frozen." + entityType.name())) {
+                        typedPreventTargetingFrozen.put(entityType, saml.getAdvancedConfig().getBoolean("prevent-target-frozen." + entityType.name()));
+                    }
+                }
+            }
+            for(World world : Bukkit.getWorlds()) {
+                for(LivingEntity entity : world.getLivingEntities()) {
+                    if(typedPreventTargetingFrozen.getOrDefault(entity.getType(), preventTargetingFrozen) && entity instanceof Mob) {
+                        if(((Mob) entity).getTarget() != null && EntityFreezer.isSamlFrozen(saml, ((Mob) entity).getTarget())) {
+                            ((Mob) entity).setTarget(null);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onSamlPreMobUnfreeze(SamlPreMobUnfreezeEvent event) {
+        if(event.getReason() == SamlMobUnfreezeEvent.UnfreezeReason.MAIN_TASK) {
+            for(World world : Bukkit.getWorlds()) {
+                if(!saml.getSamlConfig().getStringList("ignore-worlds").contains(world.getName())) {
+                    event.getUnfreezeParametersBuilder().addWorld(world);
+                }
+            }
+            event.getUnfreezeParametersBuilder().setUnfreezeLimit(saml.getSamlConfig().getLong("unfreeze-limit"));
+            if(saml.getSamlConfig().getDouble("minimum-freeze-time") <= 0) {
+                event.getUnfreezeParametersBuilder().ignoreRemainingTime(true);
+            }
+        }
+
+        event.getUnfreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(e::hasMetadata)) );
+        event.getUnfreezeParametersBuilder().addIgnorePredicate( e ->(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") && !EntityFreezer.isSamlFrozen(saml, e)) );
     }
 
 }

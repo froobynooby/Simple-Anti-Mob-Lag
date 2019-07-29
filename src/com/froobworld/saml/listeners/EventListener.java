@@ -162,8 +162,8 @@ public class EventListener implements Listener {
             SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(mobsToUnfreeze, SamlMobUnfreezeEvent.UnfreezeReason.CHUNK_UNLOAD);
             Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
 
-            if (saml.getMobFreezeTask().getFrozenChunkCache() != null) {
-                saml.getMobFreezeTask().getFrozenChunkCache().removeChunk(event.getChunk());
+            if (saml.getFrozenChunkCache() != null) {
+                saml.getFrozenChunkCache().removeChunk(event.getChunk());
             }
         }
     }

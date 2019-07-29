@@ -12,7 +12,7 @@ public class HandleCacheOnShutdownTask implements Runnable {
 
     @Override
     public void run() {
-        FrozenChunkCache frozenChunkCache = saml.getMobFreezeTask().getFrozenChunkCache();
+        FrozenChunkCache frozenChunkCache = saml.getFrozenChunkCache();
         if(frozenChunkCache != null) {
             if(frozenChunkCache.shouldSaveOnExit()) {
                 frozenChunkCache.saveToFile();

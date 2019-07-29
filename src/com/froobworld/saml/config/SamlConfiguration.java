@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SamlConfiguration {
-    public static final int CONFIG_CURRENT_VERSION = 7;
-    public static final int ADVANCED_CONFIG_CURRENT_VERSION = 2;
+    public static final int CONFIG_CURRENT_VERSION = 8;
+    public static final int ADVANCED_CONFIG_CURRENT_VERSION = 3;
     public static final int CUSTOM_GROUPS_CURRENT_VERSION = 1;
     public static final int MESSAGES_CURRENT_VERSION = 1;
 

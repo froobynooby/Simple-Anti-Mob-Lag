@@ -1,0 +1,12 @@
+# Do you want to specify yourself what kind of groups of entities you want frozen and not frozen?
+# This is still affected by the use-group-bias setting in the config.yml. You'll also need that setting set to true for this to work.
+use-custom-groups: false
+
+# Which groups of entities should be frozen?
+freeze-groups:
+#  - default_group
+#  - default_singular
+
+# Which groups of entities should be excluded from being frozen?
+exclude-groups:
+#  - enderman_grinder

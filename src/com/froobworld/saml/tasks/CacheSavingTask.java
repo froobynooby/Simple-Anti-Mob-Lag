@@ -8,15 +8,15 @@ public class CacheSavingTask implements Runnable {
 
     public CacheSavingTask(Saml saml) {
         this.saml = saml;
-        if(saml.getMobFreezeTask().getFrozenChunkCache() != null) {
+        if(saml.getFrozenChunkCache() != null) {
             Bukkit.getScheduler().scheduleSyncRepeatingTask(saml, this, 1200, 1200);
         }
     }
 
     @Override
     public void run() {
-        if(saml.getMobFreezeTask().getFrozenChunkCache().hasUnsavedChanges()) {
-            saml.getMobFreezeTask().getFrozenChunkCache().saveToFile();
+        if(saml.getFrozenChunkCache().hasUnsavedChanges()) {
+            saml.getFrozenChunkCache().saveToFile();
         }
     }
 }

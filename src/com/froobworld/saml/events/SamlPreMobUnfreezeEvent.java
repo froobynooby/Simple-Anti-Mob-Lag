@@ -1,33 +1,33 @@
 package com.froobworld.saml.events;
 
-import com.froobworld.saml.data.FreezeParameters;
+import com.froobworld.saml.data.UnfreezeParameters;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class SamlPreMobFreezeEvent extends Event implements Cancellable {
+public class SamlPreMobUnfreezeEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private boolean cancelled;
-    private FreezeParameters.Builder freezeParametersBuilder;
-    private SamlMobFreezeEvent.FreezeReason reason;
+    private UnfreezeParameters.Builder unfreezeParametersBuilder;
+    private SamlMobUnfreezeEvent.UnfreezeReason reason;
 
-    public SamlPreMobFreezeEvent(SamlMobFreezeEvent.FreezeReason reason) {
+    public SamlPreMobUnfreezeEvent(SamlMobUnfreezeEvent.UnfreezeReason reason) {
         this.cancelled = false;
-        this.freezeParametersBuilder = new FreezeParameters.Builder();
+        this.unfreezeParametersBuilder = new UnfreezeParameters.Builder();
         this.reason = reason;
     }
 
 
-    public FreezeParameters.Builder getFreezeParametersBuilder() {
-        return freezeParametersBuilder;
+    public UnfreezeParameters.Builder getUnfreezeParametersBuilder() {
+        return unfreezeParametersBuilder;
     }
 
-    public FreezeParameters getCurrentFreezeParameters() {
-        return freezeParametersBuilder.build();
+    public UnfreezeParameters getCurrentUnfreezeParameters() {
+        return unfreezeParametersBuilder.build();
     }
 
-    public SamlMobFreezeEvent.FreezeReason getReason() {
+    public SamlMobUnfreezeEvent.UnfreezeReason getReason() {
         return reason;
     }
 

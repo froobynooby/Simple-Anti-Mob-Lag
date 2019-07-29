@@ -1,5 +1,5 @@
 # Don't change this!
-version: 7
+version: 8
 
 # Do you want a config file with more options to generate?
 use-advanced-config: false
@@ -16,9 +16,11 @@ tps-unfreezing-threshold: 19.0
 # Not recommended to set this below 600.
 ticks-per-operation: 1200
 
-# How long (in milliseconds) should the freezing or unfreezing operation be allowed to take?
-# If this is set too high there may be noticeable lag spikes when we freeze mobs.
-maximum-operation-time: 300
+# How long (in milliseconds) should the freezing operation be allowed to take?
+# If this is set too high there may be noticeable lag spikes when we freeze mobs (unless you have use-async-grouping set to true).
+# If this is set too low it may not have enough time to group all the entities.
+# If you have use-async-grouping set to false it's best to set this below 500.
+maximum-operation-time: 5000
 
 # At most how many mobs should be unfrozen in any given operation?
 unfreeze-limit: 100
@@ -50,8 +52,26 @@ group-bias-tps-threshold: 0
 group-minimum-size: 10
 group-maximum-radius: 8.0
 
+# Should we only group mobs of the same type?
+# If this is set to true then a collection consisting of 2 horses, 3 pigs and 4 cows won't constitute a group, but a collection of 10 chickens would.
+# This is a good option if you only really want farms to be frozen.
+group-require-same-type: true
+
 # Should we scale the maximum radius and minimum size required of a group depending on how much the server is lagging?
 use-smart-scaling: true
+
+# If we do scale the maximum radius and minimum size, what are the limits at which we should scale them no-further?
+group-minimum-scaled-size: 5
+group-maximum-scaled-radius: 20
+
+# At what ratio of the TPS freezing threshold to current TPS should the limits above be reached?
+# I.e. when the TPS reaches minimum-scale-tps-ratio * tps-freezing-threshold the minimum size and maximum radius of the groups will be the above values.
+minimum-scale-tps-ratio: 0.50
+
+# Should we run the mob grouping algorithm asynchronously?
+# This will mean that the server won't hang when we run a freezing operation.
+# There's no real reason to have this set to false; the only reason this option is here is in case the async grouping is causing errors.
+use-async-grouping: true
 
 
 # When we freeze mobs should we say so in the server console?
@@ -70,6 +90,10 @@ prevent-damaging-frozen: true
 
 # Should we stop players from being able to damage frozen mobs?
 prevent-player-damaging-frozen: false
+
+# What is the minimum amount of time (in milliseconds) that we should wait after freezing a mob before unfreezing it?
+# This does not effect the settings below; it is only with regards to the main unfreezing task.
+minimum-freeze-time: 300000
 
 # Should we unfreeze mobs when the chunk they are in is unloaded?
 unfreeze-on-unload: true

@@ -3,8 +3,21 @@
 # The options in the standard config.yml will still be used as a default when you have not specified something in here.
 
 # Don't change this!
-version: 2
+version: 3
 
+
+# Do you want to specify yourself what kind of groups of entities you want frozen and not frozen?
+# This is still affected by the use-group-bias setting in the config.yml. You'll also need that setting set to true for this to work.
+use-custom-groups: false
+
+# Which groups of entities should be frozen?
+freeze-groups:
+#  - default_group
+#  - default_singular
+
+# Which groups of entities should be excluded from being frozen?
+exclude-groups:
+#  - enderman_grinder
 
 # Be sure to remove any comment markers (the #'s) to activate an option!
 # You can find a list of entity types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html

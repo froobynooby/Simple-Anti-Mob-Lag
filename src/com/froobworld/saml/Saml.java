@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 public class Saml extends JavaPlugin {
@@ -20,9 +21,9 @@ public class Saml extends JavaPlugin {
     private SamlConfiguration advancedConfig;
     private SamlConfiguration customGroups;
     private SamlConfiguration messages;
-    private MobFreezeTask mobFreezeTask;
     private TpsSupplier tpsSupplier;
     private EntityGroupStore groupStore;
+    private FrozenChunkCache frozenChunkCache;
 
     private UnfreezeOnShutdownTask unfreezeOnShutdownTask;
     private HandleCacheOnShutdownTask handleCacheOnShutdownTask;
@@ -34,6 +35,9 @@ public class Saml extends JavaPlugin {
         advancedConfig = new SamlConfiguration(this, SamlConfiguration.ADVANCED_CONFIG_CURRENT_VERSION, "advanced_config.yml");
         if(config.getBoolean("use-advanced-config")) {
             advancedConfig.loadFromFile();
+        }
+        if(config.getBoolean("keep-frozen-chunk-cache")) {
+            createFrozenChunkCacheIfNotExist();
         }
         customGroups = new SamlConfiguration(this, SamlConfiguration.CUSTOM_GROUPS_CURRENT_VERSION, "custom_groups.yml");
         customGroups.loadFromFile();
@@ -53,7 +57,7 @@ public class Saml extends JavaPlugin {
 
     private void addTasks() {
         new CheckCacheStartupTask(this);
-        this.mobFreezeTask = new MobFreezeTask(this);
+        new MainLoopTask(this);
         new CacheSavingTask(this);
 
         this.unfreezeOnShutdownTask = new UnfreezeOnShutdownTask(this);
@@ -101,12 +105,18 @@ public class Saml extends JavaPlugin {
         Bukkit.getPluginManager().callEvent(new SamlConfigReloadEvent(config, advancedConfig, messages));
     }
 
-    public MobFreezeTask getMobFreezeTask() {
-        return mobFreezeTask;
-    }
-
     public TpsSupplier getTpsSupplier() {
         return tpsSupplier;
+    }
+
+    public FrozenChunkCache getFrozenChunkCache() {
+        return frozenChunkCache;
+    }
+
+    public void createFrozenChunkCacheIfNotExist() {
+        if(frozenChunkCache == null) {
+            frozenChunkCache = new FrozenChunkCache(new File(getDataFolder(), ".chunk-cache"), this, false);
+        }
     }
 
     @Override
