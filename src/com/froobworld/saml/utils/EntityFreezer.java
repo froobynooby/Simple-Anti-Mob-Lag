@@ -19,10 +19,10 @@ public class EntityFreezer {
     }
 
     public static boolean isFrozen(LivingEntity entity) {
-        return !entity.hasAI();
+        return !entity.hasAI() && !(entity instanceof Player) && !(entity instanceof ArmorStand);
     }
 
     public static boolean isSamlFrozen(Saml saml, LivingEntity entity) {
-        return !entity.hasAI() && !(entity instanceof Player) && !(entity instanceof ArmorStand) && (!CompatibilityUtils.PERSISTENT_DATA || FrozenEntityData.getFrozenEntityData(saml, entity).isPresent());
+        return isFrozen(entity) && FrozenEntityData.getFrozenEntityData(saml, entity).isPresent();
     }
 }
