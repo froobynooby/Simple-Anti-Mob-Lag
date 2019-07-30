@@ -12,6 +12,8 @@ import org.bukkit.metadata.MetadataValue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class FrozenEntityData {
     private long time;
@@ -65,7 +67,12 @@ public class FrozenEntityData {
 
     public static Optional<FrozenEntityData> getFrozenEntityData(Saml saml, LivingEntity entity) {
         if (CompatibilityUtils.PERSISTENT_DATA) {
-            return Optional.ofNullable(entity.getPersistentDataContainer().get(new NamespacedKey(saml, "frozenEntityData"), new FrozenEntityDataType()));
+            return new Supplier<Optional<FrozenEntityData>>() {
+                @Override
+                public Optional<FrozenEntityData> get() {
+                    return Optional.ofNullable(entity.getPersistentDataContainer().get(new NamespacedKey(saml, "frozenEntityData"), new FrozenEntityDataType()));
+                }
+            }.get();
         } else {
             List<MetadataValue> metadataValues = entity.getMetadata("frozenEntityData");
             if(metadataValues.isEmpty()) {
@@ -92,7 +99,13 @@ public class FrozenEntityData {
 
     public void setAsFrozenEntityData(Saml saml, LivingEntity entity) {
         if(CompatibilityUtils.PERSISTENT_DATA) {
-            entity.getPersistentDataContainer().set(new NamespacedKey(saml, "frozenEntityData"), new FrozenEntityDataType(), this);
+            final FrozenEntityData thiz = this;
+            new Consumer<Void>() {
+                @Override
+                public void accept(Void aVoid) {
+                    entity.getPersistentDataContainer().set(new NamespacedKey(saml, "frozenEntityData"), new FrozenEntityDataType(), thiz);
+                }
+            }.accept(null);
         } else {
             entity.setMetadata("frozenEntityData", new FixedMetadataValue(saml, this));
         }
