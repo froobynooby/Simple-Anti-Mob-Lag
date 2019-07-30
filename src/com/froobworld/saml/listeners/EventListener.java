@@ -1,6 +1,7 @@
 package com.froobworld.saml.listeners;
 
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.events.SamlMobUnfreezeEvent;
 import com.froobworld.saml.utils.EntityFreezer;
 import org.bukkit.Bukkit;
@@ -27,22 +28,22 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof LivingEntity) {
-            if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getRightClicked()) : EntityFreezer.isFrozen((LivingEntity) event.getRightClicked())) {
-                if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getRightClicked()::hasMetadata)) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getRightClicked()) : EntityFreezer.isFrozen((LivingEntity) event.getRightClicked())) {
+                if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(event.getRightClicked()::hasMetadata)) {
                     return;
                 }
                 boolean unfreezeOnInteract;
-                if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-interact." + event.getRightClicked().getType().name())) {
-                    unfreezeOnInteract = saml.getAdvancedConfig().getBoolean("unfreeze-on-interact." + event.getRightClicked().getType().name());
+                if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG) && saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_UNFREEZE_ON_INTERACT + "." + event.getRightClicked().getType().name())) {
+                    unfreezeOnInteract = saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_UNFREEZE_ON_INTERACT + "." + event.getRightClicked().getType().name());
                 }else {
-                    unfreezeOnInteract = saml.getSamlConfig().getBoolean("unfreeze-on-interact");
+                    unfreezeOnInteract = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_INTERACT);
                 }
 
                 double unfreezeOnInteractTpsThreshold;
-                if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-interact-tps-threshold." + event.getRightClicked().getType().name())) {
-                    unfreezeOnInteractTpsThreshold = saml.getAdvancedConfig().getDouble("unfreeze-on-interact-tps-threshold." + event.getRightClicked().getType().name());
+                if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG) && saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_UNFREEZE_ON_INTERACT_TPS_THRESHOLD + "." + event.getRightClicked().getType().name())) {
+                    unfreezeOnInteractTpsThreshold = saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_UNFREEZE_ON_INTERACT_TPS_THRESHOLD + "." + event.getRightClicked().getType().name());
                 } else {
-                    unfreezeOnInteractTpsThreshold = saml.getSamlConfig().getDouble("unfreeze-on-interact-tps-threshold");
+                    unfreezeOnInteractTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_UNFREEZE_ON_INTERACT_TPS_THRESHOLD);
                 }
 
                 if(unfreezeOnInteract && saml.getTpsSupplier().get() > unfreezeOnInteractTpsThreshold) {
@@ -58,22 +59,22 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof LivingEntity) {
-            if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getEntity()) : EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
-                if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getEntity()::hasMetadata)) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getEntity()) : EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
+                if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(event.getEntity()::hasMetadata)) {
                     return;
                 }
                 boolean unfreezeOnDamage;
-                if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-damage." + event.getEntity().getType().name())) {
-                    unfreezeOnDamage = saml.getAdvancedConfig().getBoolean("unfreeze-on-damage." + event.getEntity().getType().name());
+                if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG) && saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_UNFREEZE_ON_DAMAGE + "." + event.getEntity().getType().name())) {
+                    unfreezeOnDamage = saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_UNFREEZE_ON_DAMAGE + "." + event.getEntity().getType().name());
                 }else {
-                    unfreezeOnDamage = saml.getSamlConfig().getBoolean("unfreeze-on-damage");
+                    unfreezeOnDamage = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_DAMAGE);
                 }
 
                 double unfreezeOnDamageTpsThreshold;
-                if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("unfreeze-on-damage-tps-threshold." + event.getEntity().getType().name())) {
-                    unfreezeOnDamageTpsThreshold = saml.getAdvancedConfig().getDouble("unfreeze-on-damage-tps-threshold." + event.getEntity().getType().name());
+                if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG) && saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_UNFREEZE_ON_DAMAGE_TPS_THRESHOLD + "." + event.getEntity().getType().name())) {
+                    unfreezeOnDamageTpsThreshold = saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_UNFREEZE_ON_DAMAGE_TPS_THRESHOLD + "." + event.getEntity().getType().name());
                 } else {
-                    unfreezeOnDamageTpsThreshold = saml.getSamlConfig().getDouble("unfreeze-on-damage-tps-threshold");
+                    unfreezeOnDamageTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_UNFREEZE_ON_DAMAGE_TPS_THRESHOLD);
                 }
 
                 if(unfreezeOnDamage && saml.getTpsSupplier().get() > unfreezeOnDamageTpsThreshold) {
@@ -91,14 +92,14 @@ public class EventListener implements Listener {
         if(event.getTarget() == null || event.getTarget() instanceof Player) {
             return;
         }
-        if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getTarget()::hasMetadata)) {
+        if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(event.getTarget()::hasMetadata)) {
             return;
         }
         boolean preventTargetingFrozen;
-        if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("prevent-targeting-frozen." + event.getTarget().getType().name())) {
-            preventTargetingFrozen = saml.getAdvancedConfig().getBoolean("prevent-targeting-frozen." + event.getTarget().getType().name());
+        if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG) && saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_PREVENT_TARGETING_FROZEN + "." + event.getTarget().getType().name())) {
+            preventTargetingFrozen = saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_PREVENT_TARGETING_FROZEN + "." + event.getTarget().getType().name());
         } else {
-            preventTargetingFrozen = saml.getSamlConfig().getBoolean("prevent-targeting-frozen");
+            preventTargetingFrozen = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PREVENT_TARGETING_FROZEN);
         }
 
         if(preventTargetingFrozen && EntityFreezer.isFrozen(event.getTarget())) {
@@ -111,7 +112,7 @@ public class EventListener implements Listener {
         if(!(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof Player || event.getEntity() instanceof ArmorStand) {
             return;
         }
-        if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(event.getEntity()::hasMetadata)) {
+        if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(event.getEntity()::hasMetadata)) {
             return;
         }
         Entity damager = event.getDamager();
@@ -123,20 +124,20 @@ public class EventListener implements Listener {
 
         if(damager instanceof Player) {
             boolean preventPlayerDamagingFrozen;
-            if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("prevent-player-damaging-frozen." + event.getEntity().getType().name())) {
-                preventPlayerDamagingFrozen = saml.getAdvancedConfig().getBoolean("prevent-player-damaging-frozen." + event.getEntity().getType().name());
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG) && saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_PREVENT_PLAYER_DAMAGING_FROZEN + "." + event.getEntity().getType().name())) {
+                preventPlayerDamagingFrozen = saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_PREVENT_PLAYER_DAMAGING_FROZEN + "." + event.getEntity().getType().name());
             } else {
-                preventPlayerDamagingFrozen = saml.getSamlConfig().getBoolean("prevent-player-damaging-frozen");
+                preventPlayerDamagingFrozen = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PREVENT_PLAYER_DAMAGING_FROZEN);
             }
             if(preventPlayerDamagingFrozen && EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
                 event.setCancelled(true);
             }
         } else {
             boolean preventDamagingFrozen;
-            if(saml.getSamlConfig().getBoolean("use-advanced-config") && saml.getAdvancedConfig().keyExists("prevent-damaging-frozen." + event.getEntity().getType().name())) {
-                preventDamagingFrozen = saml.getAdvancedConfig().getBoolean("prevent-damaging-frozen." + event.getEntity().getType().name());
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG) && saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_PREVENT_DAMAGING_FROZEN + "." + event.getEntity().getType().name())) {
+                preventDamagingFrozen = saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_PREVENT_DAMAGING_FROZEN + "." + event.getEntity().getType().name());
             } else {
-                preventDamagingFrozen = saml.getSamlConfig().getBoolean("prevent-damaging-frozen");
+                preventDamagingFrozen = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PREVENT_DAMAGING_FROZEN);
             }
             if(preventDamagingFrozen && EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
                 event.setCancelled(true);
@@ -146,12 +147,12 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent event) {
-        if(saml.getSamlConfig().getBoolean("unfreeze-on-unload")) {
+        if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_UNLOAD)) {
             List<LivingEntity> mobsToUnfreeze = new ArrayList<LivingEntity>();
             for(Entity entity : event.getChunk().getEntities()) {
                 if(entity instanceof LivingEntity) {
-                    if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
-                        if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
+                    if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
+                        if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(entity::hasMetadata)) {
                             continue;
                         }
                         EntityFreezer.unfreezeEntity(saml, (LivingEntity) entity);

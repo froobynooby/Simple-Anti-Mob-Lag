@@ -1,6 +1,7 @@
 package com.froobworld.saml.tasks;
 
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
 import com.froobworld.saml.events.SamlMobUnfreezeEvent;
 import com.froobworld.saml.events.SamlPreMobFreezeEvent;
@@ -18,12 +19,12 @@ public class MainLoopTask implements Runnable {
 
     @Override
     public void run() {
-        long ticksPerOperation = saml.getSamlConfig().getLong("ticks-per-operation");
+        long ticksPerOperation = saml.getSamlConfig().getLong(ConfigKeys.CNF_TICKS_PER_OPERATION);
         Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this, ticksPerOperation <= 0 ? 1200 : ticksPerOperation);
 
         double currentTps = saml.getTpsSupplier().get();
-        double unfreezingThresholdTps = saml.getSamlConfig().getDouble("tps-unfreezing-threshold");
-        double freezingThresholdTps = saml.getSamlConfig().getDouble("tps-freezing-threshold");
+        double unfreezingThresholdTps = saml.getSamlConfig().getDouble(ConfigKeys.CNF_TPS_UNFREEZING_THRESHOLD);
+        double freezingThresholdTps = saml.getSamlConfig().getDouble(ConfigKeys.CNF_TPS_FREEZING_THRESHOLD);
 
         if(currentTps >= unfreezingThresholdTps) {
             SamlPreMobUnfreezeEvent samlPreMobUnfreezeEvent = new SamlPreMobUnfreezeEvent(SamlMobUnfreezeEvent.UnfreezeReason.MAIN_TASK);

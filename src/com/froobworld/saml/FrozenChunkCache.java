@@ -1,5 +1,6 @@
 package com.froobworld.saml;
 
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.utils.ChunkCoordinates;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -25,7 +26,7 @@ public class FrozenChunkCache {
             loadFromFile();
         }
         unsavedChanges = false;
-        shouldSaveOnExit = !saml.getSamlConfig().getBoolean("unfreeze-on-shutdown") || !saml.getSamlConfig().getBoolean("unfreeze-on-unload");
+        shouldSaveOnExit = !saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_SHUTDOWN) || !saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_UNLOAD);
     }
 
 

@@ -1,6 +1,7 @@
 package com.froobworld.saml.tasks;
 
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.data.FreezeParameters;
 import com.froobworld.saml.data.FrozenEntityData;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
@@ -22,7 +23,7 @@ public class FreezeTask {
     public static void freezeToParameters(Saml saml, FreezeParameters parameters, SamlMobFreezeEvent.FreezeReason freezeReason) {
         long startTime = System.currentTimeMillis();
 
-        String startFreezeBroadcastMessage = ChatColor.translateAlternateColorCodes('&', saml.getSamlMessages().getString("starting-freezing-operation")
+        String startFreezeBroadcastMessage = ChatColor.translateAlternateColorCodes('&', saml.getSamlMessages().getString(ConfigKeys.MSG_STARTING_FREEZING_OPERATION)
                 .replaceAll("%TPS", parameters.getCurrentTps() + ""));
         if(parameters.broadcastToConsole()) {
             Saml.logger().info(startFreezeBroadcastMessage);
@@ -108,7 +109,7 @@ public class FreezeTask {
         }
 
         long elapsedTime = System.currentTimeMillis() - startTime;
-        String endFreezeBroacastMessage = ChatColor.translateAlternateColorCodes('&', saml.getSamlMessages().getString("freezing-operation-complete")
+        String endFreezeBroacastMessage = ChatColor.translateAlternateColorCodes('&', saml.getSamlMessages().getString(ConfigKeys.MSG_FREEZING_OPERATION_COMPLETE)
                 .replaceAll("%NUMBER_FROZEN", numberFrozen + "")
                 .replaceAll("%TOTAL_FROZEN", totalFrozen + "")
                 .replaceAll("%TOTAL_MOBS", totalCount + "")

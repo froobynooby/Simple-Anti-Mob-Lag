@@ -2,6 +2,7 @@ package com.froobworld.saml.utils;
 
 import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.events.SamlMobUnfreezeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -30,8 +31,8 @@ public class UnfreezeChunkConsumer implements Consumer<Chunk> {
         List<LivingEntity> unfrozenMobs = new ArrayList<LivingEntity>();
         for(Entity entity : chunk.getEntities()) {
             if(entity instanceof LivingEntity) {
-                if(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
-                    if(saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(entity::hasMetadata)) {
+                if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
+                    if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(entity::hasMetadata)) {
                         continue;
                     }
                     EntityFreezer.unfreezeEntity(saml, (LivingEntity) entity);

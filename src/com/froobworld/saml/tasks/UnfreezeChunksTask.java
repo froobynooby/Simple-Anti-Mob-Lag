@@ -2,6 +2,7 @@ package com.froobworld.saml.tasks;
 
 import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.utils.ChunkCoordinates;
 import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.UnfreezeChunkConsumer;
@@ -25,7 +26,7 @@ public class UnfreezeChunksTask implements Runnable {
     }
 
     private void start() {
-        if(saml.getSamlConfig().getBoolean("use-paper-get-chunk-async")) {
+        if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_PAPER_GET_CHUNK_ASYNC)) {
             if(CompatibilityUtils.USE_PAPER_GET_CHUNK_ASYNC) {
                 paper = true;
                 List<FrozenChunkCache> cacheCopy = new ArrayList<FrozenChunkCache>(frozenChunkCaches);
@@ -73,7 +74,7 @@ public class UnfreezeChunksTask implements Runnable {
             lastCompleted = completed;
             Saml.logger().info("We have unfrozen " + completed + " of " + frozenChunkCaches.size() + " of the old frozen chunk caches.");
         }
-        long ticksPerCachedChunkUnfreeze = saml.getSamlConfig().getLong("ticks-per-cached-chunk-unfreeze");
+        long ticksPerCachedChunkUnfreeze = saml.getSamlConfig().getLong(ConfigKeys.CNF_TICKS_PER_CACHED_CHUNK_UNFREEZE);
         Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this, ticksPerCachedChunkUnfreeze <= 0 ? 40:ticksPerCachedChunkUnfreeze);
     }
 }

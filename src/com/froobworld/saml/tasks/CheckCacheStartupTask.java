@@ -2,6 +2,7 @@ package com.froobworld.saml.tasks;
 
 import com.froobworld.saml.FrozenChunkCache;
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.config.ConfigKeys;
 import org.bukkit.util.FileUtil;
 
 import java.io.File;
@@ -22,7 +23,7 @@ public class CheckCacheStartupTask implements Runnable {
 
         File chunkCacheFile = new File(saml.getDataFolder(), ".chunk-cache");
         if(chunkCacheFile.exists()) {
-            if(saml.getSamlConfig().getBoolean("unfreeze-on-shutdown") && saml.getSamlConfig().getBoolean("unfreeze-on-unload")) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_SHUTDOWN) && saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_UNLOAD)) {
                 Saml.logger().info("There is an old chunk cache file. Perhaps the server didn't shut down correctly?");
             }
             if(!chunkCacheDirectory.exists()) {
@@ -31,7 +32,7 @@ public class CheckCacheStartupTask implements Runnable {
             FileUtil.copy(chunkCacheFile, new File(chunkCacheDirectory, System.currentTimeMillis() + ""));
             chunkCacheFile.delete();
         }
-        if(saml.getSamlConfig().getBoolean("unfreeze-cached-chunks-on-startup")) {
+        if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_CACHED_CHUNKS_ON_STARTUP)) {
             if (chunkCacheDirectory.exists()) {
                 if(chunkCacheDirectory.listFiles().length > 0) {
                     Saml.logger().info("We will now start unfreezing chunks from the old cache files.");

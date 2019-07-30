@@ -1,6 +1,7 @@
 package com.froobworld.saml.listeners;
 
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.events.*;
 import com.froobworld.saml.group.entity.EntityGroupOperations;
 import com.froobworld.saml.group.entity.groups.DefaultGroup;
@@ -27,15 +28,15 @@ public class SamlListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSamlConfigReload(SamlConfigReloadEvent event) {
-        if(event.getConfig().getBoolean("use-advanced-config")) {
+        if(event.getConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
             if(!saml.getAdvancedConfig().isLoaded()) {
                 saml.getAdvancedConfig().loadFromFile();
             }
         }
-        if(event.getConfig().getBoolean("keep-frozen-chunk-cache")) {
+        if(event.getConfig().getBoolean(ConfigKeys.CNF_KEEP_FROZEN_CHUNK_CACHE)) {
             saml.createFrozenChunkCacheIfNotExist();
         }
-        if(!event.getConfig().getBoolean("unfreeze-on-shutdown") || !event.getConfig().getBoolean("unfreeze-on-unload")) {
+        if(!event.getConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_SHUTDOWN) || !event.getConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_UNLOAD)) {
             if(saml.getFrozenChunkCache() != null) {
                 saml.getFrozenChunkCache().setShouldSaveOnExit();
             }
@@ -46,31 +47,31 @@ public class SamlListener implements Listener {
     public void onSamlPreMobFreeze(SamlPreMobFreezeEvent event) {
         if(event.getReason() == SamlMobFreezeEvent.FreezeReason.MAIN_TASK) {
             for(World world : Bukkit.getWorlds()) {
-                if(!saml.getSamlConfig().getStringList("ignore-worlds").contains(world.getName())) {
+                if(!saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_WORLD).contains(world.getName())) {
                     event.getFreezeParametersBuilder().addWorld(world);
                 }
             }
-            event.getFreezeParametersBuilder().broadcastToConsole(saml.getSamlConfig().getBoolean("broadcast-to-console"));
-            event.getFreezeParametersBuilder().broadcastToOps(saml.getSamlConfig().getBoolean("broadcast-to-ops"));
-            event.getFreezeParametersBuilder().setDoAsync(saml.getSamlConfig().getBoolean("use-async-grouping"));
-            event.getFreezeParametersBuilder().setMinimumFreezeTime(saml.getConfig().getLong("minimum-freeze-time"));
-            event.getFreezeParametersBuilder().setMaximumOperationTime(saml.getConfig().getLong("maximum-operation-time"));
+            event.getFreezeParametersBuilder().broadcastToConsole(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_BROADCAST_TO_CONSOLE));
+            event.getFreezeParametersBuilder().broadcastToOps(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_BROADCAST_TO_OPS));
+            event.getFreezeParametersBuilder().setDoAsync(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ASYNC_GROUPING));
+            event.getFreezeParametersBuilder().setMinimumFreezeTime(saml.getConfig().getLong(ConfigKeys.CNF_MINIMUM_FREEZE_TIME));
+            event.getFreezeParametersBuilder().setMaximumOperationTime(saml.getConfig().getLong(ConfigKeys.CNF_MAXIMUM_OPERATION_TIME));
             boolean customFreezeGroups = false;
-            if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
-                customFreezeGroups = saml.getAdvancedConfig().getBoolean("use-custom-groups");
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
+                customFreezeGroups = saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_USE_CUSTOM_GROUPS);
             }
-            if (saml.getSamlConfig().getBoolean("group-bias") && event.getCurrentFreezeParameters().getCurrentTps() > saml.getSamlConfig().getDouble("group-bias-tps-threshold")) {
+            if (saml.getSamlConfig().getBoolean(ConfigKeys.CNF_GROUP_BIAS) && event.getCurrentFreezeParameters().getCurrentTps() > saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_BIAS_TPS_THRESHOLD)) {
                 if(customFreezeGroups) {
-                    for(String group : saml.getAdvancedConfig().getStringList("freeze-groups")) {
+                    for(String group : saml.getAdvancedConfig().getStringList(ConfigKeys.ADV_FREEZE_GROUPS)) {
                         event.getFreezeParametersBuilder().includeGroup(saml.getGroupStore().getGroup(group, false));
                     }
-                    for(String group : saml.getAdvancedConfig().getStringList("exclude-groups")) {
+                    for(String group : saml.getAdvancedConfig().getStringList(ConfigKeys.ADV_EXCLUDE_GROUPS)) {
                         event.getFreezeParametersBuilder().excludeGroup(saml.getGroupStore().getGroup(group, false));
                     }
                 } else {
                     event.getFreezeParametersBuilder().includeGroup(new DefaultGroup(saml));
                 }
-                List<String> alwaysFreezeList = saml.getSamlConfig().getStringList("always-freeze");
+                List<String> alwaysFreezeList = saml.getSamlConfig().getStringList(ConfigKeys.CNF_ALWAYS_FREEZE);
                 for(EntityType entityType : EntityType.values()) {
                     if(alwaysFreezeList.contains(entityType.name())) {
                         SpecificCentreTypeGroup centreTypeGroup = new SpecificCentreTypeGroup(Collections.singleton(entityType));
@@ -83,23 +84,23 @@ public class SamlListener implements Listener {
             }
         }
 
-        boolean ignoreTamed = saml.getSamlConfig().getBoolean("ignore-tamed");
-        boolean ignoreNamed = saml.getSamlConfig().getBoolean("ignore-named");
-        boolean ignoreLeashed = saml.getSamlConfig().getBoolean("ignore-leashed");
-        boolean ignoreLoveMode = saml.getSamlConfig().getBoolean("ignore-love-mode");
-        Set<String> neverFreeze = new HashSet<String>(saml.getSamlConfig().getStringList("never-freeze"));
-        double ignorePlayerProximityDistanceSquared = Math.pow(saml.getSamlConfig().getDouble("ignore-player-proximity"), 2);
-        double ignoreYoungerThanTicks = saml.getSamlConfig().getDouble("ignore-younger-than-ticks");
-        boolean ignoreTargetPlayer = saml.getConfig().getBoolean("ignore-target-player");
+        boolean ignoreTamed = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_IGNORE_TAMED);
+        boolean ignoreNamed = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_IGNORE_NAMED);
+        boolean ignoreLeashed = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_IGNORE_LEASHED);
+        boolean ignoreLoveMode = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_IGNORE_LOVE_MODE);
+        Set<String> neverFreeze = new HashSet<String>(saml.getSamlConfig().getStringList(ConfigKeys.CNF_NEVER_FREEZE));
+        double ignorePlayerProximityDistanceSquared = Math.pow(saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_PLAYER_PROXIMITY), 2);
+        double ignoreYoungerThanTicks = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_YOUNGER_THAN_TICKS);
+        boolean ignoreTargetPlayer = saml.getConfig().getBoolean(ConfigKeys.CNF_IGNORE_TARGET_PLAYER);
 
-        double ignoreTamedTpsThreshold = saml.getSamlConfig().getDouble("ignore-tamed-tps-threshold");
-        double ignoreNamedTpsThreshold = saml.getSamlConfig().getDouble("ignore-named-tps-threshold");
-        double ignoreLeashedTpsThreshold = saml.getSamlConfig().getDouble("ignore-leashed-tps-threshold");
-        double ignoreLoveModeTpsThreshold = saml.getSamlConfig().getDouble("ignore-love-mode-tps-threshold");
-        double neverFreezeTpsThreshold = saml.getSamlConfig().getDouble("never-freeze-tps-threshold");
-        double ignorePlayerProximityTpsThreshold = saml.getSamlConfig().getDouble("ignore-player-proximity-tps-threshold");
-        double ignoreYoungerThanTicksTpsThreshold = saml.getSamlConfig().getDouble("ignore-younger-than-ticks-tps-threshold");
-        double ignoreTargetPlayerTpsThreshold = saml.getSamlConfig().getDouble("ignore-target-player-tps-threshold");
+        double ignoreTamedTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_TAMED_TPS_THRESHOLD);
+        double ignoreNamedTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_NAMED_TPS_THRESHOLD);
+        double ignoreLeashedTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_LEASHED_TPS_THRESHOLD);
+        double ignoreLoveModeTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_LOVE_MODE_TPS_THRESHOLD);
+        double neverFreezeTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_NEVER_FREEZE_TPS_THRESHOLD);
+        double ignorePlayerProximityTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_PLAYER_PROXIMITY_TPS_THRESHOLD);
+        double ignoreYoungerThanTicksTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_YOUNGER_THAN_TICKS_TPS_THRESHOLD);
+        double ignoreTargetPlayerTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_TARGET_PLAYER_TPS_THRESHOLD);
 
         HashMap<EntityType, Boolean> typedIgnoreTamed = new HashMap<EntityType, Boolean>();
         HashMap<EntityType, Boolean> typedIgnoreNamed = new HashMap<EntityType, Boolean>();
@@ -108,28 +109,28 @@ public class SamlListener implements Listener {
         HashMap<EntityType, Double> typedIgnorePlayerProximityDistanceSquared = new HashMap<EntityType, Double>();
         HashMap<EntityType, Double> typedIgnoreYoungerThanTicks = new HashMap<EntityType, Double>();
         HashMap<EntityType, Boolean> typedIgnoreTargetPlayer = new HashMap<EntityType, Boolean>();
-        if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
+        if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
             for(EntityType entityType : EntityType.values()) {
-                if(saml.getAdvancedConfig().keyExists("ignore-tamed." + entityType.name())) {
-                    typedIgnoreTamed.put(entityType, saml.getAdvancedConfig().getBoolean("ignore-tamed." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_TAMED + "." + entityType.name())) {
+                    typedIgnoreTamed.put(entityType, saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_IGNORE_TAMED + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-named." + entityType.name())) {
-                    typedIgnoreNamed.put(entityType, saml.getAdvancedConfig().getBoolean("ignore-named." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_NAMED + "." + entityType.name())) {
+                    typedIgnoreNamed.put(entityType, saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_IGNORE_NAMED + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-leashed." + entityType.name())) {
-                    typedIgnoreLeashed.put(entityType, saml.getAdvancedConfig().getBoolean("ignore-leashed." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_LEASHED + "." + entityType.name())) {
+                    typedIgnoreLeashed.put(entityType, saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_IGNORE_LEASHED + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-love-mode." + entityType.name())) {
-                    typedIgnoreLoveMode.put(entityType, saml.getAdvancedConfig().getBoolean("ignore-love-mode." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_LOVE_MODE + "." + entityType.name())) {
+                    typedIgnoreLoveMode.put(entityType, saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_IGNORE_LOVE_MODE + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-player-proximity." + entityType.name())) {
-                    typedIgnorePlayerProximityDistanceSquared.put(entityType, Math.pow(saml.getAdvancedConfig().getDouble("ignore-player-proximity." + entityType.name()), 2));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_PLAYER_PROXIMITY + "." + entityType.name())) {
+                    typedIgnorePlayerProximityDistanceSquared.put(entityType, Math.pow(saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_PLAYER_PROXIMITY + "." + entityType.name()), 2));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-younger-than-ticks." + entityType.name())) {
-                    typedIgnoreYoungerThanTicks.put(entityType, saml.getAdvancedConfig().getDouble("ignore-younger-than-ticks." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_YOUNGER_THAN_TICKS + "." + entityType.name())) {
+                    typedIgnoreYoungerThanTicks.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_YOUNGER_THAN_TICKS + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-target-player." + entityType.name())) {
-                    typedIgnoreTargetPlayer.put(entityType, saml.getAdvancedConfig().getBoolean("ignore-target-player." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_TARGET_PLAYER + "." + entityType.name())) {
+                    typedIgnoreTargetPlayer.put(entityType, saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_IGNORE_TARGET_PLAYER + "." + entityType.name()));
                 }
             }
         }
@@ -142,31 +143,31 @@ public class SamlListener implements Listener {
         HashMap<EntityType, Double> typedIgnorePlayerProximityTpsThreshold = new HashMap<EntityType, Double>();
         HashMap<EntityType, Double> typedIgnoreYoungerThanTicksTpsThreshold = new HashMap<EntityType, Double>();
         HashMap<EntityType, Double> typedIgnoreTargetPlayerTpsThreshold = new HashMap<EntityType, Double>();
-        if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
+        if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
             for(EntityType entityType : EntityType.values()) {
-                if(saml.getAdvancedConfig().keyExists("ignore-tamed-tps-threshold." + entityType.name())) {
-                    typedIgnoreTamedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-tamed-tps-threshold." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_TAMED_TPS_THRESHOLD + "." + entityType.name())) {
+                    typedIgnoreTamedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_TAMED_TPS_THRESHOLD + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-named-tps-threshold." + entityType.name())) {
-                    typedIgnoreNamedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-named-tps-threshold." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_NAMED_TPS_THRESHOLD + "." + entityType.name())) {
+                    typedIgnoreNamedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_NAMED_TPS_THRESHOLD + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-leashed-tps-threshold." + entityType.name())) {
-                    typedIgnoreLeashedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-leashed-tps-threshold." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_LEASHED_TPS_THRESHOLD + "." + entityType.name())) {
+                    typedIgnoreLeashedTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_LEASHED_TPS_THRESHOLD + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-love-mode-tps-threshold." + entityType.name())) {
-                    typedIgnoreLoveModeTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-love-mode-tps-threshold." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_LOVE_MODE_TPS_THRESHOLD + "." + entityType.name())) {
+                    typedIgnoreLoveModeTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_LOVE_MODE_TPS_THRESHOLD + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("never-freeze-tps-threshold." + entityType.name())) {
-                    typedNeverFreezeTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("never-freeze-tps-threshold." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_NEVER_FREEZE_TPS_THRESHOLD + "." + entityType.name())) {
+                    typedNeverFreezeTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_NEVER_FREEZE_TPS_THRESHOLD + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-player-proximity-tps-threshold." + entityType.name())) {
-                    typedIgnorePlayerProximityTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-player-proximity-tps-threshold." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_PLAYER_PROXIMITY_TPS_THRESHOLD + "." + entityType.name())) {
+                    typedIgnorePlayerProximityTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_PLAYER_PROXIMITY_TPS_THRESHOLD + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-younger-than-ticks-tps-threshold." + entityType.name())) {
-                    typedIgnoreYoungerThanTicksTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-younger-than-ticks-tps-threshold." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_YOUNGER_THAN_TICKS_TPS_THRESHOLD + "." + entityType.name())) {
+                    typedIgnoreYoungerThanTicksTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_YOUNGER_THAN_TICKS_TPS_THRESHOLD + "." + entityType.name()));
                 }
-                if(saml.getAdvancedConfig().keyExists("ignore-target-player-tps-threshold." + entityType.name())) {
-                    typedIgnoreTargetPlayerTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble("ignore-target-player-tps-threshold." + entityType.name()));
+                if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_TARGET_PLAYER_TPS_THRESHOLD + "." + entityType.name())) {
+                    typedIgnoreTargetPlayerTpsThreshold.put(entityType, saml.getAdvancedConfig().getDouble(ConfigKeys.ADV_IGNORE_TARGET_PLAYER_TPS_THRESHOLD + "." + entityType.name()));
                 }
             }
         }
@@ -178,7 +179,7 @@ public class SamlListener implements Listener {
         event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreLeashedTpsThreshold.getOrDefault(e.getType(), ignoreLeashedTpsThreshold) && typedIgnoreLeashed.getOrDefault(e.getType(), ignoreLeashed) && e.isLeashed()) );
         event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreLoveModeTpsThreshold.getOrDefault(e.getType(), ignoreLoveModeTpsThreshold) && CompatibilityUtils.ANIMAL_LOVE_MODE && typedIgnoreLoveMode.getOrDefault(e.getType(), ignoreLoveMode) && e instanceof Animals && ((Animals) e).isLoveMode()) );
         event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnorePlayerProximityTpsThreshold.getOrDefault(e.getType(), ignorePlayerProximityTpsThreshold) && typedIgnorePlayerProximityDistanceSquared.getOrDefault(e.getType(), ignorePlayerProximityDistanceSquared) > 0 && Bukkit.getOnlinePlayers().stream().anyMatch( p -> (p.getWorld().equals(e.getWorld()) && p.getLocation().distanceSquared(e.getLocation()) < typedIgnorePlayerProximityDistanceSquared.getOrDefault(e.getType(), ignorePlayerProximityDistanceSquared)) )) );
-        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(e::hasMetadata)) );
+        event.getFreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(e::hasMetadata)) );
         event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreYoungerThanTicksTpsThreshold.getOrDefault(e.getType(), ignoreYoungerThanTicksTpsThreshold) && e.getTicksLived() < typedIgnoreYoungerThanTicks.getOrDefault(e.getType(), ignoreYoungerThanTicks)) );
         event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreTargetPlayerTpsThreshold.getOrDefault(e.getType(), ignoreTargetPlayerTpsThreshold) && typedIgnoreTargetPlayer.getOrDefault(e.getType(), ignoreTargetPlayer) &&  CompatibilityUtils.MOB_TARGET && e instanceof Mob && ((Mob) e).getTarget() instanceof Player) );
     }
@@ -186,12 +187,12 @@ public class SamlListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSamlMobFreeze(SamlMobFreezeEvent event) {
         if(CompatibilityUtils.MOB_TARGET) {
-            boolean preventTargetingFrozen = saml.getSamlConfig().getBoolean("prevent-targeting-frozen");
+            boolean preventTargetingFrozen = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PREVENT_TARGETING_FROZEN);
             HashMap<EntityType, Boolean> typedPreventTargetingFrozen = new HashMap<EntityType, Boolean>();
-            if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
                 for (EntityType entityType : EntityType.values()) {
-                    if (saml.getAdvancedConfig().keyExists("prevent-target-frozen." + entityType.name())) {
-                        typedPreventTargetingFrozen.put(entityType, saml.getAdvancedConfig().getBoolean("prevent-target-frozen." + entityType.name()));
+                    if (saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_PREVENT_TARGETING_FROZEN + "." + entityType.name())) {
+                        typedPreventTargetingFrozen.put(entityType, saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_PREVENT_TARGETING_FROZEN + "." + entityType.name()));
                     }
                 }
             }
@@ -211,18 +212,18 @@ public class SamlListener implements Listener {
     public void onSamlPreMobUnfreeze(SamlPreMobUnfreezeEvent event) {
         if(event.getReason() == SamlMobUnfreezeEvent.UnfreezeReason.MAIN_TASK) {
             for(World world : Bukkit.getWorlds()) {
-                if(!saml.getSamlConfig().getStringList("ignore-worlds").contains(world.getName())) {
+                if(!saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_WORLD).contains(world.getName())) {
                     event.getUnfreezeParametersBuilder().addWorld(world);
                 }
             }
-            event.getUnfreezeParametersBuilder().setUnfreezeLimit(saml.getSamlConfig().getLong("unfreeze-limit"));
-            if(saml.getSamlConfig().getDouble("minimum-freeze-time") <= 0) {
+            event.getUnfreezeParametersBuilder().setUnfreezeLimit(saml.getSamlConfig().getLong(ConfigKeys.CNF_UNFREEZE_LIMIT));
+            if(saml.getSamlConfig().getDouble(ConfigKeys.CNF_MINIMUM_FREEZE_TIME) <= 0) {
                 event.getUnfreezeParametersBuilder().ignoreRemainingTime(true);
             }
         }
 
-        event.getUnfreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList("ignore-metadata").stream().anyMatch(e::hasMetadata)) );
-        event.getUnfreezeParametersBuilder().addIgnorePredicate( e ->(saml.getSamlConfig().getBoolean("only-unfreeze-tagged") && !EntityFreezer.isSamlFrozen(saml, e)) );
+        event.getUnfreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(e::hasMetadata)) );
+        event.getUnfreezeParametersBuilder().addIgnorePredicate( e ->(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) && !EntityFreezer.isSamlFrozen(saml, e)) );
     }
 
 }

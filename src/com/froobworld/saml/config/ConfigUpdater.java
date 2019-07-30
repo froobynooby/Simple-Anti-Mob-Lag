@@ -12,8 +12,8 @@ public class ConfigUpdater {
             List<String> lines = new ArrayList<String>();
             String line = configReader.readLine();
             while(line != null) {
-                if(line.startsWith("version:")) {
-                    line = line.replaceFirst("version: " + versionFrom, "version: " + (versionFrom + 1));
+                if(line.startsWith(ConfigKeys.VERSION + ":")) {
+                    line = line.replaceFirst(ConfigKeys.VERSION + ": " + versionFrom, "version: " + (versionFrom + 1));
                 }
                 lines.add(line);
                 line = configReader.readLine();

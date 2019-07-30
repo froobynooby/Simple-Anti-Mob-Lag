@@ -1,6 +1,7 @@
 package com.froobworld.saml.group.entity.groups;
 
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
@@ -23,15 +24,15 @@ public class DefaultGroup implements EntityGroup {
     private boolean sameType;
 
     public DefaultGroup(Saml saml) {
-        minimumSize = saml.getSamlConfig().getDouble("group-minimum-size");
+        minimumSize = saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_MINIMUM_SIZE);
         scaledMinimumSize = minimumSize;
-        minimumScaledMinimumSize = saml.getSamlConfig().getDouble("group-minimum-scaled-size");
-        separationDistance = saml.getSamlConfig().getDouble("group-maximum-radius");
-        scaleToTps = saml.getSamlConfig().getBoolean("use-smart-scaling");
+        minimumScaledMinimumSize = saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_MINIMUM_SCALED_SIZE);
+        separationDistance = saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_MAXIMUM_RADIUS);
+        scaleToTps = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_SMART_SCALING);
         scaledSeparationDistanceSquared = Math.pow(separationDistance, 2.0);
-        maximumScaledSeparationDistance = saml.getSamlConfig().getDouble("group-maximum-scaled-radius");
-        minimumScaleTpsRatio = saml.getSamlConfig().getDouble("minimum-scale-tps-ratio");
-        sameType = saml.getSamlConfig().getBoolean("group-require-same-type");
+        maximumScaledSeparationDistance = saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_MAXIMUM_SCALED_RADIUS);
+        minimumScaleTpsRatio = saml.getSamlConfig().getDouble(ConfigKeys.CNF_MINIMUM_SCALE_TPS_RATIO);
+        sameType = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_GROUP_REQUIRE_SAME_TYPE);
     }
 
     @Override

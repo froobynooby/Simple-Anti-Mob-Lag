@@ -1,6 +1,7 @@
 package com.froobworld.saml;
 
 import com.froobworld.saml.commands.SamlCommand;
+import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.config.SamlConfiguration;
 import com.froobworld.saml.events.SamlConfigReloadEvent;
 import com.froobworld.saml.group.entity.EntityGroupStore;
@@ -33,10 +34,10 @@ public class Saml extends JavaPlugin {
         config = new SamlConfiguration(this, SamlConfiguration.CONFIG_CURRENT_VERSION, "config.yml");
         config.loadFromFile();
         advancedConfig = new SamlConfiguration(this, SamlConfiguration.ADVANCED_CONFIG_CURRENT_VERSION, "advanced_config.yml");
-        if(config.getBoolean("use-advanced-config")) {
+        if(config.getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
             advancedConfig.loadFromFile();
         }
-        if(config.getBoolean("keep-frozen-chunk-cache")) {
+        if(config.getBoolean(ConfigKeys.CNF_KEEP_FROZEN_CHUNK_CACHE)) {
             createFrozenChunkCacheIfNotExist();
         }
         customGroups = new SamlConfiguration(this, SamlConfiguration.CUSTOM_GROUPS_CURRENT_VERSION, "custom_groups.yml");
