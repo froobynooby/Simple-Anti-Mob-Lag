@@ -56,7 +56,7 @@ public class SamlListener implements Listener {
             event.getFreezeParametersBuilder().setMinimumFreezeTime(saml.getConfig().getLong("minimum-freeze-time"));
             event.getFreezeParametersBuilder().setMaximumOperationTime(saml.getConfig().getLong("maximum-operation-time"));
             boolean customFreezeGroups = false;
-            if(saml.getSamlConfig().getBoolean("use-advanced.config")) {
+            if(saml.getSamlConfig().getBoolean("use-advanced-config")) {
                 customFreezeGroups = saml.getAdvancedConfig().getBoolean("use-custom-groups");
             }
             if (saml.getSamlConfig().getBoolean("group-bias") && event.getCurrentFreezeParameters().getCurrentTps() > saml.getSamlConfig().getDouble("group-bias-tps-threshold")) {
