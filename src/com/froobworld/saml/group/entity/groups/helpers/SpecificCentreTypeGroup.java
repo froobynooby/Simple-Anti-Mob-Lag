@@ -24,7 +24,7 @@ public class SpecificCentreTypeGroup implements EntityGroup {
 
     @Override
     public String getName() {
-        return "default_specific_centre_type";
+        return "default_specific_center_type";
     }
 
     @Override
