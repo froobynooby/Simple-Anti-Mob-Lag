@@ -5,6 +5,7 @@ import com.froobworld.saml.data.FrozenEntityData;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class EntityFreezer {
 
@@ -15,6 +16,7 @@ public class EntityFreezer {
 
     public static void unfreezeEntity(Saml saml, LivingEntity entity) {
         entity.setAI(true);
+        entity.setVelocity(new Vector());
         FrozenEntityData.stripOfFrozenEntityData(saml, entity);
     }
 
