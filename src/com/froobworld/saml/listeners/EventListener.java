@@ -46,7 +46,7 @@ public class EventListener implements Listener {
                     unfreezeOnInteractTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_UNFREEZE_ON_INTERACT_TPS_THRESHOLD);
                 }
 
-                if(unfreezeOnInteract && saml.getTpsSupplier().get() > unfreezeOnInteractTpsThreshold) {
+                if(unfreezeOnInteract && saml.getTpsSupplier().getTps() > unfreezeOnInteractTpsThreshold) {
                     EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getRightClicked());
 
                     SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getRightClicked(), SamlMobUnfreezeEvent.UnfreezeReason.INTERACTION);
@@ -77,7 +77,7 @@ public class EventListener implements Listener {
                     unfreezeOnDamageTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_UNFREEZE_ON_DAMAGE_TPS_THRESHOLD);
                 }
 
-                if(unfreezeOnDamage && saml.getTpsSupplier().get() > unfreezeOnDamageTpsThreshold) {
+                if(unfreezeOnDamage && saml.getTpsSupplier().getTps() > unfreezeOnDamageTpsThreshold) {
                     EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getEntity());
 
                     SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getEntity(), SamlMobUnfreezeEvent.UnfreezeReason.DAMAGE);

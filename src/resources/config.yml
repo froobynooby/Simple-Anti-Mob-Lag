@@ -12,9 +12,32 @@ tps-freezing-threshold: 18.5
 # This should be higher than the tps-freezing-threshold!
 tps-unfreezing-threshold: 19.0
 
+# Over how many ticks should we calculate the TPS?
+tps-sample-size: 600
+
+# We average the TPS over some amount of time so it's not affected by momentary lag spikes. Over how many ticks should we average the TPS?
+tps-smoothing-sample-size: 200
+
+# Should we use the built-in Minecraft TPS instead?
+# If set to true the tps-sample-size setting will not do anything. The sample size will be fixed to one minute (1200 ticks).
+use-nms-tps: false
+
+# At least how many standard deviations should the tps be away from the tps-unfreezing-threshold before we start unfreezing mobs?
+# The standard deviation of the TPS is effectively a measure of stability. This setting enables the plugin to only unfreeze mobs when the TPS is reasonably stable.
+# A higher confidence range means we require more stability.
+# It's best to keep this value in the range of 1 to 5.
+unfreeze-tps-confidence-range: 2.5
+
+# Every how many ticks should we take a sample of the TPS for calculating the standard deviation?
+tps-deviation-sample-rate: 100
+
+# How many samples of the TPS should we include in the calculation of the standard deviation?
+# It is recommended that this value is such that (tps-deviation-sample-rate)*(tps-deviation-sample-size) is roughly equal to 2*(ticks-per-operation).
+tps-deviation-sample-size: 12
+
 # Every how many ticks should we freeze or unfreeze mobs? There are 20 ticks per second.
 # Not recommended to set this below 600.
-ticks-per-operation: 1200
+ticks-per-operation: 600
 
 # How long (in milliseconds) should the freezing operation be allowed to take?
 # If this is set too high there may be noticeable lag spikes when we freeze mobs (unless you have use-async-grouping set to true).

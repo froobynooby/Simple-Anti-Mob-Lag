@@ -6,6 +6,12 @@ public final class ConfigKeys {
     public static final String CNF_USE_ADVANCED_CONFIG = "use-advanced-config";
     public static final String CNF_TPS_FREEZING_THRESHOLD = "tps-freezing-threshold";
     public static final String CNF_TPS_UNFREEZING_THRESHOLD = "tps-unfreezing-threshold";
+    public static final String CNF_TPS_SAMPLE_SIZE = "tps-sample-size";
+    public static final String CNF_TPS_SMOOTHING_SAMPLE_SIZE = "tps-smoothing-sample-size";
+    public static final String CNF_USE_NMS_TPS = "use-nms-tps";
+    public static final String CNF_UNFREEZE_TPS_CONFIDENCE_RANGE = "unfreeze-tps-confidence-range";
+    public static final String CNF_TPS_DEVIATION_SAMPLE_RATE = "tps-deviation-sample-rate";
+    public static final String CNF_TPS_DEVIATION_SAMPLE_SIZE = "tps-deviation-sample-size";
     public static final String CNF_TICKS_PER_OPERATION = "ticks-per-operation";
     public static final String CNF_MAXIMUM_OPERATION_TIME = "maximum-operation-time";
     public static final String CNF_UNFREEZE_LIMIT = "unfreeze-limit";

@@ -22,11 +22,13 @@ public class MainLoopTask implements Runnable {
         long ticksPerOperation = saml.getSamlConfig().getLong(ConfigKeys.CNF_TICKS_PER_OPERATION);
         Bukkit.getScheduler().scheduleSyncDelayedTask(saml, this, ticksPerOperation <= 0 ? 1200 : ticksPerOperation);
 
-        double currentTps = saml.getTpsSupplier().get();
+        double currentTps = saml.getTpsSupplier().getTps();
+        double currentTpsStandardDeviation = saml.getTpsSupplier().getTpsStandardDeviation();
         double unfreezingThresholdTps = saml.getSamlConfig().getDouble(ConfigKeys.CNF_TPS_UNFREEZING_THRESHOLD);
         double freezingThresholdTps = saml.getSamlConfig().getDouble(ConfigKeys.CNF_TPS_FREEZING_THRESHOLD);
+        double unfreezingConfidenceTpsRange = saml.getSamlConfig().getDouble(ConfigKeys.CNF_UNFREEZE_TPS_CONFIDENCE_RANGE);
 
-        if(currentTps >= unfreezingThresholdTps) {
+        if(currentTps - unfreezingConfidenceTpsRange * currentTpsStandardDeviation >= unfreezingThresholdTps) {
             SamlPreMobUnfreezeEvent samlPreMobUnfreezeEvent = new SamlPreMobUnfreezeEvent(SamlMobUnfreezeEvent.UnfreezeReason.MAIN_TASK);
             Bukkit.getPluginManager().callEvent(samlPreMobUnfreezeEvent);
             if(!samlPreMobUnfreezeEvent.isCancelled()) {

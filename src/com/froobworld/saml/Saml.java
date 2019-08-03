@@ -106,6 +106,11 @@ public class Saml extends JavaPlugin {
         Bukkit.getPluginManager().callEvent(new SamlConfigReloadEvent(config, advancedConfig, messages));
     }
 
+    public void reloadTpsSupplier() {
+        tpsSupplier.cancelTasks();
+        tpsSupplier = new TpsSupplier(this);
+    }
+
     public TpsSupplier getTpsSupplier() {
         return tpsSupplier;
     }

@@ -41,6 +41,7 @@ public class SamlListener implements Listener {
                 saml.getFrozenChunkCache().setShouldSaveOnExit();
             }
         }
+        saml.reloadTpsSupplier();
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
