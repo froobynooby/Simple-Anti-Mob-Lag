@@ -14,7 +14,7 @@ public class SnapshotEntity {
 
     public SnapshotEntity(LivingEntity entity, Collection<EntityGroup> groups) {
         this.type = entity.getType();
-        this.location = entity.getLocation();
+        this.location = entity.getLocation().clone();
         this.properties = new HashMap<Group, Map<String, Object>>();
         for(EntityGroup group : groups) {
             properties.put(group, group.getSnapshotProperties(entity));
