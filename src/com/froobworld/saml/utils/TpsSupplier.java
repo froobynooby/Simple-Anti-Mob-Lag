@@ -6,13 +6,13 @@ import org.bukkit.Bukkit;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class TpsSupplier {
     private Saml saml;
     private final long tpsSampleSize;
+    private final double tpsWeightingFactor;
     private final long tpsSmoothingSampleSize;
     private boolean useNmsTps;
     private final long standardDeviationSampleRate;
@@ -28,6 +28,7 @@ public class TpsSupplier {
         this.lastTps = 20.0;
         this.tpsSampleSize = saml.getSamlConfig().getLong(ConfigKeys.CNF_TPS_SAMPLE_SIZE);
         this.tpsSmoothingSampleSize = saml.getSamlConfig().getLong(ConfigKeys.CNF_TPS_SMOOTHING_SAMPLE_SIZE);
+        this.tpsWeightingFactor = saml.getSamlConfig().getDouble(ConfigKeys.CNF_TPS_WEIGHTING_FACTOR);
         this.useNmsTps = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_NMS_TPS);
         this.standardDeviationSampleRate = saml.getSamlConfig().getLong(ConfigKeys.CNF_TPS_DEVIATION_SAMPLE_RATE);
         this.standardDeviationSampleSize = saml.getSamlConfig().getLong(ConfigKeys.CNF_TPS_DEVIATION_SAMPLE_SIZE);
@@ -60,39 +61,40 @@ public class TpsSupplier {
         private Queue<Double> rawTpsValues;
         private double totalTps;
         private long lastTimeStamp;
-        private long totalDelta;
-        private long ticksSinceStart;
+        private double totalWeightedDelta;
+        private double totalWeightedTicks;
+        private double weightingFactorFinalPower;
 
         private CalculateTpsTask() {
-            Long[] initialValues = new Long[((Long) tpsSampleSize).intValue()];
-            Arrays.fill(initialValues, 50L);
-            deltas = new LinkedList<Long>(Arrays.asList(initialValues));
+            deltas = new LinkedList<>();
             rawTpsValues = new LinkedList<>();
-            totalDelta = 50 * tpsSampleSize;
+            totalWeightedTicks = tpsWeightingFactor == 1 ? tpsSampleSize : new BigDecimal(1).subtract(new BigDecimal(tpsWeightingFactor).pow((int) (tpsSampleSize - 1))).divide(new BigDecimal(1).subtract(new BigDecimal(tpsWeightingFactor)), BigDecimal.ROUND_HALF_UP).doubleValue();
+            weightingFactorFinalPower = new BigDecimal(tpsWeightingFactor).pow((int) (tpsSampleSize - 1)).doubleValue();
             tpsTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(saml, this, 0,  1);
         }
 
 
         @Override
         public void run() {
-            if(ticksSinceStart < 200) {
-                ticksSinceStart++;
-            } else {
-                startStandardDeviationCalc = true;
-            }
             if(lastTimeStamp == 0) {
                 lastTimeStamp = System.currentTimeMillis();
                 return;
             }
-            if(deltas.size() != 0 && deltas.size() > tpsSampleSize) {
-                totalDelta -= deltas.remove();
+            if(deltas.size() != 0 && deltas.size() >= tpsSampleSize) {
+                totalWeightedDelta -= weightingFactorFinalPower * deltas.remove();
             }
             long nextDelta = System.currentTimeMillis() - lastTimeStamp;
             deltas.add(nextDelta);
-            totalDelta += nextDelta;
+            totalWeightedDelta = tpsWeightingFactor * totalWeightedDelta;
+            totalWeightedDelta += nextDelta;
 
-            double nextTps = (double) deltas.size() / (double) totalDelta * 1000;
+            double nextTps = totalWeightedTicks / totalWeightedDelta * 1000;
             lastTimeStamp = System.currentTimeMillis();
+            if(deltas.size() < tpsSampleSize) {
+                return;
+            } else {
+                startStandardDeviationCalc = true;
+            }
 
             if(rawTpsValues.size() != 0 && rawTpsValues.size() > tpsSmoothingSampleSize) {
                 totalTps -= rawTpsValues.remove();

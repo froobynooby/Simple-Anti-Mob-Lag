@@ -15,6 +15,9 @@ tps-unfreezing-threshold: 19.0
 # Over how many ticks should we calculate the TPS?
 tps-sample-size: 600
 
+# We use a weighted average for the TPS such that it better reflects the current state of the server. What factor should we use for scaling?
+tps-weighting-factor: 0.995
+
 # We average the TPS over some amount of time so it's not affected by momentary lag spikes. Over how many ticks should we average the TPS?
 tps-smoothing-sample-size: 200
 

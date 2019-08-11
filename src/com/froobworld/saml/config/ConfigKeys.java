@@ -7,6 +7,7 @@ public final class ConfigKeys {
     public static final String CNF_TPS_FREEZING_THRESHOLD = "tps-freezing-threshold";
     public static final String CNF_TPS_UNFREEZING_THRESHOLD = "tps-unfreezing-threshold";
     public static final String CNF_TPS_SAMPLE_SIZE = "tps-sample-size";
+    public static final String CNF_TPS_WEIGHTING_FACTOR = "tps-weighting-factor";
     public static final String CNF_TPS_SMOOTHING_SAMPLE_SIZE = "tps-smoothing-sample-size";
     public static final String CNF_USE_NMS_TPS = "use-nms-tps";
     public static final String CNF_UNFREEZE_TPS_CONFIDENCE_RANGE = "unfreeze-tps-confidence-range";
