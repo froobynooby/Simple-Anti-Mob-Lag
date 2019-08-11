@@ -2,15 +2,16 @@ package com.froobworld.saml;
 
 import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.utils.ChunkCoordinates;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class FrozenChunkCache {
@@ -68,23 +69,26 @@ public class FrozenChunkCache {
     }
 
     public void saveToFile() {
-        YamlConfiguration config = new YamlConfiguration();
-        List<String> serialisedChunkCoordinateList = new ArrayList<String>();
-
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
         for(ChunkCoordinates coords : frozenChunkCoordinates) {
-            serialisedChunkCoordinateList.add(coords.toString());
+            jsonArray.add(coords.toString());
         }
-
-        config.set("frozen-chunks", serialisedChunkCoordinateList);
+        jsonObject.add("frozen-chunks", jsonArray);
         try {
             if(!cacheFile.exists()) {
                 cacheFile.createNewFile();
             }
-            config.save(cacheFile);
+            try (FileWriter writer = new FileWriter(cacheFile)) {
+                writer.append(jsonObject.toString());
+            } catch(IOException e) {
+                e.printStackTrace();
+                Saml.logger().warning("There was a problem writing to the frozen chunk cache file.");
+            }
             unsavedChanges = false;
         } catch (IOException e) {
             e.printStackTrace();
-            Saml.logger().warning("There was a problem saving the frozen chunk cache.");
+            Saml.logger().warning("There was a problem creating the frozen chunk cache file.");
         }
     }
 }
