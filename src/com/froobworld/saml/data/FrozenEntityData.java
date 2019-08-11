@@ -80,12 +80,9 @@ public class FrozenEntityData {
             }
             MetadataValue metadataValue = null;
             for(MetadataValue value : metadataValues) {
-                if(value.getOwningPlugin() == saml) {
+                if(saml.equals(value.getOwningPlugin())) {
                     metadataValue = value;
                 }
-            }
-            if(metadataValue == null) {
-                return Optional.empty();
             }
             if(metadataValue instanceof FixedMetadataValue) {
                 if(metadataValue.value() instanceof FrozenEntityData) {
