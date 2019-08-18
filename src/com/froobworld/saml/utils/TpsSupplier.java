@@ -44,7 +44,7 @@ public class TpsSupplier {
 
 
     public double getTps() {
-        return new BigDecimal(useNmsTps ? NmsUtils.getTPS() : lastTps).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        return Math.min(new BigDecimal(useNmsTps ? NmsUtils.getTPS() : lastTps).setScale(2, RoundingMode.HALF_UP).doubleValue(), 20.0);
     }
 
     public double getTpsStandardDeviation() {
@@ -109,6 +109,7 @@ public class TpsSupplier {
     private class CalculateStandardDeviationTask implements Runnable {
         private Queue<Double> tpsSamples;
         private double total;
+        private double squareTotal;
 
         private CalculateStandardDeviationTask() {
             tpsSamples = new LinkedList<>();
@@ -122,20 +123,17 @@ public class TpsSupplier {
                 return;
             }
             if(tpsSamples.size() != 0 && tpsSamples.size() >= standardDeviationSampleSize) {
-                total -= tpsSamples.remove();
+                double oldest = tpsSamples.remove();
+                total -= oldest;
+                squareTotal -= Math.pow(oldest, 2.0);
             }
-            double nextTps = getTps();
+            double nextTps = lastTps;
             tpsSamples.add(nextTps);
             total += nextTps;
+            squareTotal += Math.pow(nextTps, 2.0);
 
             if(tpsSamples.size() > 1) {
-                double average = total / tpsSamples.size();
-
-                double squareDifferenceSum = 0;
-                for (double sample : tpsSamples) {
-                    squareDifferenceSum += Math.pow(sample - average, 2.0);
-                }
-                lastTpsStandardDeviation = Math.sqrt(squareDifferenceSum / (tpsSamples.size() - 1));
+                lastTpsStandardDeviation = Math.sqrt(Math.abs((squareTotal - Math.pow(total, 2.0) / tpsSamples.size()) / (tpsSamples.size() - 1)));
             } else {
                 lastTpsStandardDeviation = 0;
             }
