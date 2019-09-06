@@ -1,5 +1,6 @@
 package com.froobworld.saml.events;
 
+import com.froobworld.saml.data.UnfreezeReason;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -20,11 +21,11 @@ public class SamlMobUnfreezeEvent extends Event{
     }
 
     public SamlMobUnfreezeEvent(LivingEntity mobToUnfreeze, UnfreezeReason unfreezeReason) {
-        this(new ArrayList<LivingEntity>(Collections.singletonList(mobToUnfreeze)), unfreezeReason);
+        this(new ArrayList<>(Collections.singletonList(mobToUnfreeze)), unfreezeReason);
     }
 
     public List<LivingEntity> getUnfrozenMobs() {
-        return new ArrayList<LivingEntity>(unfrozenMobs);
+        return new ArrayList<>(unfrozenMobs);
     }
 
     public UnfreezeReason getUnfreezeReason() {
@@ -40,13 +41,4 @@ public class SamlMobUnfreezeEvent extends Event{
         return handlers;
     }
 
-    public static enum UnfreezeReason {
-        MAIN_TASK,
-        INTERACTION,
-        DAMAGE,
-        CHUNK_UNLOAD,
-        UNFREEZE_CACHED_CHUNK,
-        SHUTDOWN,
-        CUSTOM
-    }
 }

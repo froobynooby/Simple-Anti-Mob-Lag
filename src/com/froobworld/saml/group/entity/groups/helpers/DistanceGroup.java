@@ -1,5 +1,6 @@
 package com.froobworld.saml.group.entity.groups.helpers;
 
+import com.froobworld.saml.group.GroupMetadata;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
@@ -14,6 +15,12 @@ import org.bukkit.entity.LivingEntity;
 import java.util.Map;
 
 public class DistanceGroup implements EntityGroup {
+    private static final GroupMetadata METADATA = new GroupMetadata.Builder()
+            .setVolatile(false)
+            .setRestrictsMembers(true)
+            .setRestrictsGroupStatus(false)
+            .build();
+
     private double separationDistance;
     private Metric metric;
     private boolean scaleToTps;
@@ -37,8 +44,8 @@ public class DistanceGroup implements EntityGroup {
     }
 
     @Override
-    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return (metric.distanceSquared(entity.getLocation(), protoGroup.getCentre().getLocation()) <= scaledSeparationDistanceSquared) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
+    public GroupMetadata getGroupMetadata() {
+        return METADATA;
     }
 
     @Override
@@ -49,6 +56,11 @@ public class DistanceGroup implements EntityGroup {
     @Override
     public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
         return new GroupStatusUpdater<SnapshotEntity>() {
+            @Override
+            public ProtoMemberStatus getProtoMemberStatus(SnapshotEntity candidate, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                return (metric.distanceSquared(candidate.getLocation(), protoGroup.getCentre().getLocation()) <= scaledSeparationDistanceSquared) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
+            }
+
             @Override
             public void updateStatus(SnapshotEntity member) {}
 

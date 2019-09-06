@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.Queue;
 
 public class TpsSupplier {
@@ -66,8 +66,8 @@ public class TpsSupplier {
         private double weightingFactorFinalPower;
 
         private CalculateTpsTask() {
-            deltas = new LinkedList<>();
-            rawTpsValues = new LinkedList<>();
+            deltas = new ArrayDeque<>((int) tpsSampleSize);
+            rawTpsValues = new ArrayDeque<>((int) tpsSmoothingSampleSize);
             totalWeightedTicks = tpsWeightingFactor == 1 ? tpsSampleSize : new BigDecimal(1).subtract(new BigDecimal(tpsWeightingFactor).pow((int) (tpsSampleSize - 1))).divide(new BigDecimal(1).subtract(new BigDecimal(tpsWeightingFactor)), BigDecimal.ROUND_HALF_UP).doubleValue();
             weightingFactorFinalPower = new BigDecimal(tpsWeightingFactor).pow((int) (tpsSampleSize - 1)).doubleValue();
             tpsTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(saml, this, 0,  1);
@@ -112,7 +112,7 @@ public class TpsSupplier {
         private double squareTotal;
 
         private CalculateStandardDeviationTask() {
-            tpsSamples = new LinkedList<>();
+            tpsSamples = new ArrayDeque<>((int) standardDeviationSampleSize);
             standardDeviationTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(saml, this, 0, standardDeviationSampleRate);
         }
 

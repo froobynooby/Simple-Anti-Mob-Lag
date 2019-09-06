@@ -1,5 +1,6 @@
 package com.froobworld.saml.group.entity.groups.helpers;
 
+import com.froobworld.saml.group.GroupMetadata;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
@@ -11,6 +12,12 @@ import org.bukkit.entity.LivingEntity;
 import java.util.Map;
 
 public class TotalCountGroup implements EntityGroup {
+    private static final GroupMetadata METADATA = new GroupMetadata.Builder()
+            .setVolatile(false)
+            .setRestrictsMembers(false)
+            .setRestrictsGroupStatus(true)
+            .build();
+
     private double minimumSize;
     private double scaledMinimumSize;
     private boolean scaleToTps;
@@ -32,8 +39,8 @@ public class TotalCountGroup implements EntityGroup {
     }
 
     @Override
-    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return ProtoMemberStatus.MEMBER;
+    public GroupMetadata getGroupMetadata() {
+        return METADATA;
     }
 
     @Override
@@ -46,6 +53,11 @@ public class TotalCountGroup implements EntityGroup {
         return new GroupStatusUpdater<SnapshotEntity>() {
             private int count;
             private boolean group;
+
+            @Override
+            public ProtoMemberStatus getProtoMemberStatus(SnapshotEntity candidate, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                return ProtoMemberStatus.MEMBER;
+            }
 
             @Override
             public void updateStatus(SnapshotEntity member) {

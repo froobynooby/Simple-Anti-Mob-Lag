@@ -1,5 +1,6 @@
 package com.froobworld.saml.group.entity.groups;
 
+import com.froobworld.saml.group.GroupMetadata;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
@@ -11,6 +12,11 @@ import org.bukkit.entity.LivingEntity;
 import java.util.Map;
 
 public class SingularGroup implements EntityGroup {
+    private static final GroupMetadata METADATA = new GroupMetadata.Builder()
+            .setVolatile(false)
+            .setRestrictsMembers(true)
+            .setRestrictsGroupStatus(false)
+            .build();
 
     @Override
     public String getName() {
@@ -18,8 +24,8 @@ public class SingularGroup implements EntityGroup {
     }
 
     @Override
-    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return ProtoMemberStatus.NON_MEMBER;
+    public GroupMetadata getGroupMetadata() {
+        return METADATA;
     }
 
     @Override
@@ -30,6 +36,12 @@ public class SingularGroup implements EntityGroup {
     @Override
     public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
         return new GroupStatusUpdater<SnapshotEntity>() {
+
+            @Override
+            public ProtoMemberStatus getProtoMemberStatus(SnapshotEntity candidate, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                return ProtoMemberStatus.NON_MEMBER;
+            }
+
             @Override
             public void updateStatus(SnapshotEntity member) {}
 

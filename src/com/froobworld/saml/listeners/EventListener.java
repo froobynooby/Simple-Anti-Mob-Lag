@@ -2,14 +2,19 @@ package com.froobworld.saml.listeners;
 
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.config.ConfigKeys;
+import com.froobworld.saml.data.FrozenEntityData;
+import com.froobworld.saml.data.NerfedEntityData;
+import com.froobworld.saml.data.UnfreezeReason;
 import com.froobworld.saml.events.SamlMobUnfreezeEvent;
 import com.froobworld.saml.utils.EntityFreezer;
+import com.froobworld.saml.utils.EntityNerfer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -28,7 +33,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof LivingEntity) {
-            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getRightClicked()) : EntityFreezer.isFrozen((LivingEntity) event.getRightClicked())) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getRightClicked()) : EntityFreezer.isFrozen((LivingEntity) event.getRightClicked()) || EntityNerfer.isNerfed((LivingEntity) event.getRightClicked())) {
                 if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(event.getRightClicked()::hasMetadata)) {
                     return;
                 }
@@ -48,8 +53,9 @@ public class EventListener implements Listener {
 
                 if(unfreezeOnInteract && saml.getTpsSupplier().getTps() > unfreezeOnInteractTpsThreshold) {
                     EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getRightClicked());
+                    EntityNerfer.unnerf(saml, (LivingEntity) event.getRightClicked());
 
-                    SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getRightClicked(), SamlMobUnfreezeEvent.UnfreezeReason.INTERACTION);
+                    SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getRightClicked(), UnfreezeReason.INTERACTION);
                     Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
                 }
             }
@@ -59,7 +65,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof LivingEntity) {
-            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getEntity()) : EntityFreezer.isFrozen((LivingEntity) event.getEntity())) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getEntity()) : EntityFreezer.isFrozen((LivingEntity) event.getEntity()) || EntityNerfer.isNerfed((LivingEntity) event.getEntity())) {
                 if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(event.getEntity()::hasMetadata)) {
                     return;
                 }
@@ -79,8 +85,9 @@ public class EventListener implements Listener {
 
                 if(unfreezeOnDamage && saml.getTpsSupplier().getTps() > unfreezeOnDamageTpsThreshold) {
                     EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getEntity());
+                    EntityNerfer.unnerf(saml, (LivingEntity) event.getEntity());
 
-                    SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getEntity(), SamlMobUnfreezeEvent.UnfreezeReason.DAMAGE);
+                    SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getEntity(), UnfreezeReason.DAMAGE);
                     Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
                 }
             }
@@ -147,12 +154,16 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent event) {
-        if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_UNLOAD)) {
-            List<LivingEntity> mobsToUnfreeze = new ArrayList<LivingEntity>();
-            for(Entity entity : event.getChunk().getEntities()) {
-                if(entity instanceof LivingEntity) {
-                    if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
-                        if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(entity::hasMetadata)) {
+        boolean unfreezeOnUnload = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_UNLOAD);
+        boolean onlyUnfreezeTagged = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED);
+        List<String> ignoreMeta = saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA);
+        List<LivingEntity> mobsToUnfreeze = new ArrayList<>();
+        for(Entity entity : event.getChunk().getEntities()) {
+            if(entity instanceof LivingEntity) {
+                EntityNerfer.unnerf(saml, (LivingEntity) entity);
+                if(unfreezeOnUnload) {
+                    if (onlyUnfreezeTagged ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) entity) : EntityFreezer.isFrozen((LivingEntity) entity)) {
+                        if (ignoreMeta.stream().anyMatch(entity::hasMetadata)) {
                             continue;
                         }
                         EntityFreezer.unfreezeEntity(saml, (LivingEntity) entity);
@@ -160,13 +171,21 @@ public class EventListener implements Listener {
                     }
                 }
             }
-            SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(mobsToUnfreeze, SamlMobUnfreezeEvent.UnfreezeReason.CHUNK_UNLOAD);
+        }
+        if(unfreezeOnUnload) {
+            SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(mobsToUnfreeze, UnfreezeReason.CHUNK_UNLOAD);
             Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
 
             if (saml.getFrozenChunkCache() != null) {
                 saml.getFrozenChunkCache().removeChunk(event.getChunk());
             }
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityDeathEvent(EntityDeathEvent event) {
+        FrozenEntityData.stripOfFrozenEntityData(saml, event.getEntity());
+        NerfedEntityData.stripOfNerfedEntityData(saml, event.getEntity());
     }
 
 }

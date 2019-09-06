@@ -4,21 +4,20 @@ public class GroupOperations {
 
     public static <T> Group<T> conjunction(String resultName, Group<T> group1, Group<T> group2) {
         return new Group<T>() {
+            private final GroupMetadata groupMetadata = new GroupMetadata.Builder()
+                    .setVolatile(group1.getGroupMetadata().isVolatile() || group2.getGroupMetadata().isVolatile())
+                    .setRestrictsMembers(group1.getGroupMetadata().restrictsMembers() || group2.getGroupMetadata().restrictsMembers())
+                    .setRestrictsGroupStatus(group1.getGroupMetadata().restrictsGroupStatus() || group2.getGroupMetadata().restrictsGroupStatus())
+                    .build();
+
             @Override
             public String getName() {
                 return resultName;
             }
 
             @Override
-            public ProtoMemberStatus inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
-                ProtoMemberStatus protoMemberStatus1 = group1.inProtoGroup(candidate, protoGroup);
-                ProtoMemberStatus protoMemberStatus2 = group2.inProtoGroup(candidate, protoGroup);
-
-                if(protoMemberStatus1 == ProtoMemberStatus.NON_MEMBER || protoMemberStatus2 == ProtoMemberStatus.NON_MEMBER) {
-                    return ProtoMemberStatus.NON_MEMBER;
-                }
-
-                return (protoMemberStatus1 == ProtoMemberStatus.CONDITIONAL && protoMemberStatus2 == ProtoMemberStatus.CONDITIONAL) ? ProtoMemberStatus.CONDITIONAL : ProtoMemberStatus.MEMBER;
+            public GroupMetadata getGroupMetadata() {
+                return groupMetadata;
             }
 
             @Override
@@ -67,6 +66,19 @@ public class GroupOperations {
                 GroupStatusUpdater<T> groupStatusUpdater1 = group1.groupStatusUpdater();
                 GroupStatusUpdater<T> groupStatusUpdater2 = group2.groupStatusUpdater();
                 return new GroupStatusUpdater<T>() {
+
+                    @Override
+                    public ProtoMemberStatus getProtoMemberStatus(T candidate, ProtoGroup<? extends T> protoGroup) {
+                        ProtoMemberStatus protoMemberStatus1 = groupStatusUpdater1.getProtoMemberStatus(candidate, protoGroup);
+                        ProtoMemberStatus protoMemberStatus2 = groupStatusUpdater2.getProtoMemberStatus(candidate, protoGroup);
+
+                        if(protoMemberStatus1 == ProtoMemberStatus.NON_MEMBER || protoMemberStatus2 == ProtoMemberStatus.NON_MEMBER) {
+                            return ProtoMemberStatus.NON_MEMBER;
+                        }
+
+                        return (protoMemberStatus1 == ProtoMemberStatus.CONDITIONAL && protoMemberStatus2 == ProtoMemberStatus.CONDITIONAL) ? ProtoMemberStatus.CONDITIONAL : ProtoMemberStatus.MEMBER;
+                    }
+
                     @Override
                     public void updateStatus(T member) {
                         groupStatusUpdater1.updateStatus(member);
@@ -84,8 +96,11 @@ public class GroupOperations {
 
     public static <T> Group<T> weakConjunction(String resultName, Group<T> group1, Group<T> group2) {
         return new Group<T>() {
-            private boolean in1 = true;
-            private boolean in2 = true;
+            private final GroupMetadata groupMetadata = new GroupMetadata.Builder()
+                    .setVolatile(group1.getGroupMetadata().isVolatile() || group2.getGroupMetadata().isVolatile())
+                    .setRestrictsMembers(group1.getGroupMetadata().restrictsMembers() && group2.getGroupMetadata().restrictsMembers())
+                    .setRestrictsGroupStatus(group1.getGroupMetadata().restrictsGroupStatus() || group2.getGroupMetadata().restrictsGroupStatus())
+                    .build();
 
             @Override
             public String getName() {
@@ -93,22 +108,8 @@ public class GroupOperations {
             }
 
             @Override
-            public ProtoMemberStatus inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
-                ProtoMemberStatus protoMemberStatus1 = group1.inProtoGroup(candidate, protoGroup);
-                ProtoMemberStatus protoMemberStatus2 = group2.inProtoGroup(candidate, protoGroup);
-                in1 = false;
-                in2 = false;
-                if(protoMemberStatus1 != ProtoMemberStatus.NON_MEMBER) {
-                    in1 = true;
-                }
-                if(protoMemberStatus2 != ProtoMemberStatus.NON_MEMBER) {
-                    in2 = true;
-                }
-                if(!in1 && !in2) {
-                    return ProtoMemberStatus.NON_MEMBER;
-                }
-
-                return (protoMemberStatus1 == ProtoMemberStatus.MEMBER || protoMemberStatus2 == ProtoMemberStatus.MEMBER) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.CONDITIONAL;
+            public GroupMetadata getGroupMetadata() {
+                return groupMetadata;
             }
 
             @Override
@@ -170,13 +171,37 @@ public class GroupOperations {
                 GroupStatusUpdater<T> groupStatusUpdater2 = group2.groupStatusUpdater();
                 return new GroupStatusUpdater<T>() {
                     @Override
+                    public ProtoMemberStatus getProtoMemberStatus(T candidate, ProtoGroup<? extends T> protoGroup) {
+                        ProtoMemberStatus protoMemberStatus1 = groupStatusUpdater1.getProtoMemberStatus(candidate, protoGroup);
+                        ProtoMemberStatus protoMemberStatus2 = groupStatusUpdater2.getProtoMemberStatus(candidate, protoGroup);
+                        if(protoMemberStatus1 == ProtoMemberStatus.NON_MEMBER && protoMemberStatus2 == ProtoMemberStatus.NON_MEMBER) {
+                            return ProtoMemberStatus.NON_MEMBER;
+                        }
+
+                        return (protoMemberStatus1 == ProtoMemberStatus.MEMBER || protoMemberStatus2 == ProtoMemberStatus.MEMBER) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.CONDITIONAL;
+                    }
+
+                    @Override
                     public void updateStatus(T member) {
-                        if(in1) {
-                            groupStatusUpdater1.updateStatus(member);
+                        groupStatusUpdater1.updateStatus(member);
+                        groupStatusUpdater2.updateStatus(member);
+                    }
+
+                    @Override
+                    public ProtoMemberStatus attemptUpdateStatus(T candidate, ProtoGroup<? extends T> protoGroup) {
+                        ProtoMemberStatus protoMemberStatus1 = groupStatusUpdater1.getProtoMemberStatus(candidate, protoGroup);
+                        ProtoMemberStatus protoMemberStatus2 = groupStatusUpdater2.getProtoMemberStatus(candidate, protoGroup);
+                        if(protoMemberStatus1 == ProtoMemberStatus.NON_MEMBER && protoMemberStatus2 == ProtoMemberStatus.NON_MEMBER) {
+                            return ProtoMemberStatus.NON_MEMBER;
                         }
-                        if(in2) {
-                            groupStatusUpdater2.updateStatus(member);
+                        if(protoMemberStatus1 != ProtoMemberStatus.NON_MEMBER) {
+                            groupStatusUpdater1.updateStatus(candidate);
                         }
+                        if(protoMemberStatus2 != ProtoMemberStatus.NON_MEMBER) {
+                            groupStatusUpdater2.updateStatus(candidate);
+                        }
+
+                        return (protoMemberStatus1 == ProtoMemberStatus.MEMBER || protoMemberStatus2 == ProtoMemberStatus.MEMBER) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.CONDITIONAL;
                     }
 
                     @Override
@@ -190,8 +215,11 @@ public class GroupOperations {
 
     public static <T> Group<T> disjunction(String resultName, Group<T> group1, Group<T> group2) {
         return new Group<T>() {
-            private boolean in1 = true;
-            private boolean in2 = true;
+            private final GroupMetadata groupMetadata = new GroupMetadata.Builder()
+                    .setVolatile(group1.getGroupMetadata().isVolatile() || group2.getGroupMetadata().isVolatile())
+                    .setRestrictsMembers(group1.getGroupMetadata().restrictsMembers() && group2.getGroupMetadata().restrictsMembers())
+                    .setRestrictsGroupStatus(group1.getGroupMetadata().restrictsGroupStatus() && group2.getGroupMetadata().restrictsGroupStatus())
+                    .build();
 
             @Override
             public String getName() {
@@ -199,34 +227,14 @@ public class GroupOperations {
             }
 
             @Override
-            public ProtoMemberStatus inProtoGroup(T candidate, ProtoGroup<? extends T> protoGroup) {
-                ProtoMemberStatus protoMemberStatus1 = group1.inProtoGroup(candidate, protoGroup);
-                ProtoMemberStatus protoMemberStatus2 = group2.inProtoGroup(candidate, protoGroup);
-                in1 = false;
-                in2 = false;
-                if(protoMemberStatus1 != ProtoMemberStatus.NON_MEMBER) {
-                    in1 = true;
-                }
-                if(protoMemberStatus2 != ProtoMemberStatus.NON_MEMBER) {
-                    in2 = true;
-                }
-                if(!in1 && !in2) {
-                    return ProtoMemberStatus.NON_MEMBER;
-                }
-
-                return (protoMemberStatus1 == ProtoMemberStatus.MEMBER || protoMemberStatus2 == ProtoMemberStatus.MEMBER) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.CONDITIONAL;
+            public GroupMetadata getGroupMetadata() {
+                return groupMetadata;
             }
 
             @Override
             public MembershipEligibility getMembershipEligibility(T candidate) {
                 MembershipEligibility membershipEligibility1 = group1.getMembershipEligibility(candidate);
                 MembershipEligibility membershipEligibility2 = group2.getMembershipEligibility(candidate);
-                if(membershipEligibility1 == MembershipEligibility.CENTRE || membershipEligibility1 == MembershipEligibility.CENTRE_OR_MEMBER) {
-                    in1 = true;
-                }
-                if(membershipEligibility2 == MembershipEligibility.CENTRE || membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
-                    in2 = true;
-                }
                 if(membershipEligibility1 == MembershipEligibility.CENTRE_OR_MEMBER) {
                     if(membershipEligibility2 == MembershipEligibility.CENTRE_OR_MEMBER) {
                         return MembershipEligibility.CENTRE_OR_MEMBER;
@@ -281,13 +289,37 @@ public class GroupOperations {
                 GroupStatusUpdater<T> groupStatusUpdater2 = group2.groupStatusUpdater();
                 return new GroupStatusUpdater<T>() {
                     @Override
+                    public ProtoMemberStatus getProtoMemberStatus(T candidate, ProtoGroup<? extends T> protoGroup) {
+                        ProtoMemberStatus protoMemberStatus1 = groupStatusUpdater1.getProtoMemberStatus(candidate, protoGroup);
+                        ProtoMemberStatus protoMemberStatus2 = groupStatusUpdater2.getProtoMemberStatus(candidate, protoGroup);
+                        if(protoMemberStatus1 == ProtoMemberStatus.NON_MEMBER && protoMemberStatus2 == ProtoMemberStatus.NON_MEMBER) {
+                            return ProtoMemberStatus.NON_MEMBER;
+                        }
+
+                        return (protoMemberStatus1 == ProtoMemberStatus.MEMBER || protoMemberStatus2 == ProtoMemberStatus.MEMBER) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.CONDITIONAL;
+                    }
+
+                    @Override
                     public void updateStatus(T member) {
-                        if(in1) {
-                            groupStatusUpdater1.updateStatus(member);
+                        groupStatusUpdater1.updateStatus(member);
+                        groupStatusUpdater2.updateStatus(member);
+                    }
+
+                    @Override
+                    public ProtoMemberStatus attemptUpdateStatus(T candidate, ProtoGroup<? extends T> protoGroup) {
+                        ProtoMemberStatus protoMemberStatus1 = groupStatusUpdater1.getProtoMemberStatus(candidate, protoGroup);
+                        ProtoMemberStatus protoMemberStatus2 = groupStatusUpdater2.getProtoMemberStatus(candidate, protoGroup);
+                        if(protoMemberStatus1 == ProtoMemberStatus.NON_MEMBER && protoMemberStatus2 == ProtoMemberStatus.NON_MEMBER) {
+                            return ProtoMemberStatus.NON_MEMBER;
                         }
-                        if(in2) {
-                            groupStatusUpdater2.updateStatus(member);
+                        if(protoMemberStatus1 != ProtoMemberStatus.NON_MEMBER) {
+                            groupStatusUpdater1.updateStatus(candidate);
                         }
+                        if(protoMemberStatus2 != ProtoMemberStatus.NON_MEMBER) {
+                            groupStatusUpdater2.updateStatus(candidate);
+                        }
+
+                        return (protoMemberStatus1 == ProtoMemberStatus.MEMBER || protoMemberStatus2 == ProtoMemberStatus.MEMBER) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.CONDITIONAL;
                     }
 
                     @Override

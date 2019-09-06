@@ -22,7 +22,7 @@ public class FrozenChunkCache {
 
     public FrozenChunkCache(File cacheFile, Saml saml, boolean loadFromFile) {
         this.cacheFile = cacheFile;
-        frozenChunkCoordinates = new HashSet<ChunkCoordinates>();
+        frozenChunkCoordinates = new HashSet<>();
         if(loadFromFile) {
             loadFromFile();
         }

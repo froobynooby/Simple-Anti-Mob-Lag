@@ -1,5 +1,6 @@
 package com.froobworld.saml.group.entity.groups.helpers;
 
+import com.froobworld.saml.group.GroupMetadata;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
@@ -11,6 +12,11 @@ import org.bukkit.entity.LivingEntity;
 import java.util.Map;
 
 public class ChunkGroup implements EntityGroup {
+    private static final GroupMetadata METADATA = new GroupMetadata.Builder()
+            .setVolatile(false)
+            .setRestrictsMembers(true)
+            .setRestrictsGroupStatus(false)
+            .build();
 
     @Override
     public String getName() {
@@ -18,8 +24,8 @@ public class ChunkGroup implements EntityGroup {
     }
 
     @Override
-    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return (entity.getLocation().getBlockX() >> 4 == protoGroup.getCentre().getLocation().getBlockX() >> 4 && entity.getLocation().getBlockZ() >> 4 == protoGroup.getCentre().getLocation().getBlockZ() >> 4) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
+    public GroupMetadata getGroupMetadata() {
+        return METADATA;
     }
 
     @Override
@@ -30,6 +36,11 @@ public class ChunkGroup implements EntityGroup {
     @Override
     public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
         return new GroupStatusUpdater<SnapshotEntity>() {
+            @Override
+            public ProtoMemberStatus getProtoMemberStatus(SnapshotEntity candidate, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                return (candidate.getLocation().getBlockX() >> 4 == protoGroup.getCentre().getLocation().getBlockX() >> 4 && candidate.getLocation().getBlockZ() >> 4 == protoGroup.getCentre().getLocation().getBlockZ() >> 4) ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
+            }
+
             @Override
             public void updateStatus(SnapshotEntity member) {}
 

@@ -44,14 +44,14 @@ public class SamlCommand implements CommandExecutor {
     public static TabCompleter tabCompleter = new TabCompleter() {
         @Override
         public List<String> onTabComplete(CommandSender sender, Command command, String cl, String[] args) {
-            List<String> completions = new ArrayList<String>();
+            List<String> completions = new ArrayList<>();
             if(args.length == 1) {
                 completions.add("reload");
                 completions.add("rl");
                 completions.add("stats");
             }
 
-            return StringUtil.copyPartialMatches(args[args.length - 1], completions, new ArrayList<String>());
+            return StringUtil.copyPartialMatches(args[args.length - 1], completions, new ArrayList<>());
         }
     };
 }

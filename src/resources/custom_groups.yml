@@ -6,26 +6,40 @@ version: 1
 group:
   egg_farm:
     definition: |-
-      default_specific_type{"acceptedTypes": ["CHICKEN"]}
+      specific_center_member_type{"acceptedTypes": ["CHICKEN"]}
       & default_distance{"separationDistance": 2}
       & default_total_count{"minimumSize": 5}
 
   1_13_iron_farm_villagers:
     definition: |-
-      default_specific_type{"acceptedTypes": ["VILLAGER"]}
+      specific_center_member_type{"acceptedTypes": ["VILLAGER"]}
       & default_distance{"separationDistance": 2}
       & default_total_count{"minimumSize": 5}
 
   animal_farm:
     definition: |-
-      default_specific_type{"acceptedTypes": ["COW", "PIG", "SHEEP", "CHICKEN"]}
+      specific_center_member_type{"acceptedTypes": ["COW", "PIG", "SHEEP", "CHICKEN"]}
       & default_distance{"separationDistance": 10}
       & default_total_count{"minimumSize": 20}
 
+  dense_animal_farm:
+    definition: |-
+      specific_center_member_type{"acceptedTypes": ["COW", "PIG", "SHEEP", "CHICKEN"]}
+      & default_distance{"separationDistance": 2}
+      & default_total_count{"minimumSize": 10}
+
   enderman_grinder:
     definition: |-
-      default_specific_type{"acceptedTypes": ["ENDERMAN", "ENDERMITE"]}
-      & default_distance{"separationDistance": 20}
+      default_specific_center_type{"acceptedTypes": ["ENDERMITE"]}
+      & default_specific_type{"acceptedTypes": ["ENDERMAN"]}
+      & default_distance{"separationDistance": 20, "weightY": 0}
       & default_type_count{"typedMinimumSize": {"ENDERMAN": 10}}
 
 helper:
+  specific_center_member_type:
+    definition: |-
+      default_specific_center_type{"acceptedTypes": %acceptedTypes%}
+      & default_specific_type{"acceptedTypes": %acceptedTypes%}
+    arguments:
+      acceptedTypes:
+        required: true

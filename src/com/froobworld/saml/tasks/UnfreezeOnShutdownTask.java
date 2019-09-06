@@ -2,6 +2,7 @@ package com.froobworld.saml.tasks;
 
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.config.ConfigKeys;
+import com.froobworld.saml.data.UnfreezeReason;
 import com.froobworld.saml.events.SamlMobUnfreezeEvent;
 import com.froobworld.saml.utils.EntityFreezer;
 import org.bukkit.Bukkit;
@@ -22,7 +23,7 @@ public class UnfreezeOnShutdownTask implements Runnable {
     @Override
     public void run() {
         if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_UNFREEZE_ON_SHUTDOWN)) {
-            List<LivingEntity> unfrozenMobs = new ArrayList<LivingEntity>();
+            List<LivingEntity> unfrozenMobs = new ArrayList<>();
             for(World world : Bukkit.getWorlds()) {
                 for(LivingEntity entity : world.getLivingEntities()) {
                     if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, entity) : EntityFreezer.isFrozen(entity)) {
@@ -35,7 +36,7 @@ public class UnfreezeOnShutdownTask implements Runnable {
                 }
             }
             if(!unfrozenMobs.isEmpty()) {
-                SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, SamlMobUnfreezeEvent.UnfreezeReason.SHUTDOWN);
+                SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent(unfrozenMobs, UnfreezeReason.SHUTDOWN);
                 Bukkit.getPluginManager().callEvent(mobUnfreezeEvent);
             }
         }

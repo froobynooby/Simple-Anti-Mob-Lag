@@ -6,14 +6,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class NmsUtils {
-    private final static String name = Bukkit.getServer().getClass().getPackage().getName();
-    private final static String version = name.substring(name.lastIndexOf('.') + 1);
+    private static final String NAME = Bukkit.getServer().getClass().getPackage().getName();
+    public static final String VERSION = NAME.substring(NAME.lastIndexOf('.') + 1);
 
     private static Object serverInstance = null;
     private static Field tpsField = null;
 
     private static Class<?> getNMSClass(String className) throws ClassNotFoundException {
-        return Class.forName("net.minecraft.server." + version + "." + className);
+        return Class.forName("net.minecraft.server." + VERSION + "." + className);
     }
 
     public static Double getTPS() {

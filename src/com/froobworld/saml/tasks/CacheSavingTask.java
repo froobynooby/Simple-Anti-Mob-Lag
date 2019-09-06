@@ -9,7 +9,7 @@ public class CacheSavingTask implements Runnable {
     public CacheSavingTask(Saml saml) {
         this.saml = saml;
         if(saml.getFrozenChunkCache() != null) {
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(saml, this, 1200, 1200);
+            Bukkit.getScheduler().scheduleSyncRepeatingTask(saml, this, 6000, 6000);
         }
     }
 

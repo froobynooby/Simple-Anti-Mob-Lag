@@ -36,7 +36,7 @@ public class CheckCacheStartupTask implements Runnable {
             if (chunkCacheDirectory.exists()) {
                 if(chunkCacheDirectory.listFiles().length > 0) {
                     Saml.logger().info("We will now start unfreezing chunks from the old cache files.");
-                    List<FrozenChunkCache> frozenChunkCaches = new ArrayList<FrozenChunkCache>();
+                    List<FrozenChunkCache> frozenChunkCaches = new ArrayList<>();
                     for (File file : chunkCacheDirectory.listFiles()) {
                         frozenChunkCaches.add(new FrozenChunkCache(file, saml, true));
                     }

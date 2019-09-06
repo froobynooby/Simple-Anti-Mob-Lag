@@ -20,8 +20,8 @@ public class Saml_StatsCommand implements CommandExecutor {
         int totalMobCount = 0;
         int totalFrozenMobCount = 0;
 
-        Map<World, Integer> worldMobCounts = new HashMap<World, Integer>();
-        Map<World, Integer> worldFrozenMobCounts = new HashMap<World, Integer>();
+        Map<World, Integer> worldMobCounts = new HashMap<>();
+        Map<World, Integer> worldFrozenMobCounts = new HashMap<>();
         for(World world : Bukkit.getWorlds()) {
             int worldMobCount = 0;
             int worldFrozenMobCount = 0;

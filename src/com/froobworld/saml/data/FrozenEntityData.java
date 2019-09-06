@@ -16,16 +16,21 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class FrozenEntityData {
+    private FreezeReason freezeReason;
     private long time;
     private List<String> groups;
     private long minimumFreezeTime;
 
-    private FrozenEntityData(long time, List<String> groups, long minimumFreezeTime) {
+    private FrozenEntityData(FreezeReason freezeReason, long time, List<String> groups, long minimumFreezeTime) {
+        this.freezeReason = freezeReason;
         this.time = time;
         this.groups = groups;
         this.minimumFreezeTime = minimumFreezeTime;
     }
 
+    public FreezeReason getFreezeReason() {
+        return freezeReason;
+    }
 
     public long getTimeAtFreeze() {
         return time;
@@ -41,6 +46,7 @@ public class FrozenEntityData {
 
     public JsonObject toJsonObject() {
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("freezeReason", freezeReason.name());
         jsonObject.addProperty("time", time);
         JsonArray groupsArray = new JsonArray();
         for(String group : groups) {
@@ -54,6 +60,7 @@ public class FrozenEntityData {
 
     public static FrozenEntityData fromJsonObject(JsonObject jsonObject) {
         Builder builder = new Builder();
+        Optional.ofNullable(jsonObject.get("freezeReason")).ifPresent( e -> builder.setFreezeReason(FreezeReason.valueOfOrDefault(e.getAsString())) );
         Optional.ofNullable(jsonObject.get("time")).ifPresent( e -> builder.setTimeFrozen(e.getAsNumber().longValue()) );
         Optional.ofNullable(jsonObject.get("groups")).ifPresent( e -> e.getAsJsonArray().forEach( o -> {
             if(!o.isJsonNull()) {
@@ -117,18 +124,25 @@ public class FrozenEntityData {
     }
 
     public static class Builder {
+        private FreezeReason freezeReason;
         private long time;
         private List<String> groups;
         private long minimumFreezeTime;
 
         public Builder() {
+            this.freezeReason = FreezeReason.DEFAULT;
             this.time = System.currentTimeMillis();
-            this.groups = new ArrayList<String>();
+            this.groups = new ArrayList<>();
             this.minimumFreezeTime = 0;
         }
 
 
-        private Builder setTimeFrozen(long time) {
+        public Builder setFreezeReason(FreezeReason freezeReason) {
+            this.freezeReason = freezeReason;
+            return this;
+        }
+
+        public Builder setTimeFrozen(long time) {
             this.time = time;
             return this;
         }
@@ -144,7 +158,7 @@ public class FrozenEntityData {
         }
 
         public FrozenEntityData build() {
-            return new FrozenEntityData(time, groups, minimumFreezeTime);
+            return new FrozenEntityData(freezeReason, time, groups, minimumFreezeTime);
         }
     }
 }

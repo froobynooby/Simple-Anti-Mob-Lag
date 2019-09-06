@@ -1,5 +1,6 @@
 package com.froobworld.saml.group.entity.groups.helpers;
 
+import com.froobworld.saml.group.GroupMetadata;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
@@ -14,6 +15,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TypeCountGroup implements EntityGroup {
+    private static final GroupMetadata METADATA = new GroupMetadata.Builder()
+            .setVolatile(false)
+            .setRestrictsMembers(false)
+            .setRestrictsGroupStatus(true)
+            .build();
+
     private Map<EntityType, Double> typedMinimumSize;
     private Map<EntityType, Double> scaledTypedMinimumSize;
     private boolean scaleToTps;
@@ -35,8 +42,8 @@ public class TypeCountGroup implements EntityGroup {
     }
 
     @Override
-    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return ProtoMemberStatus.MEMBER;
+    public GroupMetadata getGroupMetadata() {
+        return METADATA;
     }
 
     @Override
@@ -47,8 +54,13 @@ public class TypeCountGroup implements EntityGroup {
     @Override
     public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
         return new GroupStatusUpdater<SnapshotEntity>() {
-            private Map<EntityType, Integer> typedCounts = new HashMap<EntityType, Integer>();
+            private Map<EntityType, Integer> typedCounts = new HashMap<>();
             private boolean group = false;
+
+            @Override
+            public ProtoMemberStatus getProtoMemberStatus(SnapshotEntity candidate, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                return ProtoMemberStatus.MEMBER;
+            }
 
             @Override
             public void updateStatus(SnapshotEntity member) {
@@ -118,10 +130,10 @@ public class TypeCountGroup implements EntityGroup {
         private double minimumScaleTpsRatio;
 
         public Builder() {
-            this.typedMinimumSize = new HashMap<EntityType, Double>();
+            this.typedMinimumSize = new HashMap<>();
             Arrays.stream(EntityType.values()).forEach( e -> typedMinimumSize.put(e, 0.0) );
             this.scaleToTps = false;
-            this.typedMinimumScaledMinimumSize = new HashMap<EntityType, Double>();
+            this.typedMinimumScaledMinimumSize = new HashMap<>();
             Arrays.stream(EntityType.values()).forEach( e -> typedMinimumScaledMinimumSize.put(e, 0.0) );
             this.minimumScaleTpsRatio = 0;
         }

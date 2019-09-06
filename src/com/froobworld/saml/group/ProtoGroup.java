@@ -11,8 +11,8 @@ public class ProtoGroup<T> {
         groupStatusUpdater.updateStatus(centre);
     }
 
-    public void addMember(T member) {
-        groupStatusUpdater.updateStatus(member);
+    public Group.ProtoMemberStatus attemptAddMember(T candidate) {
+        return groupStatusUpdater.attemptUpdateStatus(candidate, this);
     }
 
     public T getCentre() {

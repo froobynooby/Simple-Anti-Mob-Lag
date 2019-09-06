@@ -1,13 +1,18 @@
 #Don't change this!
 version: 1
 
-#This will be broadcast to players with the permission 'saml.notify' if enabled in config when we begin freezing mobs.
-#Use '%TPS' to display the current TPS.
-starting-freezing-operation: '&cTPS low (%TPS). Will attempt to freeze some mobs...'
+tps-freeze-start-console: '&cTPS low (%tps%). Will attempt to freeze some mobs...'
 
-#This will be broadcast to players with the permission 'saml.notify' if enabled in config when we finish freezing mobs.
-#Use '%TIME' to display the amount of time the operation took.
-#Use '%NUMBER_FROZEN' to display the number of mobs frozen in this operation.
-#Use '%TOTAL_FROZEN' to display the total number of frozen mobs currently loaded.
-#Use '%TOTAL_MOBS' to display the total number of mobs currently loaded (frozen or not).
-freezing-operation-complete: '&c%NUMBER_FROZEN mobs have been frozen in %TIMEms (%TOTAL_FROZEN/%TOTAL_MOBS now frozen).'
+tps-freeze-complete-console: '&c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
+
+tps-freeze-start-ops: '&cTPS low (%tps%). Will attempt to freeze some mobs...'
+
+tps-freeze-complete-ops: '&c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
+
+passive-freeze-start-console: '&cStarting passive freeze...'
+
+passive-freeze-complete-console: '&c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
+
+passive-freeze-start-ops: '&cStarting passive freeze...'
+
+passive-freeze-complete-ops: '%c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'

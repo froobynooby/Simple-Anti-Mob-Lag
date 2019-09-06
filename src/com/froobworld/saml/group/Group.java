@@ -2,7 +2,7 @@ package com.froobworld.saml.group;
 
 public interface Group<T> {
     public String getName();
-    public ProtoMemberStatus inProtoGroup(T entity, ProtoGroup<? extends T> protoGroup);
+    public GroupMetadata getGroupMetadata();
     public MembershipEligibility getMembershipEligibility(T candidate);
     public GroupStatusUpdater<T> groupStatusUpdater();
 

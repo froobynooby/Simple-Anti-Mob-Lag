@@ -2,6 +2,7 @@ package com.froobworld.saml.group.entity.groups;
 
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.config.ConfigKeys;
+import com.froobworld.saml.group.GroupMetadata;
 import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
@@ -13,6 +14,12 @@ import org.bukkit.entity.LivingEntity;
 import java.util.Map;
 
 public class DefaultGroup implements EntityGroup {
+    private static final GroupMetadata METADATA = new GroupMetadata.Builder()
+            .setVolatile(false)
+            .setRestrictsMembers(true)
+            .setRestrictsGroupStatus(true)
+            .build();
+
     private double minimumSize;
     private double scaledMinimumSize;
     private double minimumScaledMinimumSize;
@@ -28,10 +35,10 @@ public class DefaultGroup implements EntityGroup {
         scaledMinimumSize = minimumSize;
         minimumScaledMinimumSize = saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_MINIMUM_SCALED_SIZE);
         separationDistance = saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_MAXIMUM_RADIUS);
-        scaleToTps = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_SMART_SCALING);
+        scaleToTps = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_GROUP_USE_SMART_SCALING);
         scaledSeparationDistanceSquared = Math.pow(separationDistance, 2.0);
         maximumScaledSeparationDistance = saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_MAXIMUM_SCALED_RADIUS);
-        minimumScaleTpsRatio = saml.getSamlConfig().getDouble(ConfigKeys.CNF_MINIMUM_SCALE_TPS_RATIO);
+        minimumScaleTpsRatio = saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_MINIMUM_SCALE_TPS_RATIO);
         sameType = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_GROUP_REQUIRE_SAME_TYPE);
     }
 
@@ -41,8 +48,8 @@ public class DefaultGroup implements EntityGroup {
     }
 
     @Override
-    public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-        return (!sameType || entity.getType() == protoGroup.getCentre().getType()) && entity.getLocation().distanceSquared(protoGroup.getCentre().getLocation()) <= scaledSeparationDistanceSquared ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
+    public GroupMetadata getGroupMetadata() {
+        return METADATA;
     }
 
     @Override
@@ -57,9 +64,14 @@ public class DefaultGroup implements EntityGroup {
             private boolean group;
 
             @Override
+            public ProtoMemberStatus getProtoMemberStatus(SnapshotEntity candidate, ProtoGroup<? extends SnapshotEntity> protoGroup) {
+                return (!sameType || candidate.getType() == protoGroup.getCentre().getType()) && candidate.getLocation().distanceSquared(protoGroup.getCentre().getLocation()) <= scaledSeparationDistanceSquared ? ProtoMemberStatus.MEMBER : ProtoMemberStatus.NON_MEMBER;
+            }
+
+            @Override
             public void updateStatus(SnapshotEntity member) {
                 count++;
-                if(count >= scaledMinimumSize) {
+                if (count >= scaledMinimumSize) {
                     group = true;
                 }
             }

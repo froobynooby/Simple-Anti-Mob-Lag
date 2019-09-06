@@ -2,14 +2,14 @@ package com.froobworld.saml.listeners;
 
 import com.froobworld.saml.Saml;
 import com.froobworld.saml.config.ConfigKeys;
+import com.froobworld.saml.data.FreezeReason;
+import com.froobworld.saml.data.UnfreezeReason;
 import com.froobworld.saml.events.*;
-import com.froobworld.saml.group.entity.EntityGroupOperations;
-import com.froobworld.saml.group.entity.groups.DefaultGroup;
-import com.froobworld.saml.group.entity.groups.SingularGroup;
-import com.froobworld.saml.group.entity.groups.helpers.SpecificCentreTypeGroup;
 import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.EntityFreezer;
+import com.froobworld.saml.utils.EntityNerfer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -46,42 +46,42 @@ public class SamlListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onSamlPreMobFreeze(SamlPreMobFreezeEvent event) {
-        if(event.getReason() == SamlMobFreezeEvent.FreezeReason.MAIN_TASK) {
-            for(World world : Bukkit.getWorlds()) {
-                if(!saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_WORLD).contains(world.getName())) {
-                    event.getFreezeParametersBuilder().addWorld(world);
-                }
+        event.getFreezeParametersBuilder().setDoAsync(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ASYNC_GROUPING));
+        event.getFreezeParametersBuilder().setMaximumOperationTime(saml.getSamlConfig().getLong(ConfigKeys.CNF_MAXIMUM_OPERATION_TIME));
+
+        if(event.getReason() == FreezeReason.TPS) {
+            for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_FREEZE_GROUPS)) {
+                event.getFreezeParametersBuilder().includeFreezeGroup(saml.getGroupStore().getGroup(group, false));
             }
-            event.getFreezeParametersBuilder().broadcastToConsole(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_BROADCAST_TO_CONSOLE));
-            event.getFreezeParametersBuilder().broadcastToOps(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_BROADCAST_TO_OPS));
-            event.getFreezeParametersBuilder().setDoAsync(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ASYNC_GROUPING));
-            event.getFreezeParametersBuilder().setMinimumFreezeTime(saml.getConfig().getLong(ConfigKeys.CNF_MINIMUM_FREEZE_TIME));
-            event.getFreezeParametersBuilder().setMaximumOperationTime(saml.getConfig().getLong(ConfigKeys.CNF_MAXIMUM_OPERATION_TIME));
-            boolean customFreezeGroups = false;
-            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
-                customFreezeGroups = saml.getAdvancedConfig().getBoolean(ConfigKeys.ADV_USE_CUSTOM_GROUPS);
+            for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_FREEZE_EXCLUDE_GROUPS)) {
+                event.getFreezeParametersBuilder().excludeFreezeGroup(saml.getGroupStore().getGroup(group, false));
             }
-            if (saml.getSamlConfig().getBoolean(ConfigKeys.CNF_GROUP_BIAS) && event.getCurrentFreezeParameters().getCurrentTps() > saml.getSamlConfig().getDouble(ConfigKeys.CNF_GROUP_BIAS_TPS_THRESHOLD)) {
-                if(customFreezeGroups) {
-                    for(String group : saml.getAdvancedConfig().getStringList(ConfigKeys.ADV_FREEZE_GROUPS)) {
-                        event.getFreezeParametersBuilder().includeGroup(saml.getGroupStore().getGroup(group, false));
-                    }
-                    for(String group : saml.getAdvancedConfig().getStringList(ConfigKeys.ADV_EXCLUDE_GROUPS)) {
-                        event.getFreezeParametersBuilder().excludeGroup(saml.getGroupStore().getGroup(group, false));
-                    }
-                } else {
-                    event.getFreezeParametersBuilder().includeGroup(new DefaultGroup(saml));
-                }
-                List<String> alwaysFreezeList = saml.getSamlConfig().getStringList(ConfigKeys.CNF_ALWAYS_FREEZE);
-                for(EntityType entityType : EntityType.values()) {
-                    if(alwaysFreezeList.contains(entityType.name())) {
-                        SpecificCentreTypeGroup centreTypeGroup = new SpecificCentreTypeGroup(Collections.singleton(entityType));
-                        SingularGroup singularGroup = new SingularGroup();
-                        event.getFreezeParametersBuilder().includeGroup(EntityGroupOperations.conjunction("default_always_freeze", centreTypeGroup, singularGroup));
-                    }
-                }
-            } else {
-                event.getFreezeParametersBuilder().includeGroup(new SingularGroup());
+            for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_NERF_GROUPS)) {
+                event.getFreezeParametersBuilder().includeNerfGroup(saml.getGroupStore().getGroup(group, false));
+            }
+            for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_NERF_EXCLUDE_GROUPS)) {
+                event.getFreezeParametersBuilder().excludeNerfGroup(saml.getGroupStore().getGroup(group, false));
+            }
+            event.getFreezeParametersBuilder().setDoCleanup(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_TPS_DO_CLEANUP));
+        }
+        if(event.getReason() == FreezeReason.PASSIVE) {
+            for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_FREEZE_GROUPS)) {
+                event.getFreezeParametersBuilder().includeFreezeGroup(saml.getGroupStore().getGroup(group, false));
+            }
+            for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_FREEZE_EXCLUDE_GROUPS)) {
+                event.getFreezeParametersBuilder().excludeFreezeGroup(saml.getGroupStore().getGroup(group, false));
+            }
+            for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_NERF_GROUPS)) {
+                event.getFreezeParametersBuilder().includeNerfGroup(saml.getGroupStore().getGroup(group, false));
+            }
+            for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_NERF_EXCLUDE_GROUPS)) {
+                event.getFreezeParametersBuilder().excludeNerfGroup(saml.getGroupStore().getGroup(group, false));
+            }
+            event.getFreezeParametersBuilder().setDoCleanup(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PASSIVE_DO_CLEANUP));
+        }
+        for(World world : Bukkit.getWorlds()) {
+            if(!saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_WORLD).contains(world.getName())) {
+                event.getFreezeParametersBuilder().addWorld(world);
             }
         }
 
@@ -89,7 +89,7 @@ public class SamlListener implements Listener {
         boolean ignoreNamed = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_IGNORE_NAMED);
         boolean ignoreLeashed = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_IGNORE_LEASHED);
         boolean ignoreLoveMode = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_IGNORE_LOVE_MODE);
-        Set<String> neverFreeze = new HashSet<String>(saml.getSamlConfig().getStringList(ConfigKeys.CNF_NEVER_FREEZE));
+        Set<String> neverFreeze = new HashSet<>(saml.getSamlConfig().getStringList(ConfigKeys.CNF_NEVER_FREEZE));
         double ignorePlayerProximityDistanceSquared = Math.pow(saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_PLAYER_PROXIMITY), 2);
         double ignoreYoungerThanTicks = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_YOUNGER_THAN_TICKS);
         boolean ignoreTargetPlayer = saml.getConfig().getBoolean(ConfigKeys.CNF_IGNORE_TARGET_PLAYER);
@@ -103,13 +103,13 @@ public class SamlListener implements Listener {
         double ignoreYoungerThanTicksTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_YOUNGER_THAN_TICKS_TPS_THRESHOLD);
         double ignoreTargetPlayerTpsThreshold = saml.getSamlConfig().getDouble(ConfigKeys.CNF_IGNORE_TARGET_PLAYER_TPS_THRESHOLD);
 
-        HashMap<EntityType, Boolean> typedIgnoreTamed = new HashMap<EntityType, Boolean>();
-        HashMap<EntityType, Boolean> typedIgnoreNamed = new HashMap<EntityType, Boolean>();
-        HashMap<EntityType, Boolean> typedIgnoreLeashed = new HashMap<EntityType, Boolean>();
-        HashMap<EntityType, Boolean> typedIgnoreLoveMode = new HashMap<EntityType, Boolean>();
-        HashMap<EntityType, Double> typedIgnorePlayerProximityDistanceSquared = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Double> typedIgnoreYoungerThanTicks = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Boolean> typedIgnoreTargetPlayer = new HashMap<EntityType, Boolean>();
+        HashMap<EntityType, Boolean> typedIgnoreTamed = new HashMap<>();
+        HashMap<EntityType, Boolean> typedIgnoreNamed = new HashMap<>();
+        HashMap<EntityType, Boolean> typedIgnoreLeashed = new HashMap<>();
+        HashMap<EntityType, Boolean> typedIgnoreLoveMode = new HashMap<>();
+        HashMap<EntityType, Double> typedIgnorePlayerProximityDistanceSquared = new HashMap<>();
+        HashMap<EntityType, Double> typedIgnoreYoungerThanTicks = new HashMap<>();
+        HashMap<EntityType, Boolean> typedIgnoreTargetPlayer = new HashMap<>();
         if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
             for(EntityType entityType : EntityType.values()) {
                 if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_TAMED + "." + entityType.name())) {
@@ -136,14 +136,14 @@ public class SamlListener implements Listener {
             }
         }
 
-        HashMap<EntityType, Double> typedIgnoreTamedTpsThreshold = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Double> typedIgnoreNamedTpsThreshold = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Double> typedIgnoreLeashedTpsThreshold = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Double> typedIgnoreLoveModeTpsThreshold = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Double> typedNeverFreezeTpsThreshold = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Double> typedIgnorePlayerProximityTpsThreshold = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Double> typedIgnoreYoungerThanTicksTpsThreshold = new HashMap<EntityType, Double>();
-        HashMap<EntityType, Double> typedIgnoreTargetPlayerTpsThreshold = new HashMap<EntityType, Double>();
+        HashMap<EntityType, Double> typedIgnoreTamedTpsThreshold = new HashMap<>();
+        HashMap<EntityType, Double> typedIgnoreNamedTpsThreshold = new HashMap<>();
+        HashMap<EntityType, Double> typedIgnoreLeashedTpsThreshold = new HashMap<>();
+        HashMap<EntityType, Double> typedIgnoreLoveModeTpsThreshold = new HashMap<>();
+        HashMap<EntityType, Double> typedNeverFreezeTpsThreshold = new HashMap<>();
+        HashMap<EntityType, Double> typedIgnorePlayerProximityTpsThreshold = new HashMap<>();
+        HashMap<EntityType, Double> typedIgnoreYoungerThanTicksTpsThreshold = new HashMap<>();
+        HashMap<EntityType, Double> typedIgnoreTargetPlayerTpsThreshold = new HashMap<>();
         if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
             for(EntityType entityType : EntityType.values()) {
                 if(saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_IGNORE_TAMED_TPS_THRESHOLD + "." + entityType.name())) {
@@ -185,11 +185,124 @@ public class SamlListener implements Listener {
         event.getFreezeParametersBuilder().addIgnorePredicate( e -> (currentTps >= typedIgnoreTargetPlayerTpsThreshold.getOrDefault(e.getType(), ignoreTargetPlayerTpsThreshold) && typedIgnoreTargetPlayer.getOrDefault(e.getType(), ignoreTargetPlayer) &&  CompatibilityUtils.MOB_TARGET && e instanceof Mob && ((Mob) e).getTarget() instanceof Player) );
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSamlPreMobFreezeMonitor(SamlPreMobFreezeEvent event) {
+        if(event.getReason() == FreezeReason.TPS) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_TPS_FREEZE_BROADCAST_TO_OPS)) {
+                String message = saml.getSamlMessages().getString(ConfigKeys.MSG_TPS_FREEZE_START_OPS)
+                        .replace("%tps%", event.getCurrentFreezeParameters().getCurrentTps() + "");
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                Bukkit.broadcast(message, "saml.notify");
+            }
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_TPS_FREEZE_BROADCAST_TO_CONSOLE)) {
+                String message = saml.getSamlMessages().getString(ConfigKeys.MSG_TPS_FREEZE_START_CONSOLE)
+                        .replace("%tps%", event.getCurrentFreezeParameters().getCurrentTps() + "");
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                Saml.logger().info(message);
+            }
+        }
+        if(event.getReason() == FreezeReason.PASSIVE) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PASSIVE_FREEZE_BROADCAST_TO_OPS)) {
+                String message = saml.getSamlMessages().getString(ConfigKeys.MSG_PASSIVE_FREEZE_START_OPS);
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                Bukkit.broadcast(message, "saml.notify");
+            }
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PASSIVE_FREEZE_BROADCAST_TO_CONSOLE)) {
+                String message = saml.getSamlMessages().getString(ConfigKeys.MSG_PASSIVE_FREEZE_START_CONSOLE);
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                Saml.logger().info(message);
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSamlMobFreeze(SamlMobFreezeEvent event) {
+        int total = 0;
+        int totalAffected = 0;
+        int totalFrozen = 0;
+        int totalNerfed = 0;
+
+        if(event.getReason() == FreezeReason.TPS || event.getReason() == FreezeReason.PASSIVE) {
+            for (World world : Bukkit.getWorlds()) {
+                for (LivingEntity entity : world.getLivingEntities()) {
+                    total++;
+                    boolean affected = false;
+                    if (EntityFreezer.isFrozen(entity)) {
+                        totalFrozen++;
+                        affected = true;
+                    }
+                    if (EntityNerfer.isNerfed(entity)) {
+                        totalNerfed++;
+                        affected = true;
+                    }
+                    if (affected) {
+                        totalAffected++;
+                    }
+                }
+            }
+        }
+
+        if(event.getReason() == FreezeReason.TPS) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_TPS_FREEZE_BROADCAST_TO_OPS)) {
+                String message = saml.getSamlMessages().getString(ConfigKeys.MSG_TPS_FREEZE_COMPLETE_OPS)
+                        .replace("%time%", event.getTimeTaken() + "")
+                        .replace("%number_affected%", event.getMobsAffected().size() + "")
+                        .replace("%number_frozen%", event.getMobsFrozen().size() + "")
+                        .replace("%number_nerfed%", event.getMobsNerfed().size() + "")
+                        .replace("%total_number_mobs%", total + "")
+                        .replace("%total_number_affected%", totalAffected + "")
+                        .replace("%total_number_frozen%", totalFrozen + "")
+                        .replace("%total_number_nerfed%", totalNerfed + "");
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                Bukkit.broadcast(message, "saml.notify");
+            }
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_TPS_FREEZE_BROADCAST_TO_CONSOLE)) {
+                String message = saml.getSamlMessages().getString(ConfigKeys.MSG_TPS_FREEZE_COMPLETE_CONSOLE)
+                        .replace("%time%", event.getTimeTaken() + "")
+                        .replace("%number_affected%", event.getMobsAffected().size() + "")
+                        .replace("%number_frozen%", event.getMobsFrozen().size() + "")
+                        .replace("%number_nerfed%", event.getMobsNerfed().size() + "")
+                        .replace("%total_number_mobs%", total + "")
+                        .replace("%total_number_affected%", totalAffected + "")
+                        .replace("%total_number_frozen%", totalFrozen + "")
+                        .replace("%total_number_nerfed%", totalNerfed + "");
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                Saml.logger().info(message);
+            }
+        }
+        if(event.getReason() == FreezeReason.PASSIVE) {
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PASSIVE_FREEZE_BROADCAST_TO_OPS)) {
+                String message = saml.getSamlMessages().getString(ConfigKeys.MSG_PASSIVE_FREEZE_COMPLETE_OPS)
+                        .replace("%time%", event.getTimeTaken() + "")
+                        .replace("%number_affected%", event.getMobsAffected().size() + "")
+                        .replace("%number_frozen%", event.getMobsFrozen().size() + "")
+                        .replace("%number_nerfed%", event.getMobsNerfed().size() + "")
+                        .replace("%total_number_mobs%", total + "")
+                        .replace("%total_number_affected%", totalAffected + "")
+                        .replace("%total_number_frozen%", totalFrozen + "")
+                        .replace("%total_number_nerfed%", totalNerfed + "");
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                Bukkit.broadcast(message, "saml.notify");
+            }
+            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PASSIVE_FREEZE_BROADCAST_TO_CONSOLE)) {
+                String message = saml.getSamlMessages().getString(ConfigKeys.MSG_PASSIVE_FREEZE_COMPLETE_CONSOLE)
+                        .replace("%time%", event.getTimeTaken() + "")
+                        .replace("%number_affected%", event.getMobsAffected().size() + "")
+                        .replace("%number_frozen%", event.getMobsFrozen().size() + "")
+                        .replace("%number_nerfed%", event.getMobsNerfed().size() + "")
+                        .replace("%total_number_mobs%", total + "")
+                        .replace("%total_number_affected%", totalAffected + "")
+                        .replace("%total_number_frozen%", totalFrozen + "")
+                        .replace("%total_number_nerfed%", totalNerfed + "");
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                Saml.logger().info(message);
+            }
+        }
+
+
         if(CompatibilityUtils.MOB_TARGET) {
             boolean preventTargetingFrozen = saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PREVENT_TARGETING_FROZEN);
-            HashMap<EntityType, Boolean> typedPreventTargetingFrozen = new HashMap<EntityType, Boolean>();
+            HashMap<EntityType, Boolean> typedPreventTargetingFrozen = new HashMap<>();
             if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_ADVANCED_CONFIG)) {
                 for (EntityType entityType : EntityType.values()) {
                     if (saml.getAdvancedConfig().keyExists(ConfigKeys.ADV_PREVENT_TARGETING_FROZEN + "." + entityType.name())) {
@@ -211,16 +324,18 @@ public class SamlListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onSamlPreMobUnfreeze(SamlPreMobUnfreezeEvent event) {
-        if(event.getReason() == SamlMobUnfreezeEvent.UnfreezeReason.MAIN_TASK) {
+        if(event.getReason() == UnfreezeReason.TPS) {
             for(World world : Bukkit.getWorlds()) {
                 if(!saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_WORLD).contains(world.getName())) {
                     event.getUnfreezeParametersBuilder().addWorld(world);
                 }
             }
-            event.getUnfreezeParametersBuilder().setUnfreezeLimit(saml.getSamlConfig().getLong(ConfigKeys.CNF_UNFREEZE_LIMIT));
-            if(saml.getSamlConfig().getDouble(ConfigKeys.CNF_MINIMUM_FREEZE_TIME) <= 0) {
+            event.getUnfreezeParametersBuilder().setUnfreezeLimit(saml.getSamlConfig().getLong(ConfigKeys.CNF_TPS_UNFREEZE_LIMIT));
+            if(saml.getSamlConfig().getDouble(ConfigKeys.CNF_TPS_MINIMUM_FREEZE_TIME) <= 0) {
                 event.getUnfreezeParametersBuilder().ignoreRemainingTime(true);
             }
+            event.getUnfreezeParametersBuilder().includeFreezeReason(FreezeReason.TPS);
+            event.getUnfreezeParametersBuilder().includeFreezeReason(FreezeReason.DEFAULT);
         }
 
         event.getUnfreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(e::hasMetadata)) );

@@ -1,8 +1,12 @@
-package com.froobworld.saml.group.entity;
+package com.froobworld.saml.group.entity.custom;
 
-import com.froobworld.saml.group.GroupOperations;
+import com.froobworld.saml.group.GroupMetadata;
 import com.froobworld.saml.group.GroupStatusUpdater;
-import com.froobworld.saml.group.ProtoGroup;
+import com.froobworld.saml.group.entity.EntityGroup;
+import com.froobworld.saml.group.entity.EntityGroupOperations;
+import com.froobworld.saml.group.entity.EntityGroupStore;
+import com.froobworld.saml.group.entity.SnapshotEntity;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.bukkit.entity.LivingEntity;
 
@@ -16,7 +20,7 @@ public class CustomGroupParser {
 
     public CustomGroupParser(EntityGroupStore entityGroupStore) {
         this.entityGroupStore = entityGroupStore;
-        groupOperations = new HashMap<Character, BiFunction<EntityGroup, EntityGroup, EntityGroup>>();
+        groupOperations = new HashMap<>();
         addGroupOperations();
     }
 
@@ -26,7 +30,8 @@ public class CustomGroupParser {
             if(!key.contains(".")) {
                 String replacement;
                 if(jsonPart.has(key)) {
-                    replacement = jsonPart.get(key).getAsString();
+                    JsonElement argumentValue = jsonPart.get(key);
+                    replacement = argumentValue.isJsonArray() ? argumentValue.toString() : argumentValue.getAsString();
                 } else {
                     if(arguments.containsKey(key + ".required") && arguments.get(key + ".required").equals(true)) {
                         throw new IllegalArgumentException("The argument '" + key + "' is required for custom group '" + resultName + "'");
@@ -165,8 +170,8 @@ public class CustomGroupParser {
                 }
 
                 @Override
-                public ProtoMemberStatus inProtoGroup(SnapshotEntity entity, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-                    return tail.inProtoGroup(entity, protoGroup);
+                public GroupMetadata getGroupMetadata() {
+                    return tail.getGroupMetadata();
                 }
 
                 @Override

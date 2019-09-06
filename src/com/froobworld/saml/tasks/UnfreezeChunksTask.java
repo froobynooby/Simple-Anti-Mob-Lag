@@ -29,9 +29,9 @@ public class UnfreezeChunksTask implements Runnable {
         if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_USE_PAPER_GET_CHUNK_ASYNC)) {
             if(CompatibilityUtils.USE_PAPER_GET_CHUNK_ASYNC) {
                 paper = true;
-                List<FrozenChunkCache> cacheCopy = new ArrayList<FrozenChunkCache>(frozenChunkCaches);
+                List<FrozenChunkCache> cacheCopy = new ArrayList<>(frozenChunkCaches);
                 for(FrozenChunkCache frozenChunkCache : cacheCopy) {
-                    List<ChunkCoordinates> coordsCopy = new ArrayList<ChunkCoordinates>(frozenChunkCache.getFrozenChunkCoordinates());
+                    List<ChunkCoordinates> coordsCopy = new ArrayList<>(frozenChunkCache.getFrozenChunkCoordinates());
                     coordsCopy.forEach(c -> c.getWorld().getChunkAtAsync(
                             c.getX(), c.getZ(), false, new UnfreezeChunkConsumer(saml, frozenChunkCache)
                     ));

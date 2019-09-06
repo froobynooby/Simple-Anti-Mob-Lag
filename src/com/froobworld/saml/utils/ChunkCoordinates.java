@@ -37,7 +37,7 @@ public class ChunkCoordinates {
 
     @Override
     public String toString() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         return worldUUID.toString() + ";" + x + ";" + z;
     }

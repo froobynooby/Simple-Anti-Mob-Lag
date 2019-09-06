@@ -1,6 +1,7 @@
 package com.froobworld.saml.group.entity;
 
 import com.froobworld.saml.Saml;
+import com.froobworld.saml.group.entity.custom.CustomGroupParser;
 import com.froobworld.saml.group.entity.groups.DefaultGroup;
 import com.froobworld.saml.group.entity.groups.SingularGroup;
 import com.froobworld.saml.group.entity.groups.helpers.*;
@@ -18,8 +19,8 @@ public class EntityGroupStore {
 
     public EntityGroupStore(Saml saml) {
         this.saml = saml;
-        parsers = new HashMap<String, EntityGroupParser>();
-        helperParsers = new HashMap<String, EntityGroupParser>();
+        parsers = new HashMap<>();
+        helperParsers = new HashMap<>();
         customGroupParser = new CustomGroupParser(this);
         addHelpers(saml);
         addDefaults(saml);
@@ -31,9 +32,14 @@ public class EntityGroupStore {
 
         String groupPart = split[0].toLowerCase();
         JsonObject jsonPart = new JsonParser().parse("{" + (split.length == 1 ? "}" : split[1])).getAsJsonObject();
+        boolean negate = false;
         boolean conditionalise = false;
-        if(groupPart.endsWith("*")) {
-            groupPart = groupPart.substring(0, groupPart.length() - 1);
+        if(groupPart.startsWith("!")) {
+            groupPart = groupPart.substring(1, groupPart.length());
+            negate = true;
+        }
+        if(groupPart.startsWith("*")) {
+            groupPart = groupPart.substring(1, groupPart.length());
             conditionalise = true;
         }
 
@@ -54,8 +60,14 @@ public class EntityGroupStore {
         }
         if(isNameAcceptable(groupPart) && includeHelpers && saml.getCustomGroups() != null && saml.getCustomGroups().keyExists("helper." + groupPart)) {
             EntityGroup entityGroup = customGroupParser.parse(groupPart, saml.getCustomGroups().getString("helper." + groupPart + ".definition"), jsonPart, saml.getCustomGroups().getSection("helper." + groupPart + ".arguments"));
+            if(negate) {
+                entityGroup = EntityGroup.negate(entityGroup);
+            }
+            if(conditionalise) {
+                entityGroup = EntityGroup.conditionalise(entityGroup);
+            }
 
-            return conditionalise ? EntityGroup.conditionalise(entityGroup) : entityGroup;
+            return entityGroup;
         }
 
         return null;

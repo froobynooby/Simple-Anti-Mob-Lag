@@ -15,8 +15,9 @@ import java.util.Map;
 
 public class SamlConfiguration {
     public static final int CONFIG_CURRENT_VERSION = 8;
-    public static final int ADVANCED_CONFIG_CURRENT_VERSION = 3;
+    public static final int ADVANCED_CONFIG_CURRENT_VERSION = 2;
     public static final int CUSTOM_GROUPS_CURRENT_VERSION = 1;
+    public static final int NERFER_GOALS_CURRENT_VERSION = 1;
     public static final int MESSAGES_CURRENT_VERSION = 1;
 
     private Saml saml;
@@ -64,7 +65,7 @@ public class SamlConfiguration {
             if (version < currentVersion) {
                 Saml.logger().info("Your " + fileName + " is out of date. Will attempt to perform upgrades...");
                 for (int i = version; i < currentVersion; i++) {
-                    if (ConfigUpdater.update(configFile, saml.getResource("resources/" + fileNameDashed + "-updates/" + i), i)) {
+                    if (ConfigUpdater.update(configFile, saml.getResource("resources/" + fileNameDashed + "-updates/" + i), i, configFile.getParent() + File.separator + fileNameDashed + "-backups")) {
                         Saml.logger().info("Applied changes for " + fileName + " version " + i + " to " + (i + 1) + ".");
                     } else {
                         Saml.logger().warning("Failed to apply changes for " + fileName + " version " + i + " to " + (i + 1) + ".");

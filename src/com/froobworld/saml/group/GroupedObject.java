@@ -8,7 +8,7 @@ public class GroupedObject<T> {
     private Set<Group<? super T>> groups;
 
     public GroupedObject(T object) {
-        this(object, new HashSet<Group<? super T>>());
+        this(object, new HashSet<>());
     }
 
     public GroupedObject(T object, Set<Group<? super T>> groups) {

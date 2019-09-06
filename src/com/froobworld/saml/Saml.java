@@ -21,12 +21,14 @@ public class Saml extends JavaPlugin {
     private SamlConfiguration config;
     private SamlConfiguration advancedConfig;
     private SamlConfiguration customGroups;
+    private SamlConfiguration nerferGoals;
     private SamlConfiguration messages;
     private TpsSupplier tpsSupplier;
     private EntityGroupStore groupStore;
     private FrozenChunkCache frozenChunkCache;
 
     private UnfreezeOnShutdownTask unfreezeOnShutdownTask;
+    private UnnerfOnShutdownTask unnerfOnShutdownTask;
     private HandleCacheOnShutdownTask handleCacheOnShutdownTask;
 
     @Override
@@ -42,6 +44,8 @@ public class Saml extends JavaPlugin {
         }
         customGroups = new SamlConfiguration(this, SamlConfiguration.CUSTOM_GROUPS_CURRENT_VERSION, "custom_groups.yml");
         customGroups.loadFromFile();
+        nerferGoals = new SamlConfiguration(this, SamlConfiguration.NERFER_GOALS_CURRENT_VERSION, "nerfer_goals.yml");
+        nerferGoals.loadFromFile();
         messages = new SamlConfiguration(this, SamlConfiguration.MESSAGES_CURRENT_VERSION, "messages.yml");
         messages.loadFromFile();
         tpsSupplier = new TpsSupplier(this);
@@ -58,10 +62,12 @@ public class Saml extends JavaPlugin {
 
     private void addTasks() {
         new CheckCacheStartupTask(this);
-        new MainLoopTask(this);
+        new TpsFreezeTask(this);
+        new PassiveFreezeTask(this);
         new CacheSavingTask(this);
 
         this.unfreezeOnShutdownTask = new UnfreezeOnShutdownTask(this);
+        this.unnerfOnShutdownTask = new UnnerfOnShutdownTask(this);
         this.handleCacheOnShutdownTask = new HandleCacheOnShutdownTask(this);
     }
 
@@ -89,6 +95,10 @@ public class Saml extends JavaPlugin {
         return customGroups;
     }
 
+    public SamlConfiguration getNerferGoals() {
+        return nerferGoals;
+    }
+
     public SamlConfiguration getSamlMessages() {
         return messages;
     }
@@ -102,6 +112,8 @@ public class Saml extends JavaPlugin {
         if(advancedConfig.isLoaded()) {
             advancedConfig.loadFromFile();
         }
+        customGroups.loadFromFile();
+        nerferGoals.loadFromFile();
         messages.loadFromFile();
         Bukkit.getPluginManager().callEvent(new SamlConfigReloadEvent(config, advancedConfig, messages));
     }
@@ -128,6 +140,7 @@ public class Saml extends JavaPlugin {
     @Override
     public void onDisable() {
         unfreezeOnShutdownTask.run();
+        unnerfOnShutdownTask.run();
         handleCacheOnShutdownTask.run();
         logger().info("Successfully disabled.");
     }
