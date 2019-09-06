@@ -59,7 +59,7 @@ public class SamlConfiguration {
         if(config.contains(ConfigKeys.VERSION)) {
             int version = config.getInt(ConfigKeys.VERSION);
             if (version > currentVersion) {
-                Saml.logger().warning("Your're using a " + fileName + " for a higher version. This may lead to some issues.");
+                Saml.logger().warning("You're using a " + fileName + " for a higher version. This may lead to some issues.");
                 Saml.logger().info("You may wish to regenerate this file by deleting it and reloading.");
             }
             if (version < currentVersion) {
