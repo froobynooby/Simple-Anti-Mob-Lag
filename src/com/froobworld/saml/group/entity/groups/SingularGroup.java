@@ -6,10 +6,14 @@ import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
 import com.froobworld.saml.group.entity.EntityGroupParser;
 import com.froobworld.saml.group.entity.SnapshotEntity;
+import com.froobworld.saml.utils.SetUtils;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.bukkit.entity.LivingEntity;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class SingularGroup implements EntityGroup {
     private static final GroupMetadata METADATA = new GroupMetadata.Builder()
@@ -17,6 +21,12 @@ public class SingularGroup implements EntityGroup {
             .setRestrictsMembers(true)
             .setRestrictsGroupStatus(false)
             .build();
+
+    private Set<String> acceptedTypes;
+
+    private SingularGroup(Set<String> acceptedTypes) {
+        this.acceptedTypes = acceptedTypes;
+    }
 
     @Override
     public String getName() {
@@ -30,7 +40,7 @@ public class SingularGroup implements EntityGroup {
 
     @Override
     public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
-        return MembershipEligibility.CENTRE;
+        return (acceptedTypes == null || !SetUtils.disjoint(acceptedTypes, candidate.getTypeIdentifiers())) ? MembershipEligibility.CENTRE : MembershipEligibility.NONE;
     }
 
     @Override
@@ -61,7 +71,14 @@ public class SingularGroup implements EntityGroup {
         return new EntityGroupParser<SingularGroup>() {
             @Override
             public SingularGroup fromJson(JsonObject jsonObject) {
-                return new SingularGroup();
+                Set<String> acceptedTypes = null;
+                if(jsonObject.has("acceptedTypes")) {
+                    acceptedTypes = new HashSet<>();
+                    for (JsonElement jsonElement : jsonObject.get("acceptedTypes").getAsJsonArray()) {
+                        acceptedTypes.add(jsonElement.getAsString());
+                    }
+                }
+                return new SingularGroup(acceptedTypes);
             }
         };
     }
