@@ -33,7 +33,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof LivingEntity) {
-            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getRightClicked()) : EntityFreezer.isFrozen((LivingEntity) event.getRightClicked()) || EntityNerfer.isNerfed((LivingEntity) event.getRightClicked())) {
+            if((saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getRightClicked()) : EntityFreezer.isFrozen((LivingEntity) event.getRightClicked())) || EntityNerfer.isNerfed((LivingEntity) event.getRightClicked())) {
                 if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(event.getRightClicked()::hasMetadata)) {
                     return;
                 }
@@ -65,7 +65,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof LivingEntity) {
-            if(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) ? EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getEntity()) : EntityFreezer.isFrozen((LivingEntity) event.getEntity()) || EntityNerfer.isNerfed((LivingEntity) event.getEntity())) {
+            if(EntityFreezer.isFrozen((LivingEntity) event.getEntity()) || EntityNerfer.isNerfed((LivingEntity) event.getEntity())) {
                 if(saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(event.getEntity()::hasMetadata)) {
                     return;
                 }
@@ -84,7 +84,9 @@ public class EventListener implements Listener {
                 }
 
                 if(unfreezeOnDamage && saml.getTpsSupplier().getTps() > unfreezeOnDamageTpsThreshold) {
-                    EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getEntity());
+                    if(!saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) || EntityFreezer.isSamlFrozen(saml, (LivingEntity) event.getEntity())) {
+                        EntityFreezer.unfreezeEntity(saml, (LivingEntity) event.getEntity());
+                    }
                     EntityNerfer.unnerf(saml, (LivingEntity) event.getEntity());
 
                     SamlMobUnfreezeEvent mobUnfreezeEvent = new SamlMobUnfreezeEvent((LivingEntity) event.getEntity(), UnfreezeReason.DAMAGE);
