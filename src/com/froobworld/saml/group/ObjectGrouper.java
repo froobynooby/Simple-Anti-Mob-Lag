@@ -6,57 +6,76 @@ public class ObjectGrouper {
 
     public static <T> List<GroupedObject<T>> groupObjects(Collection<T> objects, Set<? extends Group<? super T>> groups, long maxOperationTime) {
         long startTime = System.currentTimeMillis();
-        List<ProtoGroupedObject<T>> protoGroupedObjects = new ArrayList<>(objects.size());
+        HashMap<T, List<ProtoGroupedObject<T>>> protoGroupedObjects = new HashMap<>();
 
-        for(T object : objects) {
-            if(maxOperationTime != 0 && System.currentTimeMillis() - startTime >= maxOperationTime) {
-                break;
-            }
-            ProtoGroupedObject<T> nextProtoGroupedObject = new ProtoGroupedObject<>(object);
-            for(Group<? super T> group : groups) {
-                nextProtoGroupedObject.protoGroups.put(group, new ArrayList<>());
+        for(Group<? super T> group : groups) {
+            boolean isVolatile = group.getGroupMetadata().isVolatile();
+            List<ProtoGroupedObject<T>> groupProtoGroupedObjects = new ArrayList<>();
+            for(T object : objects) {
+                if(maxOperationTime != 0 && System.currentTimeMillis() - startTime >= maxOperationTime) {
+                    break;
+                }
+                List<ProtoGroupedObject<T>> protoGroupedObjectsList = protoGroupedObjects.computeIfAbsent(object, k -> new ArrayList<>());
+
                 Group.MembershipEligibility nextMembershipEligibility = group.getMembershipEligibility(object);
-                nextProtoGroupedObject.groupMembershipEligibility.put(group, nextMembershipEligibility);
                 if(nextMembershipEligibility != Group.MembershipEligibility.NONE) {
-                    ProtoGroup<T> nextProtoGroup = null;
+                    ProtoGroupedObject<T> nextProtoGroupedObject = new ProtoGroupedObject<>(object);
+                    nextProtoGroupedObject.group = group;
+                    nextProtoGroupedObject.membershipEligibility = nextMembershipEligibility;
+
                     if(nextMembershipEligibility == Group.MembershipEligibility.CENTRE || nextMembershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER) {
-                        nextProtoGroup = new ProtoGroup<>(group, object);
-                        nextProtoGroupedObject.centres.put(group, nextProtoGroup);
+                        nextProtoGroupedObject.centreGroup = new ProtoGroup<T>(group, object);
                     }
 
-                    for(ProtoGroupedObject<T> otherProtoGroupedObject : protoGroupedObjects) {
-                        Group.MembershipEligibility otherMembershipEligibility = otherProtoGroupedObject.groupMembershipEligibility.get(group);
-                        if(otherMembershipEligibility != Group.MembershipEligibility.NONE) {
-                            ProtoGroup<T> otherProtoGroup = otherProtoGroupedObject.centres.get(group);
+                    for(ProtoGroupedObject<T> otherProtoGroupedObject : groupProtoGroupedObjects) {
+                        ProtoGroup<T> nextCentreGroup = nextProtoGroupedObject.centreGroup;
+                        ProtoGroup<T> otherCentreGroup = otherProtoGroupedObject.centreGroup;
+                        boolean nextIsDefiniteGroup = !isVolatile && nextCentreGroup != null && nextCentreGroup.isGroup();
+                        boolean otherIsDefiniteGroup = !isVolatile && otherCentreGroup != null && otherCentreGroup.isGroup();
+                        if(nextIsDefiniteGroup && otherIsDefiniteGroup) {
+                            continue;
+                        }
 
-                            if (otherProtoGroup != null && (nextMembershipEligibility == Group.MembershipEligibility.MEMBER || nextMembershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
-                                Group.ProtoMemberStatus protoMemberStatus = otherProtoGroup.attemptAddMember(nextProtoGroupedObject.object);
+                        if(!(nextIsDefiniteGroup && otherProtoGroupedObject.quickMemberStatus)) {
+                            if (nextCentreGroup != null && (otherProtoGroupedObject.membershipEligibility == Group.MembershipEligibility.MEMBER || otherProtoGroupedObject.membershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
+                                Group.ProtoMemberStatus protoMemberStatus = nextCentreGroup.attemptAddMember(otherProtoGroupedObject.object);
                                 if (protoMemberStatus == Group.ProtoMemberStatus.MEMBER) {
-                                    nextProtoGroupedObject.protoGroups.get(group).add(otherProtoGroup);
+                                    otherProtoGroupedObject.memberGroups.add(nextCentreGroup);
+                                    if (nextIsDefiniteGroup) {
+                                        otherProtoGroupedObject.quickMemberStatus = true;
+                                    }
                                 }
                             }
-                            if (nextProtoGroup != null && (otherMembershipEligibility == Group.MembershipEligibility.MEMBER || otherMembershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
-                                Group.ProtoMemberStatus protoMemberStatus = nextProtoGroup.attemptAddMember(otherProtoGroupedObject.object);
+                        }
+                        if(!(otherIsDefiniteGroup && nextProtoGroupedObject.quickMemberStatus)) {
+                            if (otherCentreGroup != null && (nextProtoGroupedObject.membershipEligibility == Group.MembershipEligibility.MEMBER || nextProtoGroupedObject.membershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
+                                Group.ProtoMemberStatus protoMemberStatus = otherCentreGroup.attemptAddMember(nextProtoGroupedObject.object);
                                 if (protoMemberStatus == Group.ProtoMemberStatus.MEMBER) {
-                                    otherProtoGroupedObject.protoGroups.get(group).add(nextProtoGroup);
+                                    nextProtoGroupedObject.memberGroups.add(otherCentreGroup);
+                                    if (otherIsDefiniteGroup) {
+                                        nextProtoGroupedObject.quickMemberStatus = true;
+                                    }
                                 }
                             }
                         }
                     }
+
+                    protoGroupedObjectsList.add(nextProtoGroupedObject);
+                    groupProtoGroupedObjects.add(nextProtoGroupedObject);
                 }
+
             }
-            protoGroupedObjects.add(nextProtoGroupedObject);
         }
 
         ArrayList<GroupedObject<T>> groupedObjects = new ArrayList<>(objects.size());
-        for(ProtoGroupedObject<T> protoGroupedObject : protoGroupedObjects) {
-            GroupedObject<T> groupedObject = new GroupedObject<>(protoGroupedObject.object);
-            for(Group<? super T> group : groups) {
-                if(protoGroupedObject.inGroup(group)) {
-                    groupedObject.getGroups().add(group);
+        for(Map.Entry<T, List<ProtoGroupedObject<T>>> entry : protoGroupedObjects.entrySet()) {
+            Set<Group<? super T>> objectGroups = new HashSet<>();
+            for(ProtoGroupedObject<T> protoGroupedObject : entry.getValue()) {
+                if(protoGroupedObject.inGroup()) {
+                    objectGroups.add(protoGroupedObject.group);
                 }
             }
-            groupedObjects.add(groupedObject);
+            groupedObjects.add(new GroupedObject<T>(entry.getKey(), objectGroups));
         }
 
         return groupedObjects;
@@ -68,29 +87,33 @@ public class ObjectGrouper {
 
     private static class ProtoGroupedObject<T> {
         private T object;
-        private HashMap<Group<? super T>, Group.MembershipEligibility> groupMembershipEligibility;
-        private HashMap<Group<? super T>, ProtoGroup<T>> centres;
-        private HashMap<Group<? super T>, List<ProtoGroup<T>>> protoGroups;
+        private Group<? super T> group;
+        private Group.MembershipEligibility membershipEligibility;
+        private ProtoGroup<T> centreGroup;
+        private List<ProtoGroup<T>> memberGroups;
+        private boolean quickMemberStatus;
 
         public ProtoGroupedObject(T object) {
             this.object = object;
-            this.groupMembershipEligibility = new HashMap<>();
-            this.centres = new HashMap<>();
-            this.protoGroups = new HashMap<>();
+            this.memberGroups = new ArrayList<>();
         }
 
 
-        public boolean inGroup(Group group) {
-            if(centres.get(group) != null && centres.get(group).isGroup()) {
+        public boolean inGroup() {
+            if(quickMemberStatus) {
                 return true;
             }
-            for(ProtoGroup protoGroup : protoGroups.getOrDefault(group, Collections.emptyList())) {
+            if(centreGroup != null && centreGroup.isGroup()) {
+                return true;
+            }
+            for(ProtoGroup protoGroup : memberGroups) {
                 if(protoGroup.isGroup()) {
                     return true;
                 }
             }
             return false;
         }
+
     }
 
 }
