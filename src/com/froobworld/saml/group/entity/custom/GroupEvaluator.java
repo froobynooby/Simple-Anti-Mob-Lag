@@ -28,7 +28,7 @@ public class GroupEvaluator {
         int openParens = 0;
         List<Node> parenthicalNodes = new ArrayList<>();
         Associativity nextAssociativity = null;
-        int nextPrecendence = Integer.MIN_VALUE;
+        int nextPrecendence = Integer.MAX_VALUE;
 
         while(iterator.hasNext()) {
             Node nextNode = iterator.next();
@@ -76,39 +76,39 @@ public class GroupEvaluator {
         }
 
         Node replacement = null;
-        List<Integer> affectedIndices = new ArrayList<>();
+        int replacementIndex = 0;
         for(int i = 0; i < workingNodes.size(); i++) {
-            Node node = workingNodes.get(i);
+            int j = nextAssociativity == Associativity.LEFT ? i : (workingNodes.size() - i - 1);
+            Node node = workingNodes.get(j);
             if(node.precedence() == nextPrecendence && node.associativity() == nextAssociativity) {
                 if(node instanceof OperationNode) {
-                    Node left = workingNodes.get(i - 1);
-                    Node right = workingNodes.get(i + 1);
-                    affectedIndices.add(i - 1);
-                    affectedIndices.add(i);
-                    affectedIndices.add(i + 1);
+                    Node left = workingNodes.get(j - 1);
+                    Node right = workingNodes.get(j + 1);
+                    workingNodes.remove(j + 1);
+                    workingNodes.remove(j);
+                    workingNodes.remove(j - 1);
+                    replacementIndex = j - 1;
                     if(left instanceof GroupNode && right instanceof GroupNode) {
                         replacement = new GroupNode(((OperationNode) node).getOperation().apply(((GroupNode) left).entityGroup, ((GroupNode) right).entityGroup));
                     }
                     break;
                 }
                 if(node instanceof ModifierNode) {
-                    Node actsOn = workingNodes.get(node.associativity() == Associativity.LEFT ? (i - 1) : (i + 1));
-                    affectedIndices.add(node.associativity() == Associativity.LEFT ? (i - 1) : (i + 1));
-                    affectedIndices.add(i);
+                    Node actsOn = workingNodes.get(node.associativity() == Associativity.LEFT ? (j - 1) : (j + 1));
+                    replacementIndex = node.associativity() == Associativity.LEFT ? (j - 1) : j;
+                    workingNodes.remove(node.associativity() == Associativity.LEFT ? (j) : (j+1));
+                    workingNodes.remove(node.associativity() == Associativity.LEFT ? (j - 1) : j);
                     if(actsOn instanceof GroupNode) {
                         replacement = new GroupNode(((ModifierNode) node).getModifier().apply(((GroupNode) actsOn).entityGroup));
-                    } else {
-                        throw new IllegalStateException("Tried to apply modifier to a non-group node");
                     }
                     break;
                 }
             }
         }
         if(replacement != null) {
-            affectedIndices.forEach( i -> workingNodes.remove((int) i) );
-            workingNodes.add(Collections.min(affectedIndices), replacement);
+            workingNodes.add(replacementIndex, replacement);
         } else {
-            throw new IllegalStateException("Nothing left to evaluate, but multiple nodes are left");
+            throw new IllegalStateException("Nothing left to evaluate, but multiple nodes remain");
         }
 
         return new GroupEvaluator(workingNodes).evaluate();

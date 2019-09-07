@@ -8,6 +8,7 @@ import com.froobworld.saml.group.entity.groups.helpers.*;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,45 +28,29 @@ public class EntityGroupStore {
     }
 
 
-    public EntityGroup getGroup(String group, boolean includeHelpers) {
+    public EntityGroup getGroup(String group, boolean includeHelpers) throws ParseException {
         String[] split = group.split("\\{", 2);
 
         String groupPart = split[0].toLowerCase();
         JsonObject jsonPart = new JsonParser().parse("{" + (split.length == 1 ? "}" : split[1])).getAsJsonObject();
-        boolean negate = false;
-        boolean conditionalise = false;
-        if(groupPart.startsWith("!")) {
-            groupPart = groupPart.substring(1, groupPart.length());
-            negate = true;
-        }
-        if(groupPart.startsWith("*")) {
-            groupPart = groupPart.substring(1, groupPart.length());
-            conditionalise = true;
-        }
 
         if(parsers.containsKey(groupPart)) {
             EntityGroup entityGroup = parsers.get(groupPart).fromJson(jsonPart);
 
-            return conditionalise ? EntityGroup.conditionalise(entityGroup) : entityGroup;
+            return entityGroup;
         }
         if(includeHelpers && helperParsers.containsKey(groupPart)) {
             EntityGroup entityGroup = helperParsers.get(groupPart).fromJson(jsonPart);
 
-            return conditionalise ? EntityGroup.conditionalise(entityGroup) : entityGroup;
+            return entityGroup;
         }
         if(isNameAcceptable(groupPart) && saml.getCustomGroups() != null && saml.getCustomGroups().keyExists("group." + groupPart)) {
             EntityGroup entityGroup = customGroupParser.parse(groupPart, saml.getCustomGroups().getString("group." + groupPart + ".definition"), jsonPart, saml.getCustomGroups().getSection("group." + groupPart + ".arguments"));
 
-            return conditionalise ? EntityGroup.conditionalise(entityGroup) : entityGroup;
+            return entityGroup;
         }
         if(isNameAcceptable(groupPart) && includeHelpers && saml.getCustomGroups() != null && saml.getCustomGroups().keyExists("helper." + groupPart)) {
             EntityGroup entityGroup = customGroupParser.parse(groupPart, saml.getCustomGroups().getString("helper." + groupPart + ".definition"), jsonPart, saml.getCustomGroups().getSection("helper." + groupPart + ".arguments"));
-            if(negate) {
-                entityGroup = EntityGroup.negate(entityGroup);
-            }
-            if(conditionalise) {
-                entityGroup = EntityGroup.conditionalise(entityGroup);
-            }
 
             return entityGroup;
         }

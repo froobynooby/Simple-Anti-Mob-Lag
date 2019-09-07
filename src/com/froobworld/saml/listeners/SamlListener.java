@@ -5,6 +5,7 @@ import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.data.FreezeReason;
 import com.froobworld.saml.data.UnfreezeReason;
 import com.froobworld.saml.events.*;
+import com.froobworld.saml.group.entity.EntityGroup;
 import com.froobworld.saml.utils.CompatibilityUtils;
 import com.froobworld.saml.utils.EntityFreezer;
 import com.froobworld.saml.utils.EntityNerfer;
@@ -16,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.text.ParseException;
 import java.util.*;
 
 public class SamlListener implements Listener {
@@ -51,31 +53,55 @@ public class SamlListener implements Listener {
 
         if(event.getReason() == FreezeReason.TPS) {
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_FREEZE_GROUPS)) {
-                event.getFreezeParametersBuilder().includeFreezeGroup(saml.getGroupStore().getGroup(group, false));
+                EntityGroup entityGroup = getGroupOrWarn(group);
+                if(entityGroup != null) {
+                    event.getFreezeParametersBuilder().includeFreezeGroup(entityGroup);
+                }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_FREEZE_EXCLUDE_GROUPS)) {
-                event.getFreezeParametersBuilder().excludeFreezeGroup(saml.getGroupStore().getGroup(group, false));
+                EntityGroup entityGroup = getGroupOrWarn(group);
+                if(entityGroup != null) {
+                    event.getFreezeParametersBuilder().excludeFreezeGroup(entityGroup);
+                }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_NERF_GROUPS)) {
-                event.getFreezeParametersBuilder().includeNerfGroup(saml.getGroupStore().getGroup(group, false));
+                EntityGroup entityGroup = getGroupOrWarn(group);
+                if(entityGroup != null) {
+                    event.getFreezeParametersBuilder().includeNerfGroup(entityGroup);
+                }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_NERF_EXCLUDE_GROUPS)) {
-                event.getFreezeParametersBuilder().excludeNerfGroup(saml.getGroupStore().getGroup(group, false));
+                EntityGroup entityGroup = getGroupOrWarn(group);
+                if(entityGroup != null) {
+                    event.getFreezeParametersBuilder().excludeNerfGroup(entityGroup);
+                }
             }
             event.getFreezeParametersBuilder().setDoCleanup(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_TPS_DO_CLEANUP));
         }
         if(event.getReason() == FreezeReason.PASSIVE) {
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_FREEZE_GROUPS)) {
-                event.getFreezeParametersBuilder().includeFreezeGroup(saml.getGroupStore().getGroup(group, false));
+                EntityGroup entityGroup = getGroupOrWarn(group);
+                if(entityGroup != null) {
+                    event.getFreezeParametersBuilder().includeFreezeGroup(entityGroup);
+                }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_FREEZE_EXCLUDE_GROUPS)) {
-                event.getFreezeParametersBuilder().excludeFreezeGroup(saml.getGroupStore().getGroup(group, false));
+                EntityGroup entityGroup = getGroupOrWarn(group);
+                if(entityGroup != null) {
+                    event.getFreezeParametersBuilder().excludeFreezeGroup(entityGroup);
+                }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_NERF_GROUPS)) {
-                event.getFreezeParametersBuilder().includeNerfGroup(saml.getGroupStore().getGroup(group, false));
+                EntityGroup entityGroup = getGroupOrWarn(group);
+                if(entityGroup != null) {
+                    event.getFreezeParametersBuilder().includeNerfGroup(entityGroup);
+                }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_NERF_EXCLUDE_GROUPS)) {
-                event.getFreezeParametersBuilder().excludeNerfGroup(saml.getGroupStore().getGroup(group, false));
+                EntityGroup entityGroup = getGroupOrWarn(group);
+                if(entityGroup != null) {
+                    event.getFreezeParametersBuilder().excludeNerfGroup(entityGroup);
+                }
             }
             event.getFreezeParametersBuilder().setDoCleanup(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_PASSIVE_DO_CLEANUP));
         }
@@ -340,6 +366,20 @@ public class SamlListener implements Listener {
 
         event.getUnfreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(e::hasMetadata)) );
         event.getUnfreezeParametersBuilder().addIgnorePredicate( e ->(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_ONLY_UNFREEZE_TAGGED) && !EntityFreezer.isSamlFrozen(saml, e)) );
+    }
+
+    private EntityGroup getGroupOrWarn(String groupName) {
+        EntityGroup entityGroup = null;
+        try {
+            entityGroup = saml.getGroupStore().getGroup(groupName, false);
+        } catch (ParseException e) {
+            Saml.logger().warning("There was an issue retrieving the group '" + groupName + "': parse exception. Run the command '/saml test " + groupName + "' for more info");
+            return null;
+        }
+        if(entityGroup == null) {
+            Saml.logger().warning("There was an issue retrieving the group '" + groupName + "': it doesn't exist");
+        }
+        return entityGroup;
     }
 
 }

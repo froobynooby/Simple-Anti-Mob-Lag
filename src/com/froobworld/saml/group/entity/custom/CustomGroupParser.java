@@ -1,31 +1,34 @@
 package com.froobworld.saml.group.entity.custom;
 
-import com.froobworld.saml.group.GroupMetadata;
-import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.entity.EntityGroup;
 import com.froobworld.saml.group.entity.EntityGroupOperations;
 import com.froobworld.saml.group.entity.EntityGroupStore;
-import com.froobworld.saml.group.entity.SnapshotEntity;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.bukkit.entity.LivingEntity;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class CustomGroupParser {
     private EntityGroupStore entityGroupStore;
     private Map<Character, BiFunction<EntityGroup, EntityGroup, EntityGroup>> groupOperations;
+    private Map<Character, GroupOperation> operations;
+    private Map<Character, GroupModifier> modifiers;
 
     public CustomGroupParser(EntityGroupStore entityGroupStore) {
         this.entityGroupStore = entityGroupStore;
         groupOperations = new HashMap<>();
+        operations = new HashMap<>();
+        modifiers = new HashMap<>();
         addGroupOperations();
+        addGroupModifiers();
     }
 
 
-    public EntityGroup parse(String resultName, String toParse, JsonObject jsonPart, Map<String, Object> arguments) {
+    public EntityGroup parse(String resultName, String toParse, JsonObject jsonPart, Map<String, Object> arguments) throws ParseException {
         for(String key : arguments.keySet()) {
             if(!key.contains(".")) {
                 String replacement;
@@ -45,151 +48,159 @@ public class CustomGroupParser {
 
         String[] lines = toParse.split("\\r?\\n");
 
-        Evaluator evaluator = new Evaluator(resultName, entityGroupStore.getGroup(lines[0], true));
-
-        for(int i = 1; i < lines.length; i++) {
-            String[] split = lines[i].split(" ", 2);
-
-            String operationsPart = split[0];
-            String groupPart = split.length == 1 ? null : split[1];
-
-            for(char c : operationsPart.toCharArray()) {
-                if(c == '(') {
-                    evaluator.openParen();
-                    continue;
+        GroupEvaluator groupEvaluator = new GroupEvaluator();
+        for(int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            int cursorPosition = 0;
+            while(line.length() > 0) {
+                int remove = 0;
+                for(char c : line.toCharArray()) {
+                    if(c == ' ') {
+                        remove++;
+                        continue;
+                    }
+                    if(c == '(') {
+                        groupEvaluator.openParen();
+                        remove++;
+                        continue;
+                    }
+                    if(c == ')') {
+                        groupEvaluator.closeParen();
+                        remove++;
+                        continue;
+                    }
+                    if(modifiers.containsKey(c)) {
+                        GroupModifier modifier = modifiers.get(c);
+                        groupEvaluator.passModifier(modifier.modifier, modifier.actsOn, modifier.precedence);
+                        remove++;
+                        continue;
+                    }
+                    if(operations.containsKey(c)) {
+                        GroupOperation operation = operations.get(c);
+                        groupEvaluator.passOperation(operation.operation, operation.associativity, operation.precedence);
+                        remove++;
+                        continue;
+                    }
+                    break;
                 }
-                if(c == ')') {
-                    evaluator.closeParen();
-                    continue;
-                }
-                if(groupOperations.containsKey(c)) {
-                    evaluator.nextOperation(groupOperations.get(c));
+                if(remove >= line.length()) {
+                    line = "";
                 } else {
-                    throw new IllegalArgumentException("Unknown operation '" + c + "'");
+                    line = line.substring(remove);
                 }
-            }
-            if(groupPart != null) {
-                evaluator.applyGroup(entityGroupStore.getGroup(groupPart, true));
+                cursorPosition += remove;
+                if(line.length() > 0) {
+                    String possibleGroupString = getFirstPossibleGroupSubstring(line);
+                    if(possibleGroupString == null) {
+                        throw new ParseException("Problem parsing line " + i +": '" + lines[i] + "' at column " + cursorPosition, -1);
+                    }
+                    groupEvaluator.passGroup(entityGroupStore.getGroup(possibleGroupString, true));
+                    if(possibleGroupString.length() >= line.length()) {
+                        line = "";
+                    } else {
+                        line = line.substring(possibleGroupString.length());
+                    }
+                    cursorPosition += possibleGroupString.length();
+                }
             }
         }
-
-        return evaluator.evaluate();
+        return groupEvaluator.evaluate();
     }
 
     private void addGroupOperations() {
         groupOperations.put('&', (u, v) -> EntityGroupOperations.conjunction(null, u, v));
         groupOperations.put('^', (u, v) -> EntityGroupOperations.weakConjunction(null, u, v));
         groupOperations.put('|', (u, v) -> EntityGroupOperations.disjunction(null, u, v));
+
+        operations.put('&', new GroupOperation((u, v) -> EntityGroupOperations.conjunction(null, u, v), 2, GroupEvaluator.Associativity.LEFT));
+        operations.put('^', new GroupOperation((u, v) -> EntityGroupOperations.weakConjunction(null, u, v), 3, GroupEvaluator.Associativity.LEFT));
+        operations.put('|', new GroupOperation((u, v) -> EntityGroupOperations.disjunction(null, u, v), 4, GroupEvaluator.Associativity.LEFT));
     }
 
-    private static class Evaluator {
-        private EntityGroup tail;
-        private String resultName;
-        private BiFunction<EntityGroup, EntityGroup, EntityGroup> nextOperation;
-        private Evaluator subEvaluator;
+    private void addGroupModifiers() {
+        modifiers.put('*', new GroupModifier(EntityGroup::conditionalise, 1, GroupEvaluator.Associativity.RIGHT));
+        modifiers.put('!', new GroupModifier(EntityGroup::negate, 1, GroupEvaluator.Associativity.RIGHT));
+    }
 
-        public Evaluator(String resultName, EntityGroup start) {
-            this.tail = start;
-            this.resultName = resultName;
-        }
+    private static String getFirstPossibleGroupSubstring(String line) {
+        StringBuilder subStringBuilder = new StringBuilder();
+        int openBraces = 0;
+        boolean startedJsonPart = false;
+        boolean inQuotes = false;
+        boolean escapeNext = false;
 
-        private Evaluator() {}
-
-
-        public void openParen() {
-            if(subEvaluator != null) {
-                subEvaluator.openParen();
-                return;
-            }
-            if(nextOperation == null) {
-                throw new IllegalStateException("Tried to open parenthesis without a preceding operation");
-            }
-            subEvaluator = new Evaluator();
-        }
-
-        public void closeParen() {
-            if(subEvaluator != null && subEvaluator.subEvaluator != null) {
-                subEvaluator.closeParen();
-                return;
-            }
-            if(subEvaluator == null) {
-                throw new IllegalStateException("Tried to close parenthesis without a matching open parenthesis");
-            }
-            if(subEvaluator.nextOperation != null) {
-                throw new IllegalStateException("Tried to close parenthesis containing an unapplied operation");
-            }
-            EntityGroup toApply = subEvaluator.evaluate();
-            subEvaluator = null;
-            applyGroup(toApply);
-        }
-
-        public void nextOperation(BiFunction<EntityGroup, EntityGroup, EntityGroup> operation) {
-            if(subEvaluator != null) {
-                subEvaluator.nextOperation(operation);
-                return;
-            }
-            if(tail == null) {
-                throw new IllegalStateException("Tried to apply an operation to nothing");
-            }
-            nextOperation = operation;
-        }
-
-        public void applyGroup(EntityGroup entityGroup) {
-            if(subEvaluator != null) {
-                subEvaluator.applyGroup(entityGroup);
-                return;
-            }
-            if(tail == null) {
-                tail = entityGroup;
-                return;
-            }
-            if(nextOperation == null) {
-                throw new IllegalStateException("Tried to apply a group without an operation");
-            }
-            tail = nextOperation.apply(tail, entityGroup);
-            nextOperation = null;
-        }
-
-        public EntityGroup evaluate() {
-            if(subEvaluator != null) {
-                throw new IllegalStateException("Tried to evaluate with unclosed parentheses");
-            }
-            if(nextOperation != null) {
-                throw new IllegalStateException("Tried to evaluate with an unapplied operation");
-            }
-
-            return new EntityGroup() {
-                @Override
-                public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
-                    return tail.getSnapshotProperties(entity);
+        for(char c : line.toCharArray()) {
+            if(!startedJsonPart) {
+                if(Character.isLetter(c) && Character.isLowerCase(c) || c == '_') {
+                    subStringBuilder.append(c);
+                } else if(c == '{') {
+                    subStringBuilder.append(c);
+                    startedJsonPart = true;
+                    openBraces++;
+                } else {
+                    return subStringBuilder.length() == 0 ? null : subStringBuilder.toString();
+                }
+                if(subStringBuilder.length() == 0) {
+                    return subStringBuilder.toString();
+                }
+            } else {
+                if(subStringBuilder.length() == 0) {
+                    return null;
+                }
+                if(c == '\\') {
+                    subStringBuilder.append(c);
+                    escapeNext = true;
+                    continue;
+                } else if(c == '{') {
+                    subStringBuilder.append(c);
+                    if(!(escapeNext || inQuotes)) {
+                        openBraces++;
+                    }
+                } else if(c == '}') {
+                    subStringBuilder.append(c);
+                    if(!(escapeNext || inQuotes)) {
+                        openBraces--;
+                    }
+                } else if(c == '"') {
+                    subStringBuilder.append(c);
+                    if(!escapeNext) {
+                        inQuotes = !inQuotes;
+                    }
+                } else {
+                    subStringBuilder.append(c);
                 }
 
-                @Override
-                public String getName() {
-                    return resultName;
+                if(openBraces == 0) {
+                    return subStringBuilder.toString();
                 }
-
-                @Override
-                public GroupMetadata getGroupMetadata() {
-                    return tail.getGroupMetadata();
-                }
-
-                @Override
-                public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
-                    return tail.getMembershipEligibility(candidate);
-                }
-
-                @Override
-                public GroupStatusUpdater<SnapshotEntity> groupStatusUpdater() {
-                    return tail.groupStatusUpdater();
-                }
-
-                @Override
-                public void scaleToTps(double tps, double expectedTps) {
-                    tail.scaleToTps(tps, expectedTps);
-                }
-            };
+                escapeNext = false;
+            }
         }
 
+        return subStringBuilder.length() == 0 || openBraces > 0 ? null : subStringBuilder.toString();
+    }
+
+    private static class GroupOperation {
+        private BiFunction<EntityGroup, EntityGroup, EntityGroup> operation;
+        private int precedence;
+        private GroupEvaluator.Associativity associativity;
+
+        public GroupOperation(BiFunction<EntityGroup, EntityGroup, EntityGroup> operation, int precedence, GroupEvaluator.Associativity associativity) {
+            this.operation = operation;
+            this.precedence = precedence;
+            this.associativity = associativity;
+        }
+    }
+
+    private static class GroupModifier {
+        private Function<EntityGroup, EntityGroup> modifier;
+        private int precedence;
+        private GroupEvaluator.Associativity actsOn;
+
+        public GroupModifier(Function<EntityGroup, EntityGroup> modifier, int precedence, GroupEvaluator.Associativity actsOn) {
+            this.modifier = modifier;
+            this.precedence = precedence;
+            this.actsOn = actsOn;
+        }
     }
 }
