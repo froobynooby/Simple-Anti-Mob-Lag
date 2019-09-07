@@ -41,7 +41,7 @@ public class SpecificCentreTypeGroup implements EntityGroup {
 
     @Override
     public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
-        return SetUtils.disjoint(acceptedTypes, candidate.getTypeIdentifiers()) ? MembershipEligibility.CENTRE : MembershipEligibility.CENTRE_OR_MEMBER;
+        return SetUtils.disjoint(acceptedTypes, candidate.getTypeIdentifiers()) ? MembershipEligibility.MEMBER : MembershipEligibility.CENTRE_OR_MEMBER;
     }
 
     @Override
