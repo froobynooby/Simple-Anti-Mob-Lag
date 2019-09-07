@@ -131,7 +131,7 @@ public class CustomGroupParser {
 
         for(char c : line.toCharArray()) {
             if(!startedJsonPart) {
-                if(Character.isLetter(c) && Character.isLowerCase(c) || c == '_') {
+                if(Character.isLetter(c) && Character.isLowerCase(c) || c == '_' || Character.isDigit(c)) {
                     subStringBuilder.append(c);
                 } else if(c == '{') {
                     subStringBuilder.append(c);
