@@ -6,11 +6,11 @@ import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
 import com.froobworld.saml.group.entity.EntityGroupParser;
 import com.froobworld.saml.group.entity.SnapshotEntity;
+import com.froobworld.saml.utils.SetUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +41,7 @@ public class SpecificTypeGroup implements EntityGroup {
 
     @Override
     public MembershipEligibility getMembershipEligibility(SnapshotEntity candidate) {
-        return Collections.disjoint(acceptedTypes, candidate.getTypeIdentifiers()) ? MembershipEligibility.CENTRE : MembershipEligibility.CENTRE_OR_MEMBER;
+        return SetUtils.disjoint(acceptedTypes, candidate.getTypeIdentifiers()) ? MembershipEligibility.CENTRE : MembershipEligibility.CENTRE_OR_MEMBER;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class SpecificTypeGroup implements EntityGroup {
         return new GroupStatusUpdater<SnapshotEntity>() {
             @Override
             public ProtoMemberStatus getProtoMemberStatus(SnapshotEntity candidate, ProtoGroup<? extends SnapshotEntity> protoGroup) {
-                if(!Collections.disjoint(acceptedTypes, candidate.getTypeIdentifiers())) {
+                if(!SetUtils.disjoint(acceptedTypes, candidate.getTypeIdentifiers())) {
                     return ProtoMemberStatus.MEMBER;
                 }
                 return ProtoMemberStatus.NON_MEMBER;
