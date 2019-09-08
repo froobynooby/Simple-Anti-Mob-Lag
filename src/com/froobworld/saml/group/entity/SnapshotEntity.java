@@ -1,6 +1,5 @@
 package com.froobworld.saml.group.entity;
 
-import com.froobworld.saml.group.Group;
 import com.froobworld.saml.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -20,7 +19,10 @@ public class SnapshotEntity {
         this.location = entity.getLocation();
         this.properties = new HashMap<>();
         for(EntityGroup group : groups) {
-            properties.putAll(group.getSnapshotProperties(entity));
+            Map<EntityGroupPropertyKey, Object> groupProperties = group.getSnapshotProperties(entity);
+            if(groupProperties != null) {
+                properties.putAll(groupProperties);
+            }
         }
     }
 
