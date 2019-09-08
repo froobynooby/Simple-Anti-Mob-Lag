@@ -15,7 +15,8 @@ import java.util.Map;
 public class ChunkGroup implements EntityGroup {
     private static final GroupMetadata METADATA = new GroupMetadata.Builder()
             .setVolatile(false)
-            .setRestrictsMembers(true)
+            .setRestrictsEligibility(false)
+            .setRestrictsMemberStatus(true)
             .setRestrictsGroupStatus(false)
             .build();
 

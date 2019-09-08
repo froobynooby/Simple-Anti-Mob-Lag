@@ -17,16 +17,18 @@ import java.util.Map;
 import java.util.Set;
 
 public class SingularGroup implements EntityGroup {
-    private static final GroupMetadata METADATA = new GroupMetadata.Builder()
-            .setVolatile(false)
-            .setRestrictsMembers(true)
-            .setRestrictsGroupStatus(false)
-            .build();
+    private final GroupMetadata metadata;
 
     private Set<String> acceptedTypes;
 
     private SingularGroup(Set<String> acceptedTypes) {
         this.acceptedTypes = acceptedTypes;
+        this.metadata = new GroupMetadata.Builder()
+                .setVolatile(false)
+                .setRestrictsEligibility(acceptedTypes != null)
+                .setRestrictsMemberStatus(true)
+                .setRestrictsGroupStatus(false)
+                .build();
     }
 
     @Override
@@ -36,7 +38,7 @@ public class SingularGroup implements EntityGroup {
 
     @Override
     public GroupMetadata getGroupMetadata() {
-        return METADATA;
+        return metadata;
     }
 
     @Override

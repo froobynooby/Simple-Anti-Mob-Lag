@@ -19,7 +19,8 @@ import java.util.Set;
 public class SpecificCentreTypeGroup implements EntityGroup {
     private static final GroupMetadata METADATA = new GroupMetadata.Builder()
             .setVolatile(false)
-            .setRestrictsMembers(true)
+            .setRestrictsEligibility(true)
+            .setRestrictsMemberStatus(false)
             .setRestrictsGroupStatus(false)
             .build();
 

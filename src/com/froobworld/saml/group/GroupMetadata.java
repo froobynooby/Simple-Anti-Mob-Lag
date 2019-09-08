@@ -1,13 +1,15 @@
 package com.froobworld.saml.group;
 
 public class GroupMetadata {
-    private boolean vol;
-    private boolean restrictsMembers;
-    private boolean restrictsGroupStatus;
+    private final boolean vol;
+    private final boolean restrictsEligibility;
+    private final boolean restrictsMemberStatus;
+    private final boolean restrictsGroupStatus;
 
-    private GroupMetadata(boolean vol, boolean restrictsMembers, boolean restrictsGroupStatus) {
+    private GroupMetadata(boolean vol, boolean restrictsEligibility, boolean restrictsMemberStatus, boolean restrictsGroupStatus) {
         this.vol = vol;
-        this.restrictsMembers = restrictsMembers;
+        this.restrictsEligibility = restrictsEligibility;
+        this.restrictsMemberStatus = restrictsMemberStatus;
         this.restrictsGroupStatus = restrictsGroupStatus;
     }
 
@@ -16,8 +18,12 @@ public class GroupMetadata {
         return vol;
     }
 
-    public boolean restrictsMembers() {
-        return restrictsMembers;
+    public boolean restrictsEligibility() {
+        return restrictsEligibility;
+    }
+
+    public boolean restrictsMemberStatus() {
+        return restrictsMemberStatus;
     }
 
     public boolean restrictsGroupStatus() {
@@ -26,12 +32,14 @@ public class GroupMetadata {
 
     public static class Builder {
         private boolean vol;
-        private boolean restrictsMembers;
+        private boolean restrictsEligibility;
+        private boolean restrictsMemberStatus;
         private boolean restrictsGroupStatus;
 
         public Builder() {
             this.vol = true;
-            this.restrictsMembers = true;
+            this.restrictsEligibility = true;
+            this.restrictsMemberStatus = true;
             this.restrictsGroupStatus = true;
         }
 
@@ -41,8 +49,13 @@ public class GroupMetadata {
             return this;
         }
 
-        public Builder setRestrictsMembers(boolean restrictsMembers) {
-            this.restrictsMembers = restrictsMembers;
+        public Builder setRestrictsEligibility(boolean restrictsEligibility) {
+            this.restrictsEligibility = restrictsEligibility;
+            return this;
+        }
+
+        public Builder setRestrictsMemberStatus(boolean restrictsMemberStatus) {
+            this.restrictsMemberStatus = restrictsMemberStatus;
             return this;
         }
 
@@ -52,7 +65,7 @@ public class GroupMetadata {
         }
 
         public GroupMetadata build() {
-            return new GroupMetadata(vol, restrictsMembers, restrictsGroupStatus);
+            return new GroupMetadata(vol, restrictsEligibility, restrictsMemberStatus, restrictsGroupStatus);
         }
 
     }

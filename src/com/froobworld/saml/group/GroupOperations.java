@@ -6,7 +6,8 @@ public class GroupOperations {
         return new Group<T>() {
             private final GroupMetadata groupMetadata = new GroupMetadata.Builder()
                     .setVolatile(group1.getGroupMetadata().isVolatile() || group2.getGroupMetadata().isVolatile())
-                    .setRestrictsMembers(group1.getGroupMetadata().restrictsMembers() || group2.getGroupMetadata().restrictsMembers())
+                    .setRestrictsEligibility(group1.getGroupMetadata().restrictsEligibility() || group2.getGroupMetadata().restrictsEligibility())
+                    .setRestrictsMemberStatus(group1.getGroupMetadata().restrictsMemberStatus() || group2.getGroupMetadata().restrictsMemberStatus())
                     .setRestrictsGroupStatus(group1.getGroupMetadata().restrictsGroupStatus() || group2.getGroupMetadata().restrictsGroupStatus())
                     .build();
 
@@ -98,7 +99,8 @@ public class GroupOperations {
         return new Group<T>() {
             private final GroupMetadata groupMetadata = new GroupMetadata.Builder()
                     .setVolatile(group1.getGroupMetadata().isVolatile() || group2.getGroupMetadata().isVolatile())
-                    .setRestrictsMembers(group1.getGroupMetadata().restrictsMembers() && group2.getGroupMetadata().restrictsMembers())
+                    .setRestrictsEligibility(group1.getGroupMetadata().restrictsEligibility() && group2.getGroupMetadata().restrictsEligibility())
+                    .setRestrictsMemberStatus(group1.getGroupMetadata().restrictsMemberStatus() || group2.getGroupMetadata().restrictsMemberStatus())
                     .setRestrictsGroupStatus(group1.getGroupMetadata().restrictsGroupStatus() || group2.getGroupMetadata().restrictsGroupStatus())
                     .build();
 
@@ -217,7 +219,8 @@ public class GroupOperations {
         return new Group<T>() {
             private final GroupMetadata groupMetadata = new GroupMetadata.Builder()
                     .setVolatile(group1.getGroupMetadata().isVolatile() || group2.getGroupMetadata().isVolatile())
-                    .setRestrictsMembers(group1.getGroupMetadata().restrictsMembers() && group2.getGroupMetadata().restrictsMembers())
+                    .setRestrictsEligibility(group1.getGroupMetadata().restrictsEligibility() && group2.getGroupMetadata().restrictsEligibility())
+                    .setRestrictsMemberStatus(group1.getGroupMetadata().restrictsMemberStatus() && group2.getGroupMetadata().restrictsMemberStatus())
                     .setRestrictsGroupStatus(group1.getGroupMetadata().restrictsGroupStatus() && group2.getGroupMetadata().restrictsGroupStatus())
                     .build();
 

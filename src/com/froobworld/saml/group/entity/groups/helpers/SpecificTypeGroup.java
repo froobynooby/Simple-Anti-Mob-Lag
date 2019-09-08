@@ -19,7 +19,8 @@ import java.util.Set;
 public class SpecificTypeGroup implements EntityGroup {
     private static final GroupMetadata METADATA = new GroupMetadata.Builder()
             .setVolatile(false)
-            .setRestrictsMembers(true)
+            .setRestrictsEligibility(true)
+            .setRestrictsMemberStatus(true)
             .setRestrictsGroupStatus(false)
             .build();
 

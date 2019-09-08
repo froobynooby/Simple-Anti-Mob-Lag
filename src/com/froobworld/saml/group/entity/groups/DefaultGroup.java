@@ -17,7 +17,8 @@ import java.util.Map;
 public class DefaultGroup implements EntityGroup {
     private static final GroupMetadata METADATA = new GroupMetadata.Builder()
             .setVolatile(false)
-            .setRestrictsMembers(true)
+            .setRestrictsEligibility(true)
+            .setRestrictsMemberStatus(true)
             .setRestrictsGroupStatus(true)
             .build();
 

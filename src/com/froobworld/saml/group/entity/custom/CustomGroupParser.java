@@ -1,5 +1,6 @@
 package com.froobworld.saml.group.entity.custom;
 
+import com.froobworld.saml.group.GroupModifiers;
 import com.froobworld.saml.group.entity.EntityGroup;
 import com.froobworld.saml.group.entity.EntityGroupOperations;
 import com.froobworld.saml.group.entity.EntityGroupStore;
@@ -14,13 +15,11 @@ import java.util.function.Function;
 
 public class CustomGroupParser {
     private EntityGroupStore entityGroupStore;
-    private Map<Character, BiFunction<EntityGroup, EntityGroup, EntityGroup>> groupOperations;
     private Map<Character, GroupOperation> operations;
     private Map<Character, GroupModifier> modifiers;
 
     public CustomGroupParser(EntityGroupStore entityGroupStore) {
         this.entityGroupStore = entityGroupStore;
-        groupOperations = new HashMap<>();
         operations = new HashMap<>();
         modifiers = new HashMap<>();
         addGroupOperations();
@@ -108,18 +107,15 @@ public class CustomGroupParser {
     }
 
     private void addGroupOperations() {
-        groupOperations.put('&', (u, v) -> EntityGroupOperations.conjunction(null, u, v));
-        groupOperations.put('^', (u, v) -> EntityGroupOperations.weakConjunction(null, u, v));
-        groupOperations.put('|', (u, v) -> EntityGroupOperations.disjunction(null, u, v));
-
         operations.put('&', new GroupOperation((u, v) -> EntityGroupOperations.conjunction(null, u, v), 2, GroupEvaluator.Associativity.LEFT));
         operations.put('^', new GroupOperation((u, v) -> EntityGroupOperations.weakConjunction(null, u, v), 3, GroupEvaluator.Associativity.LEFT));
         operations.put('|', new GroupOperation((u, v) -> EntityGroupOperations.disjunction(null, u, v), 4, GroupEvaluator.Associativity.LEFT));
     }
 
     private void addGroupModifiers() {
-        modifiers.put('*', new GroupModifier(EntityGroup::conditionalise, 1, GroupEvaluator.Associativity.RIGHT));
-        modifiers.put('!', new GroupModifier(EntityGroup::negate, 1, GroupEvaluator.Associativity.RIGHT));
+        modifiers.put('*', new GroupModifier(EntityGroup.transformGroupModifier( g -> GroupModifiers.conditionalise(null, g) ), 1, GroupEvaluator.Associativity.RIGHT));
+        modifiers.put('!', new GroupModifier(EntityGroup.transformGroupModifier( g -> GroupModifiers.negateStatus(null, g) ), 1, GroupEvaluator.Associativity.RIGHT));
+        modifiers.put('~', new GroupModifier(EntityGroup.transformGroupModifier( g -> GroupModifiers.negateMembers(null, g) ), 1, GroupEvaluator.Associativity.RIGHT));
     }
 
     private static String getFirstPossibleGroupSubstring(String line) {

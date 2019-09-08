@@ -15,7 +15,8 @@ import java.util.Map;
 public class TotalCountGroup implements EntityGroup {
     private static final GroupMetadata METADATA = new GroupMetadata.Builder()
             .setVolatile(false)
-            .setRestrictsMembers(false)
+            .setRestrictsEligibility(false)
+            .setRestrictsMemberStatus(false)
             .setRestrictsGroupStatus(true)
             .build();
 
