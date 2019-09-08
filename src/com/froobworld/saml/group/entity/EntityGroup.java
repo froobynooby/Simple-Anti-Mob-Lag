@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public interface EntityGroup extends Group<SnapshotEntity> {
-    public Map<String, Object> getSnapshotProperties(LivingEntity entity);
+    public Map<EntityGroupPropertyKey, Object> getSnapshotProperties(LivingEntity entity);
     public default void scaleToTps(double tps, double expectedTps) {}
 
     public static BiFunction<EntityGroup, EntityGroup, EntityGroup> transformGroupOperation(BiFunction<EntityGroup, EntityGroup, Group<SnapshotEntity>> operation) {
@@ -22,10 +22,10 @@ public interface EntityGroup extends Group<SnapshotEntity> {
 
                 return new EntityGroup() {
                     @Override
-                    public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
-                        Map<String, Object> allProperties = new HashMap<>();
-                        Map<String, Object> snapshotProperties1 = entityGroup1.getSnapshotProperties(entity);
-                        Map<String, Object> snapshotProperties2 = entityGroup2.getSnapshotProperties(entity);
+                    public Map<EntityGroupPropertyKey, Object> getSnapshotProperties(LivingEntity entity) {
+                        Map<EntityGroupPropertyKey, Object> allProperties = new HashMap<>();
+                        Map<EntityGroupPropertyKey, Object> snapshotProperties1 = entityGroup1.getSnapshotProperties(entity);
+                        Map<EntityGroupPropertyKey, Object> snapshotProperties2 = entityGroup2.getSnapshotProperties(entity);
                         if(snapshotProperties1 != null) {
                             allProperties.putAll(snapshotProperties1);
                         }
@@ -75,7 +75,7 @@ public interface EntityGroup extends Group<SnapshotEntity> {
                     .build();
 
             @Override
-            public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
+            public Map<EntityGroupPropertyKey, Object> getSnapshotProperties(LivingEntity entity) {
                 return entityGroup.getSnapshotProperties(entity);
             }
 
@@ -145,7 +145,7 @@ public interface EntityGroup extends Group<SnapshotEntity> {
                     .build();
 
             @Override
-            public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
+            public Map<EntityGroupPropertyKey, Object> getSnapshotProperties(LivingEntity entity) {
                 return entityGroup.getSnapshotProperties(entity);
             }
 

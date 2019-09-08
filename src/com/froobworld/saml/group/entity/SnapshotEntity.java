@@ -12,7 +12,7 @@ public class SnapshotEntity {
     private EntityType type;
     private Set<String> typeIdentifiers;
     private Location location;
-    private Map<Group, Map<String, Object>> properties;
+    private Map<EntityGroupPropertyKey, Object> properties;
 
     public SnapshotEntity(LivingEntity entity, Collection<EntityGroup> groups) {
         this.type = entity.getType();
@@ -20,7 +20,7 @@ public class SnapshotEntity {
         this.location = entity.getLocation();
         this.properties = new HashMap<>();
         for(EntityGroup group : groups) {
-            properties.put(group, group.getSnapshotProperties(entity));
+            properties.putAll(group.getSnapshotProperties(entity));
         }
     }
 
@@ -37,8 +37,8 @@ public class SnapshotEntity {
         return location;
     }
 
-    public Map<String, Object> getProperties(Group group) {
-        return properties.getOrDefault(group, Collections.emptyMap());
+    public Object getProperty(EntityGroupPropertyKey key) {
+        return properties.get(key);
     }
 
 }

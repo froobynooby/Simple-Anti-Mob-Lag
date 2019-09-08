@@ -5,6 +5,7 @@ import com.froobworld.saml.group.GroupStatusUpdater;
 import com.froobworld.saml.group.ProtoGroup;
 import com.froobworld.saml.group.entity.EntityGroup;
 import com.froobworld.saml.group.entity.EntityGroupParser;
+import com.froobworld.saml.group.entity.EntityGroupPropertyKey;
 import com.froobworld.saml.group.entity.SnapshotEntity;
 import com.google.gson.JsonObject;
 import org.bukkit.entity.LivingEntity;
@@ -73,7 +74,7 @@ public class TotalCountGroup implements EntityGroup {
     }
 
     @Override
-    public Map<String, Object> getSnapshotProperties(LivingEntity entity) {
+    public Map<EntityGroupPropertyKey, Object> getSnapshotProperties(LivingEntity entity) {
         return null;
     }
 
