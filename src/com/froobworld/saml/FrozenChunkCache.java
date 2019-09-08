@@ -8,6 +8,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -79,12 +80,18 @@ public class FrozenChunkCache {
             if(!cacheFile.exists()) {
                 cacheFile.createNewFile();
             }
-            try (FileWriter writer = new FileWriter(cacheFile)) {
-                writer.append(jsonObject.toString());
-            } catch(IOException e) {
-                e.printStackTrace();
-                Saml.logger().warning("There was a problem writing to the frozen chunk cache file.");
-            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(cacheFile))) {
+                        writer.append(jsonObject.toString());
+                        writer.flush();
+                    } catch(IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
             unsavedChanges = false;
         } catch (IOException e) {
             e.printStackTrace();
