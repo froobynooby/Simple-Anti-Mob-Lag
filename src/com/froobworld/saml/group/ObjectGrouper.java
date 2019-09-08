@@ -9,8 +9,8 @@ public class ObjectGrouper {
         HashMap<T, List<ProtoGroupedObject<T>>> protoGroupedObjects = new HashMap<>();
 
         for(Group<? super T> group : groups) {
-            boolean isVolatile = group.getGroupMetadata().isVolatile();
             List<ProtoGroupedObject<T>> groupProtoGroupedObjects = new ArrayList<>();
+            List<ProtoGroupedObject<T>> definiteGroupProtoGroupedObjects = new ArrayList<>();
             for(T object : objects) {
                 if(maxOperationTime != 0 && System.currentTimeMillis() - startTime >= maxOperationTime) {
                     break;
@@ -24,46 +24,30 @@ public class ObjectGrouper {
                     nextProtoGroupedObject.membershipEligibility = nextMembershipEligibility;
 
                     if(nextMembershipEligibility == Group.MembershipEligibility.CENTRE || nextMembershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER) {
-                        nextProtoGroupedObject.centreGroup = new ProtoGroup<T>(group, object);
+                        nextProtoGroupedObject.centreGroup = new ProtoGroup<>(group, object);
                     }
 
-                    for(ProtoGroupedObject<T> otherProtoGroupedObject : groupProtoGroupedObjects) {
-                        ProtoGroup<T> nextCentreGroup = nextProtoGroupedObject.centreGroup;
-                        ProtoGroup<T> otherCentreGroup = otherProtoGroupedObject.centreGroup;
-                        boolean nextIsDefiniteGroup = !isVolatile && nextCentreGroup != null && nextCentreGroup.isGroup();
-                        boolean otherIsDefiniteGroup = !isVolatile && otherCentreGroup != null && otherCentreGroup.isGroup();
-                        if(nextIsDefiniteGroup && otherIsDefiniteGroup) {
-                            continue;
+                    ListIterator<ProtoGroupedObject<T>> iterator = definiteGroupProtoGroupedObjects.listIterator(definiteGroupProtoGroupedObjects.size());
+                    while (iterator.hasPrevious()) {
+                        ProtoGroupedObject<T> otherProtoGroupedObject = iterator.previous();
+                        checkMembershipAndUpdate(nextProtoGroupedObject, otherProtoGroupedObject);
+                        if(nextProtoGroupedObject.isDefiniteGroup()) {
+                            break;
                         }
-
-                        if(!(nextIsDefiniteGroup && otherProtoGroupedObject.quickMemberStatus)) {
-                            if (nextCentreGroup != null && (otherProtoGroupedObject.membershipEligibility == Group.MembershipEligibility.MEMBER || otherProtoGroupedObject.membershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
-                                Group.ProtoMemberStatus protoMemberStatus = nextCentreGroup.attemptAddMember(otherProtoGroupedObject.object);
-                                if (protoMemberStatus == Group.ProtoMemberStatus.MEMBER) {
-                                    otherProtoGroupedObject.memberGroups.add(nextCentreGroup);
-                                    if (nextIsDefiniteGroup) {
-                                        otherProtoGroupedObject.quickMemberStatus = true;
-                                    }
-                                }
-                            }
-                        }
-                        if(!(otherIsDefiniteGroup && nextProtoGroupedObject.quickMemberStatus)) {
-                            if (otherCentreGroup != null && (nextProtoGroupedObject.membershipEligibility == Group.MembershipEligibility.MEMBER || nextProtoGroupedObject.membershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
-                                Group.ProtoMemberStatus protoMemberStatus = otherCentreGroup.attemptAddMember(nextProtoGroupedObject.object);
-                                if (protoMemberStatus == Group.ProtoMemberStatus.MEMBER) {
-                                    nextProtoGroupedObject.memberGroups.add(otherCentreGroup);
-                                    if (otherIsDefiniteGroup) {
-                                        nextProtoGroupedObject.quickMemberStatus = true;
-                                    }
-                                }
-                            }
-                        }
+                    }
+                    iterator = groupProtoGroupedObjects.listIterator(groupProtoGroupedObjects.size());
+                    while (iterator.hasPrevious()) {
+                        ProtoGroupedObject<T> otherProtoGroupedObject = iterator.previous();
+                        checkMembershipAndUpdate(nextProtoGroupedObject, otherProtoGroupedObject);
                     }
 
                     protoGroupedObjectsList.add(nextProtoGroupedObject);
-                    groupProtoGroupedObjects.add(nextProtoGroupedObject);
+                    if(nextProtoGroupedObject.isDefiniteGroup()) {
+                        definiteGroupProtoGroupedObjects.add(nextProtoGroupedObject);
+                    } else {
+                        groupProtoGroupedObjects.add(nextProtoGroupedObject);
+                    }
                 }
-
             }
         }
 
@@ -75,7 +59,7 @@ public class ObjectGrouper {
                     objectGroups.add(protoGroupedObject.group);
                 }
             }
-            groupedObjects.add(new GroupedObject<T>(entry.getKey(), objectGroups));
+            groupedObjects.add(new GroupedObject<>(entry.getKey(), objectGroups));
         }
 
         return groupedObjects;
@@ -85,6 +69,42 @@ public class ObjectGrouper {
         return groupObjects(objects, groups, 0);
     }
 
+    private static boolean isDefiniteGroup(ProtoGroupedObject protoGroupedObject) {
+        return !protoGroupedObject.group.getGroupMetadata().isVolatile() && protoGroupedObject.centreGroup != null && protoGroupedObject.centreGroup.isGroup();
+    }
+
+    private static <T> void checkMembershipAndUpdate(ProtoGroupedObject<T> protoGroupedObject1, ProtoGroupedObject<T> protoGroupedObject2) {
+        ProtoGroup<T> centreGroup1 = protoGroupedObject1.centreGroup;
+        ProtoGroup<T> centreGroup2 = protoGroupedObject2.centreGroup;
+        boolean isDefiniteGroup1 = protoGroupedObject1.isDefiniteGroup();
+        boolean isDefiniteGroup2 = protoGroupedObject2.isDefiniteGroup();
+        if(isDefiniteGroup1 && isDefiniteGroup2) {
+            return;
+        }
+        if(!(isDefiniteGroup1 && protoGroupedObject2.quickMemberStatus)) {
+            if (centreGroup1 != null && (protoGroupedObject2.membershipEligibility == Group.MembershipEligibility.MEMBER || protoGroupedObject2.membershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
+                Group.ProtoMemberStatus protoMemberStatus = centreGroup1.attemptAddMember(protoGroupedObject2.object);
+                if (protoMemberStatus == Group.ProtoMemberStatus.MEMBER) {
+                    protoGroupedObject2.memberGroups.add(centreGroup1);
+                    if (isDefiniteGroup1) {
+                        protoGroupedObject2.quickMemberStatus = true;
+                    }
+                }
+            }
+        }
+        if(!(isDefiniteGroup2 && protoGroupedObject1.quickMemberStatus)) {
+            if (centreGroup2 != null && (protoGroupedObject1.membershipEligibility == Group.MembershipEligibility.MEMBER || protoGroupedObject1.membershipEligibility == Group.MembershipEligibility.CENTRE_OR_MEMBER)) {
+                Group.ProtoMemberStatus protoMemberStatus = centreGroup2.attemptAddMember(protoGroupedObject1.object);
+                if (protoMemberStatus == Group.ProtoMemberStatus.MEMBER) {
+                    protoGroupedObject1.memberGroups.add(centreGroup2);
+                    if (isDefiniteGroup2) {
+                        protoGroupedObject1.quickMemberStatus = true;
+                    }
+                }
+            }
+        }
+    }
+
     private static class ProtoGroupedObject<T> {
         private T object;
         private Group<? super T> group;
@@ -92,6 +112,7 @@ public class ObjectGrouper {
         private ProtoGroup<T> centreGroup;
         private List<ProtoGroup<T>> memberGroups;
         private boolean quickMemberStatus;
+        private boolean definiteGroup;
 
         public ProtoGroupedObject(T object) {
             this.object = object;
@@ -111,6 +132,18 @@ public class ObjectGrouper {
                     return true;
                 }
             }
+            return false;
+        }
+
+        public boolean isDefiniteGroup() {
+            if(definiteGroup) {
+                return true;
+            }
+            if(ObjectGrouper.isDefiniteGroup(this)) {
+                definiteGroup = true;
+                return true;
+            }
+
             return false;
         }
 
