@@ -62,7 +62,7 @@ passive-freeze-groups:
   - dense_animal_farm
 
 # Which groups of mobs should we never freeze when running a passive freeze task?
-passive-freeze-exclude-grouos:
+passive-freeze-exclude-groups:
 
 # Which groups of mobs should be nerfed when we run a passive freeze task?
 passive-nerf-groups:
