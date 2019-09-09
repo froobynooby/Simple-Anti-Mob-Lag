@@ -78,6 +78,7 @@ public class SamlListener implements Listener {
                 }
             }
             event.getFreezeParametersBuilder().setDoCleanup(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_TPS_DO_CLEANUP));
+            event.getFreezeParametersBuilder().setMinimumFreezeTime(saml.getSamlConfig().getLong(ConfigKeys.CNF_TPS_MINIMUM_FREEZE_TIME));
         }
         if(event.getReason() == FreezeReason.PASSIVE) {
             Map<String, EntityGroup> groupMap = new HashMap<>();
