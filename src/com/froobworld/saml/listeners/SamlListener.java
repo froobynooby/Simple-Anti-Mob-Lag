@@ -52,26 +52,27 @@ public class SamlListener implements Listener {
         event.getFreezeParametersBuilder().setMaximumOperationTime(saml.getSamlConfig().getLong(ConfigKeys.CNF_MAXIMUM_OPERATION_TIME));
 
         if(event.getReason() == FreezeReason.TPS) {
+            Map<String, EntityGroup> groupMap = new HashMap<>();
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_FREEZE_GROUPS)) {
-                EntityGroup entityGroup = getGroupOrWarn(group);
+                EntityGroup entityGroup = groupMap.computeIfAbsent(group, this::getGroupOrWarn);
                 if(entityGroup != null) {
                     event.getFreezeParametersBuilder().includeFreezeGroup(entityGroup);
                 }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_FREEZE_EXCLUDE_GROUPS)) {
-                EntityGroup entityGroup = getGroupOrWarn(group);
+                EntityGroup entityGroup = groupMap.computeIfAbsent(group, this::getGroupOrWarn);
                 if(entityGroup != null) {
                     event.getFreezeParametersBuilder().excludeFreezeGroup(entityGroup);
                 }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_NERF_GROUPS)) {
-                EntityGroup entityGroup = getGroupOrWarn(group);
+                EntityGroup entityGroup = groupMap.computeIfAbsent(group, this::getGroupOrWarn);
                 if(entityGroup != null) {
                     event.getFreezeParametersBuilder().includeNerfGroup(entityGroup);
                 }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_TPS_NERF_EXCLUDE_GROUPS)) {
-                EntityGroup entityGroup = getGroupOrWarn(group);
+                EntityGroup entityGroup = groupMap.computeIfAbsent(group, this::getGroupOrWarn);
                 if(entityGroup != null) {
                     event.getFreezeParametersBuilder().excludeNerfGroup(entityGroup);
                 }
@@ -79,26 +80,27 @@ public class SamlListener implements Listener {
             event.getFreezeParametersBuilder().setDoCleanup(saml.getSamlConfig().getBoolean(ConfigKeys.CNF_TPS_DO_CLEANUP));
         }
         if(event.getReason() == FreezeReason.PASSIVE) {
+            Map<String, EntityGroup> groupMap = new HashMap<>();
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_FREEZE_GROUPS)) {
-                EntityGroup entityGroup = getGroupOrWarn(group);
+                EntityGroup entityGroup = groupMap.computeIfAbsent(group, this::getGroupOrWarn);
                 if(entityGroup != null) {
                     event.getFreezeParametersBuilder().includeFreezeGroup(entityGroup);
                 }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_FREEZE_EXCLUDE_GROUPS)) {
-                EntityGroup entityGroup = getGroupOrWarn(group);
+                EntityGroup entityGroup = groupMap.computeIfAbsent(group, this::getGroupOrWarn);
                 if(entityGroup != null) {
                     event.getFreezeParametersBuilder().excludeFreezeGroup(entityGroup);
                 }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_NERF_GROUPS)) {
-                EntityGroup entityGroup = getGroupOrWarn(group);
+                EntityGroup entityGroup = groupMap.computeIfAbsent(group, this::getGroupOrWarn);
                 if(entityGroup != null) {
                     event.getFreezeParametersBuilder().includeNerfGroup(entityGroup);
                 }
             }
             for (String group : saml.getSamlConfig().getStringList(ConfigKeys.CNF_PASSIVE_NERF_EXCLUDE_GROUPS)) {
-                EntityGroup entityGroup = getGroupOrWarn(group);
+                EntityGroup entityGroup = groupMap.computeIfAbsent(group, this::getGroupOrWarn);
                 if(entityGroup != null) {
                     event.getFreezeParametersBuilder().excludeNerfGroup(entityGroup);
                 }
