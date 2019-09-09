@@ -27,18 +27,24 @@ public class ObjectGrouper {
                         nextProtoGroupedObject.centreGroup = new ProtoGroup<>(group, object);
                     }
 
-                    ListIterator<ProtoGroupedObject<T>> iterator = definiteGroupProtoGroupedObjects.listIterator(definiteGroupProtoGroupedObjects.size());
+                    ListIterator<ProtoGroupedObject<T>> iterator = groupProtoGroupedObjects.listIterator(groupProtoGroupedObjects.size());
+                    while (iterator.hasPrevious()) {
+                        ProtoGroupedObject<T> otherProtoGroupedObject = iterator.previous();
+                        if(otherProtoGroupedObject.definiteGroup) {
+                            iterator.remove();
+                            definiteGroupProtoGroupedObjects.add(otherProtoGroupedObject);
+                        } else {
+                            checkMembershipAndUpdate(nextProtoGroupedObject, otherProtoGroupedObject);
+                        }
+
+                    }
+                    iterator = definiteGroupProtoGroupedObjects.listIterator(definiteGroupProtoGroupedObjects.size());
                     while (iterator.hasPrevious()) {
                         ProtoGroupedObject<T> otherProtoGroupedObject = iterator.previous();
                         checkMembershipAndUpdate(nextProtoGroupedObject, otherProtoGroupedObject);
                         if(nextProtoGroupedObject.isDefiniteGroup()) {
                             break;
                         }
-                    }
-                    iterator = groupProtoGroupedObjects.listIterator(groupProtoGroupedObjects.size());
-                    while (iterator.hasPrevious()) {
-                        ProtoGroupedObject<T> otherProtoGroupedObject = iterator.previous();
-                        checkMembershipAndUpdate(nextProtoGroupedObject, otherProtoGroupedObject);
                     }
 
                     protoGroupedObjectsList.add(nextProtoGroupedObject);
