@@ -3,8 +3,6 @@ package com.froobworld.saml.config;
 import com.froobworld.saml.Saml;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +14,7 @@ public class ConfigUpdater {
     private static final String SECTION_BEGIN_PREFIX = "# section-begin: ";
     private static final String SECTION_END_PREFIX = "# section-end";
 
-    public static boolean update(File configFile, InputStream patchInputStream, int versionFrom, String backupDirPath) {
+    public static boolean update(File configFile, InputStream patchInputStream, int versionFrom) {
         HashMap<String, List<String>> sectionedNewLines = new HashMap<>();
         List<String> unsectionedNewLines = new ArrayList<>();
 
@@ -94,14 +92,6 @@ public class ConfigUpdater {
             Saml.logger().severe("Failed to read existing config file.");
             e.printStackTrace();
             return false;
-        }
-
-        try {
-            new File(backupDirPath).mkdirs();
-            Files.copy(configFile.toPath(), new File(backupDirPath, configFile.getName() + "." + versionFrom + ".bak").toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            Saml.logger().warning("Failed to create backup of " + configFile.getName() + ", will proceed anyway.");
-            e.printStackTrace();
         }
 
         try(PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
