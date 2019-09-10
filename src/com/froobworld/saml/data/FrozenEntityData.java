@@ -9,19 +9,17 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class FrozenEntityData {
     private FreezeReason freezeReason;
     private long time;
-    private List<String> groups;
+    private Set<String> groups;
     private long minimumFreezeTime;
 
-    private FrozenEntityData(FreezeReason freezeReason, long time, List<String> groups, long minimumFreezeTime) {
+    private FrozenEntityData(FreezeReason freezeReason, long time, Set<String> groups, long minimumFreezeTime) {
         this.freezeReason = freezeReason;
         this.time = time;
         this.groups = groups;
@@ -36,7 +34,7 @@ public class FrozenEntityData {
         return time;
     }
 
-    public List<String> getGroups() {
+    public Set<String> getGroups() {
         return groups;
     }
 
@@ -126,13 +124,13 @@ public class FrozenEntityData {
     public static class Builder {
         private FreezeReason freezeReason;
         private long time;
-        private List<String> groups;
+        private Set<String> groups;
         private long minimumFreezeTime;
 
         public Builder() {
             this.freezeReason = FreezeReason.DEFAULT;
             this.time = System.currentTimeMillis();
-            this.groups = new ArrayList<>();
+            this.groups = new HashSet<>();
             this.minimumFreezeTime = 0;
         }
 

@@ -5,17 +5,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class NerfedEntityData {
     private FreezeReason freezeReason;
     private long time;
-    private List<String> groups;
+    private Set<String> groups;
     private long minimumNerfTime;
 
-    private NerfedEntityData(FreezeReason freezeReason, long time, List<String> groups, long minimumNerfTime) {
+    private NerfedEntityData(FreezeReason freezeReason, long time, Set<String> groups, long minimumNerfTime) {
         this.freezeReason = freezeReason;
         this.time = time;
         this.groups = groups;
@@ -30,7 +28,7 @@ public class NerfedEntityData {
         return time;
     }
 
-    public List<String> getGroups() {
+    public Set<String> getGroups() {
         return groups;
     }
 
@@ -68,13 +66,13 @@ public class NerfedEntityData {
     public static class Builder {
         private FreezeReason freezeReason;
         private long time;
-        private List<String> groups;
+        private Set<String> groups;
         private long minimumNerfTime;
 
         public Builder() {
             this.freezeReason = FreezeReason.DEFAULT;
             this.time = System.currentTimeMillis();
-            this.groups = new ArrayList<>();
+            this.groups = new HashSet<>();
             this.minimumNerfTime = 0;
         }
 

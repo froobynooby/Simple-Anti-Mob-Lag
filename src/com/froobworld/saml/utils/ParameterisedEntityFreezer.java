@@ -147,20 +147,49 @@ public class ParameterisedEntityFreezer {
                 if(EntityFreezer.isFrozen(entity)) {
                     if (!unfreezeParameters.getIgnorePredicate().test(entity)) {
                         Optional<FrozenEntityData> frozenEntityData = FrozenEntityData.getFrozenEntityData(saml, entity);
+                        boolean unfreeze = false;
                         if(frozenEntityData.isPresent()) {
-                            if(unfreezeParameters.includeAllGroups() || frozenEntityData.get().getGroups().stream().anyMatch(unfreezeParameters.getIncludeGroups()::contains)) {
-                                if(frozenEntityData.get().getGroups().stream().noneMatch(unfreezeParameters.getExcludeGroups()::contains)) {
+                            if(unfreezeParameters.includeAllGroups() || !SetUtils.disjoint(frozenEntityData.get().getGroups(), unfreezeParameters.getIncludeGroups())) {
+                                if(SetUtils.disjoint(frozenEntityData.get().getGroups(), unfreezeParameters.getExcludeGroups())) {
                                     if(unfreezeParameters.ignoreRemainingTime() || frozenEntityData.get().getMinimumFreezeTime() <= System.currentTimeMillis() - frozenEntityData.get().getTimeAtFreeze()) {
                                         if(unfreezeParameters.getIncludeFreezeReasons().contains(frozenEntityData.get().getFreezeReason()) && !unfreezeParameters.getExcludeFreezeReasons().contains(frozenEntityData.get().getFreezeReason())) {
-                                            EntityFreezer.unfreezeEntity(saml, entity);
-                                            unfrozenList.add(entity);
-                                            numberUnfrozen++;
+                                            unfreeze = true;
                                         }
                                     }
                                 }
                             }
                         } else {
+                            unfreeze = true;
+                        }
+                        if(unfreeze) {
                             EntityFreezer.unfreezeEntity(saml, entity);
+                            unfrozenList.add(entity);
+                            numberUnfrozen++;
+                        }
+                    }
+                }
+                if(unfreezeParameters.getUnfreezeLimit() != -1 && numberUnfrozen >= unfreezeParameters.getUnfreezeLimit()) {
+                    break;
+                }
+                if(EntityNerfer.isNerfed(entity)) {
+                    if (!unfreezeParameters.getIgnorePredicate().test(entity)) {
+                        Optional<NerfedEntityData> nerfedEntityData = NerfedEntityData.getNerfedEntityData(saml, entity);
+                        boolean unnerf = false;
+                        if(nerfedEntityData.isPresent()) {
+                            if(unfreezeParameters.includeAllGroups() || !SetUtils.disjoint(nerfedEntityData.get().getGroups(), unfreezeParameters.getIncludeGroups())) {
+                                if(SetUtils.disjoint(nerfedEntityData.get().getGroups(), unfreezeParameters.getExcludeGroups())) {
+                                    if(unfreezeParameters.ignoreRemainingTime() || nerfedEntityData.get().getMinimumNerfTime() <= System.currentTimeMillis() - nerfedEntityData.get().getTimeAtNerf()) {
+                                        if(unfreezeParameters.getIncludeFreezeReasons().contains(nerfedEntityData.get().getFreezeReason()) && !unfreezeParameters.getExcludeFreezeReasons().contains(nerfedEntityData.get().getFreezeReason())) {
+                                            unnerf = true;
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            unnerf = true;
+                        }
+                        if(unnerf) {
+                            EntityNerfer.unnerf(saml, entity);
                             unfrozenList.add(entity);
                             numberUnfrozen++;
                         }
