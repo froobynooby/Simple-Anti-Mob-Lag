@@ -7,6 +7,8 @@ public class CompatibilityUtils {
     public static final boolean USE_PAPER_GET_CHUNK_ASYNC;
     public static final boolean MOB_TARGET;
     public static final boolean PERSISTENT_DATA;
+    public static final boolean FISH_EXIST;
+    public static final boolean RAIDERS_EXIST;
     static {
         boolean loveModeMethodExists;
         try {
@@ -43,5 +45,23 @@ public class CompatibilityUtils {
             persistentDataHolderClassExists = false;
         }
         PERSISTENT_DATA = persistentDataHolderClassExists;
+
+        boolean fishExist;
+        try {
+            org.bukkit.entity.Fish.class.getClass();
+            fishExist = true;
+        } catch (NoClassDefFoundError e) {
+            fishExist = false;
+        }
+        FISH_EXIST = fishExist;
+
+        boolean raidersExist;
+        try {
+            org.bukkit.entity.Raider.class.getClass();
+            raidersExist = true;
+        } catch (NoClassDefFoundError e) {
+            raidersExist = false;
+        }
+        RAIDERS_EXIST = raidersExist;
     }
 }

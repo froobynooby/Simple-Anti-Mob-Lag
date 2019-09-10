@@ -16,7 +16,7 @@ public class EntityUtils {
         if(entity instanceof Animals) {
             identifiers.add("animal");
         }
-        if(entity instanceof Fish) {
+        if(CompatibilityUtils.FISH_EXIST && entity instanceof Fish) {
             identifiers.add("fish");
         }
         if(entity instanceof Flying) {
@@ -25,7 +25,7 @@ public class EntityUtils {
         if(entity instanceof Monster) {
             identifiers.add("monster");
         }
-        if(entity instanceof Raider) {
+        if(CompatibilityUtils.RAIDERS_EXIST && entity instanceof Raider) {
             identifiers.add("raider");
         }
         if(entity instanceof WaterMob) {

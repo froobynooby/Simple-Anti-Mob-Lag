@@ -119,6 +119,9 @@ PathfinderGoalRandomFly:
 
 PathfinderGoalRandomLookaround:
 
+PathfinderGoalRandomStroll:
+  default: false
+
 PathfinderGoalRandomStrollLand:
   default: false
 

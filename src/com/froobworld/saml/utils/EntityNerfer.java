@@ -21,16 +21,27 @@ public class EntityNerfer {
     private static Field PATHFINDER_GOAL_WRAPPED_UNWRAPPED_FIELD;
 
     static {
-        Map<String, String> PATHFINDER_GOAL_WRAPPED_CLASS_NAMES = new HashMap<>();
+        Map<String, String> pathfinderGoalWrappedClassNames = new HashMap<>();
         String defaultPathfinderGoalWrappedClassName = "PathfinderGoalWrapped";
-        PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.put("v1_14_R1", "PathfinderGoalWrapped");
-        PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.put("v1_13_R2", "PathfinderGoalSelector.PathfinderGoalSelectorItem");
-        PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.put("v1_13_R1", "PathfinderGoalSelector.PathfinderGoalSelectorItem");
-        PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.put("v1_12_R1", "PathfinderGoalSelector.PathfinderGoalSelectorItem");
-        PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.put("v1_11_R1", "PathfinderGoalSelector.PathfinderGoalSelectorItem");
-        PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.put("v1_10_R1", "PathfinderGoalSelector.PathfinderGoalSelectorItem");
-        PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.put("v1_9_R2", "PathfinderGoalSelector.PathfinderGoalSelectorItem");
-        PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.put("v1_9_R1", "PathfinderGoalSelector.PathfinderGoalSelectorItem");
+        pathfinderGoalWrappedClassNames.put("v1_14_R1", "PathfinderGoalWrapped");
+        pathfinderGoalWrappedClassNames.put("v1_13_R2", "PathfinderGoalSelector$PathfinderGoalSelectorItem");
+        pathfinderGoalWrappedClassNames.put("v1_13_R1", "PathfinderGoalSelector$PathfinderGoalSelectorItem");
+        pathfinderGoalWrappedClassNames.put("v1_12_R1", "PathfinderGoalSelector$PathfinderGoalSelectorItem");
+        pathfinderGoalWrappedClassNames.put("v1_11_R1", "PathfinderGoalSelector$PathfinderGoalSelectorItem");
+        pathfinderGoalWrappedClassNames.put("v1_10_R1", "PathfinderGoalSelector$PathfinderGoalSelectorItem");
+        pathfinderGoalWrappedClassNames.put("v1_9_R2", "PathfinderGoalSelector$PathfinderGoalSelectorItem");
+        pathfinderGoalWrappedClassNames.put("v1_9_R1", "PathfinderGoalSelector$PathfinderGoalSelectorItem");
+
+        Map<String, String> goalSetFieldNames = new HashMap<>();
+        String defaultGoalSetFieldName = "d";
+        goalSetFieldNames.put("v1_14_R1", "d");
+        goalSetFieldNames.put("v1_13_R2", "b");
+        goalSetFieldNames.put("v1_13_R1", "b");
+        goalSetFieldNames.put("v1_12_R1", "b");
+        goalSetFieldNames.put("v1_11_R1", "b");
+        goalSetFieldNames.put("v1_10_R1", "b");
+        goalSetFieldNames.put("v1_9_R2", "b");
+        goalSetFieldNames.put("v1_9_R1", "b");
 
         try {
             ENTITY_INSENTIENT_CLASS = Class.forName("net.minecraft.server." + NmsUtils.VERSION + "." + "EntityInsentient");
@@ -39,8 +50,8 @@ public class EntityNerfer {
             e.printStackTrace();
         }
         try {
-            PATHFINDER_GOAL_WRAPPED_UNWRAPPED_FIELD = Class.forName("net.minecraft.server." + NmsUtils.VERSION + "." + PATHFINDER_GOAL_WRAPPED_CLASS_NAMES.getOrDefault(NmsUtils.VERSION, defaultPathfinderGoalWrappedClassName)).getDeclaredField("a");
-            PATHFINDER_GOAL_SELECTOR_GOALS_FIELD = Class.forName("net.minecraft.server." + NmsUtils.VERSION + ".PathfinderGoalSelector").getDeclaredField("d");
+            PATHFINDER_GOAL_WRAPPED_UNWRAPPED_FIELD = Class.forName("net.minecraft.server." + NmsUtils.VERSION + "." + pathfinderGoalWrappedClassNames.getOrDefault(NmsUtils.VERSION, defaultPathfinderGoalWrappedClassName)).getDeclaredField("a");
+            PATHFINDER_GOAL_SELECTOR_GOALS_FIELD = Class.forName("net.minecraft.server." + NmsUtils.VERSION + ".PathfinderGoalSelector").getDeclaredField(goalSetFieldNames.getOrDefault(NmsUtils.VERSION, defaultGoalSetFieldName));
             ENTITY_INSENTIENT_GOAL_SELECTOR_FIELD = Class.forName("net.minecraft.server." + NmsUtils.VERSION + ".EntityInsentient").getField("goalSelector");
             ENTITY_INSENTIENT_TARGET_SELECTOR_FIELD  = Class.forName("net.minecraft.server." + NmsUtils.VERSION + ".EntityInsentient").getField("targetSelector");
             PATHFINDER_GOAL_WRAPPED_UNWRAPPED_FIELD.setAccessible(true);
