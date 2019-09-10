@@ -9,6 +9,11 @@ version: 2
 # You can find a list of entity types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
 # Make sure to use all caps for the entity types. It is case sensitive.
 
+# +--------------------------------------------------------------------------------------------------------------------+
+# |  Advanced gameplay settings                                                                                        |
+# +--------------------------------------------------------------------------------------------------------------------+
+# section-begin: advanced_gameplay_settings
+
 # Should we stop mobs from targeting mobs of the following type that are frozen?
 prevent-targeting-frozen:
 #  VILLAGER: true
@@ -24,7 +29,6 @@ prevent-player-damaging-frozen:
 #  WOLF: true
 #  CAT: true
 
-
 # Should we unfreeze mobs of the following type when they are interacted with?
 unfreeze-on-interact:
 #  HORSE: true
@@ -32,8 +36,9 @@ unfreeze-on-interact:
 #  MULE: true
 #  SKELETON_HORSE: true
 
-# For mobs of the following type, below what TPS should we ignore the unfreeze-on-interact option and never unfreeze those that are interacted with?
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the unfreeze-on-interact option and never unfreeze
+# those that are interacted with?
+#   * Set to 0 to disable this option.
 unfreeze-on-interact-tps-threshold:
 #  HORSE: 10.0
 #  DONKEY: 10.0
@@ -45,8 +50,9 @@ unfreeze-on-damage:
 #  SKELETON: true
 #  CREEPER: true
 
-# For mobs of the following type, below what TPS should we ignore the unfreeze-on-damage option and never unfreeze those that are damaged?
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the unfreeze-on-damage option and never unfreeze those
+# that are damaged?
+#   * Set to 0 to disable this option.
 unfreeze-on-damage-tps-threshold:
 #  ZOMBIE: 10.0
 #  SKELETON: 10.0
@@ -61,8 +67,9 @@ ignore-tamed:
 #  WOLF: false
 #  CAT: false
 
-# For mobs of the following type, below what TPS should we ignore the ignore-tamed option and not ignore those that are tamed?
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the ignore-tamed option and not ignore those that are
+# tamed?
+#   * Set to 0 to disable this option.
 ignore-tamed-tps-threshold:
 #  HORSE: 10.0
 #  DONKEY: 10.0
@@ -76,8 +83,9 @@ ignore-named:
 #  WOLF: true
 #  CAT: true
 
-# For mobs of the following type, below what TPS should we ignore the ignore-named option and not ignore those that are named?
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the ignore-named option and not ignore those that are
+# named?
+#   * Set to 0 to disable this option.
 ignore-named-tps-threshold:
 #  WOLF: 10.0
 #  CAT: 10.0
@@ -88,8 +96,9 @@ ignore-leashed:
 #  DONKEY: true
 #  MULE: true
 
-# For mobs of the following type, below what TPS should we ignore the ignore-leashed option and not ignore those that are leashed?
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the ignore-leashed option and not ignore those that
+# are leashed?
+#   * Set to 0 to disable this option.
 ignore-leashed-tps-threshold:
 #  COW: 10.0
 #  PIG: 10.0
@@ -106,8 +115,9 @@ ignore-love-mode:
 #  PIG: false
 #  HORSE: true
 
-# For mobs of the following type, below what TPS should we ignore the ignore-love-mode option and not ignore those that are in love mode?
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the ignore-love-mode option and not ignore those that
+# are in love mode?
+#   * Set to 0 to disable this option.
 ignore-love-mode-tps-threshold:
 #  COW: 10.0
 #  PIG: 10.0
@@ -118,15 +128,17 @@ ignore-love-mode-tps-threshold:
 #  MULE: 5.0
 
 # Should mobs of the following type not be frozen when they are within the specified distance of a player?
-# Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last significantly longer.
-# Set to 0 to disable this option.
+#   * Note that this is quite an expensive check. If you have a lot of players it may make the freezing operation last
+#     significantly longer.
+#   * Set to 0 to disable this option.
 ignore-player-proximity:
 #  ZOMBIE: 5.0
 #  SKELETON: 5.0
 #  CREEPER: 5.0
 
-# For mobs of the following type, below what TPS should we ignore the ignore-player-proximity distance and start freezing those mobs?
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the ignore-player-proximity distance and start
+# freezing those mobs?
+#   * Set to 0 to disable this option.
 ignore-player-proximity-tps-threshold:
 #  ZOMBIE: 10.0
 #  SKELETON: 10.0
@@ -139,8 +151,9 @@ ignore-younger-than-ticks:
 #  CREEPER: 600
 #  SPIDER: 600
 
-# For mobs of the following type, below what TPS should we ignore the option above and start freezing mobs with ages above the given number of ticks.
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the option above and start freezing mobs with ages
+# above the given number of ticks.
+#   * Set to 0 to disable this option.
 ignore-younger-than-ticks-tps-threshold:
 #  ZOMBIE: 10.0
 #  SKELETON: 10.0
@@ -157,8 +170,9 @@ ignore-target-player:
 #  COW: true
 #  CHICKEN: true
 
-# For mobs of the following type, below what TPS should we ignore the option above and start freezing mobs that are targeting a player?
-# Set to 0 to disable this option.
+# For mobs of the following type, below what TPS should we ignore the option above and start freezing mobs that are
+# targeting a player?
+#   * Set to 0 to disable this option.
 ignore-target-player-tps-threshold:
 #  ZOMBIE: 10.0
 #  SKELETON: 10.0
@@ -180,3 +194,5 @@ never-freeze-tps-threshold:
 #  RAVAGER: 10.0
 #  ILLUSIONER: 10.0
 #  EVOKER: 10.0
+
+# section-end

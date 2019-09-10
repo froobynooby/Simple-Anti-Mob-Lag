@@ -1,5 +1,12 @@
+# Don't change this!
 version: 1
 
+# +--------------------------------------------------------------------------------------------------------------------+
+# |  Custom group definitions                                                                                          |
+# +--------------------------------------------------------------------------------------------------------------------+
+# section-begin: custom_group_definitions
+
+# See https://github.com/froobynooby/Simple-Anti-Mob-Lag/wiki/Custom-groups for a guide on making custom groups.
 # Group name requirements:
 #  - Allowed characters: 0-9, a-z AND _
 #  - Name must not start with 'default_'
@@ -7,7 +14,7 @@ group:
   egg_farm:
     definition: |-
       specific_center_member_type{"acceptedTypes": ["CHICKEN"]}
-      & default_distance{"separationDistance": 2}
+      & default_distance{"separationDistance": 1}
       & default_total_count{"minimumSize": 5}
 
   1_13_iron_farm_villagers:
@@ -18,15 +25,15 @@ group:
 
   animal_farm:
     definition: |-
-      specific_center_member_type{"acceptedTypes": ["COW", "PIG", "SHEEP", "CHICKEN"]}
-      & default_distance{"separationDistance": 10}
-      & default_total_count{"minimumSize": 20}
+      specific_center_member_type{"acceptedTypes": ["animal"]}
+      & default_distance{"separationDistance": 8, "metric": "supremum"}
+      & default_total_count{"minimumSize": 10}
 
   dense_animal_farm:
     definition: |-
-      specific_center_member_type{"acceptedTypes": ["COW", "PIG", "SHEEP", "CHICKEN"]}
-      & default_distance{"separationDistance": 2}
-      & default_total_count{"minimumSize": 10}
+      specific_center_member_type{"acceptedTypes": ["animal"]}
+      & default_distance{"separationDistance": 0.9, "metric": "supremum"}
+      & default_total_count{"minimumSize": 9}
 
   enderman_grinder:
     definition: |-
@@ -34,6 +41,21 @@ group:
       & default_specific_type{"acceptedTypes": ["ENDERMAN"]}
       & default_distance{"separationDistance": 20, "weightY": 0}
       & default_type_count{"typedMinimumSize": {"ENDERMAN": 10}}
+
+  near_player:
+    definition: |-
+      *(default_specific_type{"acceptedTypes": ["PLAYER"]}
+      & default_distance{"separationDistance": %withinDistance%}
+      & default_total_count{"minimumSize": 2})
+    arguments:
+      withinDistance:
+        required: false
+        default: 10
+
+  lag_causers:
+    definition: |-
+      default_singular{"acceptedTypes": ["watermob", "ambient", "PILLAGER"]}
+
 
 helper:
   specific_center_member_type:
@@ -43,3 +65,5 @@ helper:
     arguments:
       acceptedTypes:
         required: true
+
+# section-end
