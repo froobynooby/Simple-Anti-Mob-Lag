@@ -1,7 +1,6 @@
 package com.froobworld.saml.utils;
 
 import com.froobworld.saml.Saml;
-import com.froobworld.saml.config.ConfigKeys;
 import com.froobworld.saml.data.*;
 import com.froobworld.saml.events.SamlMobFreezeEvent;
 import com.froobworld.saml.events.SamlMobUnfreezeEvent;
@@ -10,10 +9,8 @@ import com.froobworld.saml.group.ObjectGrouper;
 import com.froobworld.saml.group.entity.EntityGroup;
 import com.froobworld.saml.group.entity.SnapshotEntity;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -56,8 +53,8 @@ public class ParameterisedEntityFreezer {
             }
             for(GroupedObject<IdentifiedSnapshotEntity> groupedSnapshotEntity : ObjectGrouper.groupObjects(worldFreezeCandidates.get(world), groups, timeRemaining)) {
                 AfflictedEntity afflictedEntity = new AfflictedEntity(groupedSnapshotEntity.getObject().entity);
-                if(groupedSnapshotEntity.getGroups().stream().noneMatch(parameters.getExcludeFreezeGroups()::contains)) {
-                    if(groupedSnapshotEntity.getGroups().stream().anyMatch(parameters.getIncludeFreezeGroups()::contains)) {
+                if(SetUtils.disjoint(groupedSnapshotEntity.getGroups(), parameters.getExcludeFreezeGroups())) {
+                    if(!SetUtils.disjoint(groupedSnapshotEntity.getGroups(), parameters.getIncludeFreezeGroups())) {
                         FrozenEntityData.Builder frozenEntityDataBuilder = new FrozenEntityData.Builder()
                                 .setFreezeReason(freezeReason)
                                 .setMinimumFreezeTime(parameters.getMinimumFreezeTime());
@@ -67,8 +64,8 @@ public class ParameterisedEntityFreezer {
                         afflictedEntity.frozenEntityData = frozenEntityDataBuilder.build();
                     }
                 }
-                if(groupedSnapshotEntity.getGroups().stream().noneMatch(parameters.getExcludeNerfGroups()::contains)) {
-                    if(groupedSnapshotEntity.getGroups().stream().anyMatch(parameters.getIncludeNerfGroups()::contains)) {
+                if(SetUtils.disjoint(groupedSnapshotEntity.getGroups(), parameters.getExcludeNerfGroups())) {
+                    if(!SetUtils.disjoint(groupedSnapshotEntity.getGroups(), parameters.getIncludeNerfGroups())) {
                         NerfedEntityData.Builder nerfedEntityDataBuilder = new NerfedEntityData.Builder()
                                 .setFreezeReason(freezeReason)
                                 .setMinimumNerfTime(parameters.getMinimumFreezeTime());
