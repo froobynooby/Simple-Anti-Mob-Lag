@@ -83,7 +83,13 @@ public class ParameterisedEntityFreezer {
                 }
             }
         }
-        Bukkit.getScheduler().runTask(saml, () -> freeze(saml, afflictedEntities, parameters, startTime, freezeReason));
+        synchronized(saml) {
+            if(saml.isEnabled()) {
+                Bukkit.getScheduler().runTask(saml, () -> freeze(saml, afflictedEntities, parameters, startTime, freezeReason));
+            } else {
+                Saml.logger().warning("Plugin was disabled while a freeze was in progress.");
+            }
+        }
     }
 
     private static void freeze(Saml saml, List<AfflictedEntity> afflictedEntities, FreezeParameters parameters, long startTime, FreezeReason freezeReason) {
