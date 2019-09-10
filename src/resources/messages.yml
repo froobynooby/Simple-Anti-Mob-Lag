@@ -7,27 +7,61 @@ version: 2
 # section-begin: freeze_messages
 
 # Sent to the console when starting a TPS freeze if enabled in the config.yml.
+#   * %tps% - TPS at the time of the freeze.
 tps-freeze-start-console: '&cTPS low (%tps%). Will attempt to freeze some mobs...'
 
 # Sent to the console when a TPS freeze completes if enabled in the config.yml.
+#  * %time% - time taken in milliseconds between the beginning and end of the freeze.
+#  * %number_affected% - number of mobs that were frozen and/or nerfed in that given freeze.
+#  * %number_frozen% - number of mobs that were frozen in that given freeze.
+#  * %number_nerfed% - number of mobs that were nerfed in that given freeze.
+#  * %total_number_affected% - total number of mobs that are frozen and/or nerfed across all worlds.
+#  * %total_number_frozen% - total number of mobs that are frozen across all worlds.
+#  * %total_number_nerfed% - total number of mobs that are nerfed across all worlds.
+#  * %total_number_mobs% - total number of mobs across all worlds.
 tps-freeze-complete-console: '&c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
 
 # Sent to players with the permission 'saml.notify' when starting a TPS freeze if enabled in the config.yml.
+#   * %tps% - TPS at the time of the freeze.
 tps-freeze-start-ops: '&cTPS low (%tps%). Will attempt to freeze some mobs...'
 
 # Sent to players with the permission 'saml.notify' when a TPS freeze completes if enabled in the config.yml.
+#  * %time% - time taken in milliseconds between the beginning and end of the freeze.
+#  * %number_affected% - number of mobs that were frozen and/or nerfed in that given freeze.
+#  * %number_frozen% - number of mobs that were frozen in that given freeze.
+#  * %number_nerfed% - number of mobs that were nerfed in that given freeze.
+#  * %total_number_affected% - total number of mobs that are frozen and/or nerfed across all worlds.
+#  * %total_number_frozen% - total number of mobs that are frozen across all worlds.
+#  * %total_number_nerfed% - total number of mobs that are nerfed across all worlds.
+#  * %total_number_mobs% - total number of mobs across all worlds.
 tps-freeze-complete-ops: '&c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
 
 # Sent to the console when starting a passive freeze if enabled in the config.yml.
 passive-freeze-start-console: '&cStarting passive freeze...'
 
 # Sent to the console when a passive freeze completes if enabled in the config.yml.
+#  * %time% - time taken in milliseconds between the beginning and end of the freeze.
+#  * %number_affected% - number of mobs that were frozen and/or nerfed in that given freeze.
+#  * %number_frozen% - number of mobs that were frozen in that given freeze.
+#  * %number_nerfed% - number of mobs that were nerfed in that given freeze.
+#  * %total_number_affected% - total number of mobs that are frozen and/or nerfed across all worlds.
+#  * %total_number_frozen% - total number of mobs that are frozen across all worlds.
+#  * %total_number_nerfed% - total number of mobs that are nerfed across all worlds.
+#  * %total_number_mobs% - total number of mobs across all worlds.
 passive-freeze-complete-console: '&c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
 
 # Sent to those with permission 'saml.notify' when starting a passive freeze if enabled in the config.yml.
 passive-freeze-start-ops: '&cStarting passive freeze...'
 
 # Sent to those with permission 'saml.notify' when a passive freeze completes if enabled in the config.yml.
+#  * %time% - time taken in milliseconds between the beginning and end of the freeze.
+#  * %number_affected% - number of mobs that were frozen and/or nerfed in that given freeze.
+#  * %number_frozen% - number of mobs that were frozen in that given freeze.
+#  * %number_nerfed% - number of mobs that were nerfed in that given freeze.
+#  * %total_number_affected% - total number of mobs that are frozen and/or nerfed across all worlds.
+#  * %total_number_frozen% - total number of mobs that are frozen across all worlds.
+#  * %total_number_nerfed% - total number of mobs that are nerfed across all worlds.
+#  * %total_number_mobs% - total number of mobs across all worlds.
 passive-freeze-complete-ops: '%c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
 
 # section-end
