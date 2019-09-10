@@ -34,6 +34,7 @@ public final class ConfigKeys {
     public static final String CNF_TPS_UNFREEZING_THRESHOLD = "tps-unfreezing-threshold";
     public static final String CNF_TPS_UNFREEZE_CONFIDENCE_RANGE = "tps-unfreeze-confidence-range";
     public static final String CNF_TPS_UNFREEZE_LIMIT = "tps-unfreeze-limit";
+    public static final String CNF_TPS_UNFREEZE_WEIGHTS = "tps-unfreeze-weights";
     public static final String CNF_TPS_MINIMUM_FREEZE_TIME = "tps-minimum-freeze-time";
     public static final String CNF_TPS_DO_CLEANUP = "tps-do-cleanup";
     public static final String CNF_TPS_FREEZE_BROADCAST_TO_CONSOLE = "tps-freeze-broadcast-to-console";

@@ -127,6 +127,17 @@ tps-unfreeze-confidence-range: 2.5
 # At most how many mobs should be unfrozen in any given operation?
 tps-unfreeze-limit: 40
 
+# How much should certain types of mobs contribute to the unfreeze limit above?
+#   * If not specified, a mob will contribute 1 to the unfreeze limit by default.
+#   * For an example of how this works: If pillagers have a weight of 10 and the unfreeze limit is 40, then at most 4
+#     pillagers will be unfrozen as 4 * 10 = 40.
+#   * The unfreeze limit will never be overshot; so if the unfreeze limit was 40, for example, and chickens had a weight
+#     of 41, then chickens would never be unfrozen.
+tps-unfreeze-weights:
+  PILLAGER: 8
+  VILLAGER: 4
+  fish: 2
+
 # What is the minimum amount of time (in milliseconds) that we should wait after freezing a mob before unfreezing it?
 tps-minimum-freeze-time: 300000
 

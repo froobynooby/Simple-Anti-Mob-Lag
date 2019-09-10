@@ -3,9 +3,7 @@ package com.froobworld.saml.data;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class UnfreezeParameters {
@@ -16,10 +14,11 @@ public class UnfreezeParameters {
     private EnumSet<FreezeReason> excludeFreezeReasons;
     private Set<World> worlds;
     private long unfreezeLimit;
+    private Map<String, Integer> unfreezeWeights;
     private boolean ignoreRemainingTime;
     private Predicate<LivingEntity> ignorePredicate;
 
-    private UnfreezeParameters(boolean includeAllGroups, Set<String> includeGroups, Set<String> excludeGroups, EnumSet<FreezeReason> includeFreezeReasons, EnumSet<FreezeReason> excludeFreezeReasons, Set<World> worlds, long unfreezeLimit, boolean ignoreRemainingTime, Predicate<LivingEntity> ignorePredicate) {
+    private UnfreezeParameters(boolean includeAllGroups, Set<String> includeGroups, Set<String> excludeGroups, EnumSet<FreezeReason> includeFreezeReasons, EnumSet<FreezeReason> excludeFreezeReasons, Set<World> worlds, long unfreezeLimit, Map<String, Integer> unfreezeWeights, boolean ignoreRemainingTime, Predicate<LivingEntity> ignorePredicate) {
         this.includeAllGroups = includeAllGroups;
         this.includeGroups = includeGroups;
         this.excludeGroups = excludeGroups;
@@ -27,6 +26,7 @@ public class UnfreezeParameters {
         this.excludeFreezeReasons = excludeFreezeReasons;
         this.worlds = worlds;
         this.unfreezeLimit = unfreezeLimit;
+        this.unfreezeWeights = unfreezeWeights;
         this.ignoreRemainingTime = ignoreRemainingTime;
         this.ignorePredicate = ignorePredicate;
     }
@@ -60,6 +60,10 @@ public class UnfreezeParameters {
         return unfreezeLimit;
     }
 
+    public Map<String, Integer> getUnfreezeWeights() {
+        return unfreezeWeights;
+    }
+
     public boolean ignoreRemainingTime() {
         return ignoreRemainingTime;
     }
@@ -76,6 +80,7 @@ public class UnfreezeParameters {
         private EnumSet<FreezeReason> excludeFreezeReasons;
         private Set<World> worlds;
         private long unfreezeLimit;
+        private Map<String, Integer> unfreezeWeights;
         private boolean ignoreRemainingTime;
         private Predicate<LivingEntity> ignorePredicate;
 
@@ -87,6 +92,7 @@ public class UnfreezeParameters {
             this.excludeFreezeReasons = EnumSet.noneOf(FreezeReason.class);
             this.worlds = new HashSet<>();
             this.unfreezeLimit = -1;
+            this.unfreezeWeights = new HashMap<>();
             this.ignoreRemainingTime = false;
             this.ignorePredicate = e -> false;
         }
@@ -127,6 +133,11 @@ public class UnfreezeParameters {
             return this;
         }
 
+        public Builder setUnfreezeWeight(String type, int weight) {
+            this.unfreezeWeights.put(type, weight);
+            return this;
+        }
+
         public Builder ignoreRemainingTime(boolean ignoreRemainingTime) {
             this.ignoreRemainingTime = ignoreRemainingTime;
             return this;
@@ -138,7 +149,7 @@ public class UnfreezeParameters {
         }
 
         public UnfreezeParameters build() {
-            return new UnfreezeParameters(includeAllGroups, includeGroups, excludeGroups, includeFreezeReasons, excludeFreezeReasons, worlds, unfreezeLimit, ignoreRemainingTime, ignorePredicate);
+            return new UnfreezeParameters(includeAllGroups, includeGroups, excludeGroups, includeFreezeReasons, excludeFreezeReasons, worlds, unfreezeLimit, unfreezeWeights, ignoreRemainingTime, ignorePredicate);
         }
 
     }

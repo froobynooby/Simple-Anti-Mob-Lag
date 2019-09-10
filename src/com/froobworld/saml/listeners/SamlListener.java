@@ -16,6 +16,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import sun.security.krb5.Config;
 
 import java.text.ParseException;
 import java.util.*;
@@ -365,6 +366,9 @@ public class SamlListener implements Listener {
             }
             event.getUnfreezeParametersBuilder().includeFreezeReason(FreezeReason.TPS);
             event.getUnfreezeParametersBuilder().includeFreezeReason(FreezeReason.DEFAULT);
+            for(Map.Entry<String, Object> entry : saml.getSamlConfig().getSection(ConfigKeys.CNF_TPS_UNFREEZE_WEIGHTS).entrySet()) {
+                event.getUnfreezeParametersBuilder().setUnfreezeWeight(entry.getKey(), (Integer) entry.getValue());
+            }
         }
 
         event.getUnfreezeParametersBuilder().addIgnorePredicate( e -> (saml.getSamlConfig().getStringList(ConfigKeys.CNF_IGNORE_METADATA).stream().anyMatch(e::hasMetadata)) );

@@ -144,6 +144,16 @@ public class ParameterisedEntityFreezer {
                 if(unfreezeParameters.getUnfreezeLimit() != -1 && numberUnfrozen >= unfreezeParameters.getUnfreezeLimit()) {
                     break;
                 }
+                int weight = 1;
+                for(String string : EntityUtils.getTypeIdentifiers(entity)) {
+                    int typeWeight = unfreezeParameters.getUnfreezeWeights().getOrDefault(string, 1);
+                    if(typeWeight > weight) {
+                        weight = typeWeight;
+                    }
+                }
+                if(numberUnfrozen + weight > unfreezeParameters.getUnfreezeLimit()) {
+                    continue;
+                }
                 if(EntityFreezer.isFrozen(entity)) {
                     if (!unfreezeParameters.getIgnorePredicate().test(entity)) {
                         Optional<FrozenEntityData> frozenEntityData = FrozenEntityData.getFrozenEntityData(saml, entity);
@@ -164,12 +174,15 @@ public class ParameterisedEntityFreezer {
                         if(unfreeze) {
                             EntityFreezer.unfreezeEntity(saml, entity);
                             unfrozenList.add(entity);
-                            numberUnfrozen++;
+                            numberUnfrozen += weight;
                         }
                     }
                 }
                 if(unfreezeParameters.getUnfreezeLimit() != -1 && numberUnfrozen >= unfreezeParameters.getUnfreezeLimit()) {
                     break;
+                }
+                if(numberUnfrozen + weight > unfreezeParameters.getUnfreezeLimit()) {
+                    continue;
                 }
                 if(EntityNerfer.isNerfed(entity)) {
                     if (!unfreezeParameters.getIgnorePredicate().test(entity)) {
@@ -191,7 +204,7 @@ public class ParameterisedEntityFreezer {
                         if(unnerf) {
                             EntityNerfer.unnerf(saml, entity);
                             unfrozenList.add(entity);
-                            numberUnfrozen++;
+                            numberUnfrozen += weight;
                         }
                     }
                 }
