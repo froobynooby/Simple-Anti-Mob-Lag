@@ -249,6 +249,7 @@ ignore-metadata:
   - infernalMetadata # This ignores infernal mobs from the plugin InfernalMobs.
   - NPC # This ignores NPCs from the plugin Citizens.
   - shopkeeper # This ignores shopkeepers from the plugin Shopkeepers.
+  - mythicmob
 #  - Supermob  # This ignores super mobs from the plugin EliteMobs.
 
 # We will never run a freeze these worlds.
