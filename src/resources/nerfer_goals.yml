@@ -2,13 +2,13 @@
 version: 1
 
 # +--------------------------------------------------------------------------------------------------------------------+
-# |  Pathfinder goals toggling                                                                                         |
+# |  Pathfinder goal toggling                                                                                         |
 # +--------------------------------------------------------------------------------------------------------------------+
-# section-begin: pathfinder_goals_toggling
+# section-begin: pathfinder_goal_toggling
 
-# Here you can specify exactly which pathfinder goals should be enabled or disabled for a 'nerfed' mob.
+# Here you can specify exactly which pathfinder goals should be enabled for a 'nerfed' mob.
 # You can specify per entity type, group or classification:
-#   * See here for a lit of entity types: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+#   * See here for a list of entity types: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
 #   * For specifying per group you must prefix with 'group.', e.g. 'group.example_group'.
 #   * Entity classifications include: ambient, animal, fish, flying, monster, raider, watermob
 # The order is important in these settings, for example: In the below,
@@ -23,6 +23,8 @@ PathfinderGoalExample:
 # If a pathfinder goal isn't specified here, should it be enabled by default?
 unspecified:
   default: true
+
+# The following goal names are subject to change with any given version, as they are based on deobfuscated class names.
 
 PathfinderGoalArrowAttack:
 
@@ -154,7 +156,10 @@ PathfinderGoalWaterJump:
 
 PathfinderGoalZombieAttack:
 
-# This is (for 1.14.4) the Pillager's patrol goal
+# This is the Pillager's patrol goal
 EntityMonsterPatrolling.a:
+
+# This is the Zombie's turtle egg smashing goal
+EntityZombie.a:
 
 # section-end
