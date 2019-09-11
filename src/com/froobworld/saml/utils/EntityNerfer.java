@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -79,7 +80,7 @@ public class EntityNerfer {
             return null;
         }
 
-        String canonicalName = pathfinderGoal.getClass().getCanonicalName();
+        String canonicalName = Objects.toString(pathfinderGoal.getClass().getCanonicalName());
         String packageName = pathfinderGoal.getClass().getPackage().getName();
 
         return canonicalName.replaceFirst(Pattern.quote(packageName + "."), "");
