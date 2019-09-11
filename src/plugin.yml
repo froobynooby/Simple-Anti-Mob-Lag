@@ -1,10 +1,10 @@
 name: SAML
 main: com.froobworld.saml.Saml
 author: froobynooby
-version: 1.3.5
+version: 2.0.0
 api-version: 1.13
 description: >
-             Lightweight anti-mob lag plugin.
+             Plugin for reducing performance impact of mobs and farms.
 commands:
    saml:
     description: Base command for SAML.
