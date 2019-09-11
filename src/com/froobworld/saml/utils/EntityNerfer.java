@@ -68,16 +68,14 @@ public class EntityNerfer {
     private static Object getPathfinderGoalFromWrapped(Object wrappedPathfinderGoal) {
         try {
             return PATHFINDER_GOAL_WRAPPED_UNWRAPPED_FIELD.get(wrappedPathfinderGoal);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        } catch (IllegalAccessException ignored) {}
         return null;
     }
 
     public static String getPathfinderGoalName(Object wrappedPathfinderGoal) {
         Object pathfinderGoal = getPathfinderGoalFromWrapped(wrappedPathfinderGoal);
         if(pathfinderGoal == null) {
-            return null;
+            return "null";
         }
 
         String canonicalName = Objects.toString(pathfinderGoal.getClass().getCanonicalName());
