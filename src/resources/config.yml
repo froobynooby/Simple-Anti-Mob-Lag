@@ -358,7 +358,6 @@ ignore-target-player-tps-threshold: 0
 #   * See https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html for a list of types.
 #   * This is CaSE SenSiTIVe!
 never-freeze:
-  - PILLAGER
   - VINDICATOR
   - VEX
   - WITCH
