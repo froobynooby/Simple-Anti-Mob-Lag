@@ -62,6 +62,6 @@ passive-freeze-start-ops: '&cStarting passive freeze...'
 #  * %total_number_frozen% - total number of mobs that are frozen across all worlds.
 #  * %total_number_nerfed% - total number of mobs that are nerfed across all worlds.
 #  * %total_number_mobs% - total number of mobs across all worlds.
-passive-freeze-complete-ops: '%c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
+passive-freeze-complete-ops: '&c%number_affected% mobs affected (%number_frozen% frozen, %number_nerfed% nerfed) in %time%ms. Total of %total_number_affected%/%total_number_mobs% affected (%total_number_frozen% frozen, %total_number_nerfed% nerfed).'
 
 # section-end
