@@ -7,9 +7,9 @@ import com.froobworld.saml.events.SamlConfigReloadEvent;
 import com.froobworld.saml.group.entity.EntityGroupStore;
 import com.froobworld.saml.listeners.EventListener;
 import com.froobworld.saml.listeners.SamlListener;
-import com.froobworld.saml.metrics.Metrics;
 import com.froobworld.saml.tasks.*;
 import com.froobworld.saml.utils.TpsSupplier;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,7 +55,7 @@ public class Saml extends JavaPlugin {
         registerListeners();
         addTasks();
 
-        new Metrics(this);
+        new Metrics(this, 4765);
 
         logger().info("Successfully enabled.");
     }

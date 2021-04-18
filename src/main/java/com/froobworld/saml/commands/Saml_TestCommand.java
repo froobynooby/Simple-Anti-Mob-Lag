@@ -1,7 +1,6 @@
 package com.froobworld.saml.commands;
 
 import com.froobworld.saml.Saml;
-import joptsimple.internal.Strings;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,7 +22,7 @@ public class Saml_TestCommand implements CommandExecutor {
             sender.sendMessage("/" + cl + " test <group definition>");
             return false;
         }
-        String groupDefinition = Strings.join(Arrays.copyOfRange(args, 1, args.length), " ");
+        String groupDefinition = String.join(" ",Arrays.copyOfRange(args, 1, args.length));
         try {
             if(saml.getGroupStore().getGroup(groupDefinition, true) == null) {
                 sender.sendMessage(ChatColor.RED + "That group does not seem to exist.");
